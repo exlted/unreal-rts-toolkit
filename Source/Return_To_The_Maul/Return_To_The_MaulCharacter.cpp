@@ -43,3 +43,15 @@ void AReturn_To_The_MaulCharacter::UpdateSpringArmPitch(const float NewPitch)
 		SpringArm->SetRelativeRotation(Rotation);
 	}
 }
+
+void AReturn_To_The_MaulCharacter::UpdateSpringArmRotation(const float NewRotation)
+{
+	if (const auto SpringArm = GetComponentByClass<USpringArmComponent>(); SpringArm != nullptr)
+	{
+		auto Rotation = SpringArm->GetRelativeRotation();
+	
+		Rotation.Yaw = NewRotation;
+		
+		SpringArm->SetRelativeRotation(Rotation);
+	}
+}

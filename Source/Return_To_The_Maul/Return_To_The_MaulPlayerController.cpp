@@ -16,7 +16,10 @@ AReturn_To_The_MaulPlayerController::AReturn_To_The_MaulPlayerController():
   PanZonePercent(10),
   PanCurve(nullptr),
   DefaultMappingContext(nullptr),
-  ScrollAction(nullptr)
+  ScrollAction(nullptr),
+  MyCharacter(nullptr),
+  ZoomPercent(1),
+  Rotation(0)
 {
 	bShowMouseCursor = true;
 	DefaultMouseCursor = EMouseCursor::Default;
@@ -52,6 +55,7 @@ void AReturn_To_The_MaulPlayerController::SetupInputComponent()
 		EnhancedInputComponent->BindAction(ScrollAction, ETriggerEvent::Started, this, &AReturn_To_The_MaulPlayerController::OnInputStarted);
 		EnhancedInputComponent->BindAction(ScrollAction, ETriggerEvent::Triggered, this, &AReturn_To_The_MaulPlayerController::OnPanTriggered);
 		EnhancedInputComponent->BindAction(ZoomAction, ETriggerEvent::Triggered, this, &AReturn_To_The_MaulPlayerController::OnZoomTriggered);
+		EnhancedInputComponent->BindAction(RotateAction, ETriggerEvent::Triggered, this, &AReturn_To_The_MaulPlayerController::OnRotateTriggered);
 	}
 	else
 	{
@@ -72,7 +76,7 @@ void AReturn_To_The_MaulPlayerController::OnPanTriggered(const FInputActionInsta
 
 void AReturn_To_The_MaulPlayerController::OnZoomTriggered(const FInputActionInstance& Instance)
 {
-	ZoomPercent += .025 * Instance.GetValue().Get<float>();
+	ZoomPercent += .01 * Instance.GetValue().Get<float>();
 	if (ZoomPercent > 1)
 	{
 		ZoomPercent = 1;
@@ -82,13 +86,31 @@ void AReturn_To_The_MaulPlayerController::OnZoomTriggered(const FInputActionInst
 		ZoomPercent = 0;
 	}
 	
-	// Update Camera's Zoom based on "Zoom Value"
-	if (APawn* ControlledPawn = GetPawn(); ControlledPawn != nullptr && ControlledPawn->IsA<AReturn_To_The_MaulCharacter>())
+	if (!MyCharacter)
 	{
-		const auto MyCharacter = dynamic_cast<AReturn_To_The_MaulCharacter*>(ControlledPawn);
-		MyCharacter->UpdateSpringArmTargetDistance(ZoomCurve->GetFloatValue(ZoomPercent));
-		MyCharacter->UpdateSpringArmPitch(PitchCurve->GetFloatValue(ZoomPercent));
+		LazyLoadReferences();
 	}
+	MyCharacter->UpdateSpringArmTargetDistance(ZoomCurve->GetFloatValue(ZoomPercent));
+	MyCharacter->UpdateSpringArmPitch(PitchCurve->GetFloatValue(ZoomPercent));
+}
+
+void AReturn_To_The_MaulPlayerController::OnRotateTriggered(const FInputActionInstance& Instance)
+{
+	Rotation += Instance.GetValue().Get<float>();
+	if (ZoomPercent > 365)
+	{
+		ZoomPercent -= 365;
+	}
+	else if (ZoomPercent < 0)
+	{
+		ZoomPercent += 365;
+	}
+
+	if (!MyCharacter)
+	{
+		LazyLoadReferences();
+	}
+	MyCharacter->UpdateSpringArmRotation(Rotation);
 }
 
 void AReturn_To_The_MaulPlayerController::MouseControlPlayerTick(float DeltaTime) const
@@ -131,7 +153,7 @@ void AReturn_To_The_MaulPlayerController::PanScreen(const FVector& PanRate) cons
 {
 	if (APawn* ControlledPawn = GetPawn(); ControlledPawn != nullptr)
 	{
-		const auto YawOnlyRotator = FRotator(0, GetControlRotation().Yaw, 0);
+		const auto YawOnlyRotator = FRotator(0, Rotation, 0);
 		
 		ControlledPawn->AddMovementInput(YawOnlyRotator.Quaternion().GetForwardVector(), PanRate.Y * SpeedMult, false);
 		ControlledPawn->AddMovementInput(YawOnlyRotator.Quaternion().GetRightVector(), PanRate.X * SpeedMult, false);
@@ -141,4 +163,12 @@ void AReturn_To_The_MaulPlayerController::PanScreen(const FVector& PanRate) cons
 float AReturn_To_The_MaulPlayerController::RatioBetween(const float Start, const float End, const float Position)
 {
 	return fabs(End - Position) / fabs(End - Start);
+}
+
+void AReturn_To_The_MaulPlayerController::LazyLoadReferences()
+{
+	if (APawn* ControlledPawn = GetPawn(); ControlledPawn != nullptr && ControlledPawn->IsA<AReturn_To_The_MaulCharacter>())
+	{
+		MyCharacter = dynamic_cast<AReturn_To_The_MaulCharacter*>(ControlledPawn);
+	}
 }

@@ -5,7 +5,6 @@
 #include "CoreMinimal.h"
 #include "Templates/SubclassOf.h"
 #include "GameFramework/PlayerController.h"
-#include "InputAction.h"
 #include "Curves/CurveFloat.h"
 #include "Return_To_The_MaulPlayerController.generated.h"
 
@@ -13,6 +12,8 @@
 class UNiagaraSystem;
 class UInputMappingContext;
 class UInputAction;
+struct FInputActionInstance;
+class AReturn_To_The_MaulCharacter;
 
 DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
 
@@ -51,6 +52,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
 	UInputAction* ZoomAction;
 	
+	/** Standard Camera Rotate Action */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
+	UInputAction* RotateAction;
+	
 protected:
 	virtual void SetupInputComponent() override;
 	
@@ -62,16 +67,20 @@ protected:
 	void OnInputStarted();
 	void OnPanTriggered(const FInputActionInstance& Instance);
 	void OnZoomTriggered(const FInputActionInstance& Instance);
+	void OnRotateTriggered(const FInputActionInstance& Instance);
 
 	void MouseControlPlayerTick(float DeltaTime) const;
 
 	// Utility Functions
 	void PanScreen(const FVector& PanRate) const;
 	static float RatioBetween(float Start, float End, float Position);
+	void LazyLoadReferences();
 	
 private:
-	float ZoomPercent; // From 0 to 1
+	AReturn_To_The_MaulCharacter* MyCharacter;
 	
+	float ZoomPercent; // From 0 to 1
+	float Rotation;
 };
 
 

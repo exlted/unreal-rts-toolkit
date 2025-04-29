@@ -19,5 +19,6 @@ public:
 
 	void UpdateSpringArmTargetDistance(float NewTarget);
 	void UpdateSpringArmPitch(float NewPitch);
+	void UpdateSpringArmRotation(float NewRotation);
 };
 
