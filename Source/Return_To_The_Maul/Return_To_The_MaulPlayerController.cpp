@@ -6,6 +6,7 @@
 #include "EnhancedInputComponent.h"
 #include "InputActionValue.h"
 #include "EnhancedInputSubsystems.h"
+#include "Return_To_The_MaulCharacter.h"
 #include "Engine/LocalPlayer.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
@@ -49,7 +50,8 @@ void AReturn_To_The_MaulPlayerController::SetupInputComponent()
 	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(InputComponent))
 	{
 		EnhancedInputComponent->BindAction(ScrollAction, ETriggerEvent::Started, this, &AReturn_To_The_MaulPlayerController::OnInputStarted);
-		EnhancedInputComponent->BindAction(ScrollAction, ETriggerEvent::Triggered, this, &AReturn_To_The_MaulPlayerController::OnScrollTriggered);
+		EnhancedInputComponent->BindAction(ScrollAction, ETriggerEvent::Triggered, this, &AReturn_To_The_MaulPlayerController::OnPanTriggered);
+		EnhancedInputComponent->BindAction(ZoomAction, ETriggerEvent::Triggered, this, &AReturn_To_The_MaulPlayerController::OnZoomTriggered);
 	}
 	else
 	{
@@ -63,9 +65,29 @@ void AReturn_To_The_MaulPlayerController::OnInputStarted()
 }
 
 // ReSharper disable once CppMemberFunctionMayBeConst
-void AReturn_To_The_MaulPlayerController::OnScrollTriggered(const FInputActionInstance& Instance)
+void AReturn_To_The_MaulPlayerController::OnPanTriggered(const FInputActionInstance& Instance)
 {
 	PanScreen(Instance.GetValue().Get<FVector>());
+}
+
+void AReturn_To_The_MaulPlayerController::OnZoomTriggered(const FInputActionInstance& Instance)
+{
+	ZoomPercent += .025 * Instance.GetValue().Get<float>();
+	if (ZoomPercent > 1)
+	{
+		ZoomPercent = 1;
+	}
+	else if (ZoomPercent < 0)
+	{
+		ZoomPercent = 0;
+	}
+	
+	// Update Camera's Zoom based on "Zoom Value"
+	if (APawn* ControlledPawn = GetPawn(); ControlledPawn != nullptr && ControlledPawn->IsA<AReturn_To_The_MaulCharacter>())
+	{
+		const auto MyCharacter = dynamic_cast<AReturn_To_The_MaulCharacter*>(ControlledPawn);
+		MyCharacter->UpdateSpringArmTargetDistance(ZoomCurve->GetFloatValue(ZoomPercent));
+	}
 }
 
 void AReturn_To_The_MaulPlayerController::MouseControlPlayerTick(float DeltaTime) const

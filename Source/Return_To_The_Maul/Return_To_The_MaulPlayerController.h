@@ -37,9 +37,16 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
 	UInputMappingContext* DefaultMappingContext;
 
-	/** Standard Camera Movement Action */
+	/** Standard Camera Pan Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
 	UInputAction* ScrollAction;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input)
+	UCurveFloat* ZoomCurve;
+	
+	/** Standard Camera Zoom Action */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
+	UInputAction* ZoomAction;
 	
 protected:
 	virtual void SetupInputComponent() override;
@@ -50,7 +57,8 @@ protected:
 
 	/** Input handlers for SetDestination action. */
 	void OnInputStarted();
-	void OnScrollTriggered(const FInputActionInstance& Instance);
+	void OnPanTriggered(const FInputActionInstance& Instance);
+	void OnZoomTriggered(const FInputActionInstance& Instance);
 
 	void MouseControlPlayerTick(float DeltaTime) const;
 
@@ -59,6 +67,8 @@ protected:
 	static float RatioBetween(float Start, float End, float Position);
 	
 private:
+	float ZoomPercent; // From 0 to 1
+	
 };
 
 

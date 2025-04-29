@@ -2,10 +2,6 @@
 
 #include "Return_To_The_MaulCharacter.h"
 #include "UObject/ConstructorHelpers.h"
-#include "Camera/CameraComponent.h"
-#include "Components/DecalComponent.h"
-#include "Components/CapsuleComponent.h"
-#include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/PlayerController.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Materials/Material.h"
@@ -26,4 +22,12 @@ AReturn_To_The_MaulCharacter::AReturn_To_The_MaulCharacter()
 void AReturn_To_The_MaulCharacter::Tick(float DeltaSeconds)
 {
     Super::Tick(DeltaSeconds);
+}
+
+void AReturn_To_The_MaulCharacter::UpdateSpringArmTargetDistance(float NewTarget)
+{
+	if (auto SpringArm = GetComponentByClass<USpringArmComponent>(); SpringArm != nullptr)
+	{
+		SpringArm->TargetArmLength = NewTarget;
+	}
 }
