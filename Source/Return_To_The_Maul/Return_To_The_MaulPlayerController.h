@@ -44,6 +44,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input)
 	UCurveFloat* ZoomCurve;
 	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input)
+	UCurveFloat* PitchCurve;
+	
 	/** Standard Camera Zoom Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
 	UInputAction* ZoomAction;

@@ -87,6 +87,7 @@ void AReturn_To_The_MaulPlayerController::OnZoomTriggered(const FInputActionInst
 	{
 		const auto MyCharacter = dynamic_cast<AReturn_To_The_MaulCharacter*>(ControlledPawn);
 		MyCharacter->UpdateSpringArmTargetDistance(ZoomCurve->GetFloatValue(ZoomPercent));
+		MyCharacter->UpdateSpringArmPitch(PitchCurve->GetFloatValue(ZoomPercent));
 	}
 }
 

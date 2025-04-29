@@ -24,10 +24,22 @@ void AReturn_To_The_MaulCharacter::Tick(float DeltaSeconds)
     Super::Tick(DeltaSeconds);
 }
 
-void AReturn_To_The_MaulCharacter::UpdateSpringArmTargetDistance(float NewTarget)
+void AReturn_To_The_MaulCharacter::UpdateSpringArmTargetDistance(const float NewTarget)
 {
-	if (auto SpringArm = GetComponentByClass<USpringArmComponent>(); SpringArm != nullptr)
+	if (const auto SpringArm = GetComponentByClass<USpringArmComponent>(); SpringArm != nullptr)
 	{
 		SpringArm->TargetArmLength = NewTarget;
+	}
+}
+
+void AReturn_To_The_MaulCharacter::UpdateSpringArmPitch(const float NewPitch)
+{
+	if (const auto SpringArm = GetComponentByClass<USpringArmComponent>(); SpringArm != nullptr)
+	{
+		auto Rotation = SpringArm->GetRelativeRotation();
+	
+		Rotation.Pitch = NewPitch;
+		
+		SpringArm->SetRelativeRotation(Rotation);
 	}
 }

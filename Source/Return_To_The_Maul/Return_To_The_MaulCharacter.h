@@ -18,5 +18,6 @@ public:
 	virtual void Tick(float DeltaSeconds) override;
 
 	void UpdateSpringArmTargetDistance(float NewTarget);
+	void UpdateSpringArmPitch(float NewPitch);
 };
 
