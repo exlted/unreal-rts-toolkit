@@ -6,6 +6,7 @@
 #include "Templates/SubclassOf.h"
 #include "GameFramework/PlayerController.h"
 #include "InputAction.h"
+#include "Curves/CurveFloat.h"
 #include "Return_To_The_MaulPlayerController.generated.h"
 
 /** Forward declaration to improve compiling times */
@@ -23,55 +24,41 @@ class AReturn_To_The_MaulPlayerController : public APlayerController
 public:
 	AReturn_To_The_MaulPlayerController();
 
-	/** Time Threshold to know if it was a short press */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input)
-	float ShortPressThreshold;
-
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input)
 	float SpeedMult;
 	
-	/** FX Class that we will spawn when clicking */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input)
-	UNiagaraSystem* FXCursor;
+	float PanZonePercent;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input)
+	UCurveFloat* PanCurve;
+	
 	/** MappingContext */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
 	UInputMappingContext* DefaultMappingContext;
-	
-	/** Jump Input Action */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
-	UInputAction* SetDestinationClickAction;
-
-	/** Jump Input Action */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
-	UInputAction* SetDestinationTouchAction;
 
 	/** Standard Camera Movement Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
 	UInputAction* ScrollAction;
 	
 protected:
-	/** True if the controlled character should navigate to the mouse cursor. */
-	uint32 bMoveToMouseCursor : 1;
-
 	virtual void SetupInputComponent() override;
 	
 	// To add mapping context
-	virtual void BeginPlay();
+	virtual void BeginPlay() override;
+	virtual void PlayerTick(float DeltaTime) override;
 
 	/** Input handlers for SetDestination action. */
 	void OnInputStarted();
-	void OnSetDestinationTriggered();
-	void OnSetDestinationReleased();
-	void OnTouchTriggered();
-	void OnTouchReleased();
 	void OnScrollTriggered(const FInputActionInstance& Instance);
+
+	void MouseControlPlayerTick(float DeltaTime) const;
+
+	// Utility Functions
+	void PanScreen(const FVector& PanRate) const;
+	static float RatioBetween(float Start, float End, float Position);
 	
 private:
-	FVector CachedDestination;
-
-	bool bIsTouch; // Is it a touch device
-	float FollowTime; // For how long it has been pressed
 };
 
 
