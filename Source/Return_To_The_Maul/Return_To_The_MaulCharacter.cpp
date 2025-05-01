@@ -2,15 +2,13 @@
 
 #include "Return_To_The_MaulCharacter.h"
 
-#include "CollisionDebugDrawingPublic.h"
-#include "Camera/CameraComponent.h"
-#include "UObject/ConstructorHelpers.h"
 #include "GameFramework/PlayerController.h"
 #include "GameFramework/SpringArmComponent.h"
-#include "Materials/Material.h"
 #include "Engine/World.h"
 
 AReturn_To_The_MaulCharacter::AReturn_To_The_MaulCharacter()
+  : SpringArm(nullptr)
+  , WorldCursor(nullptr)
 {
 	// Don't rotate character to camera direction
 	bUseControllerRotationPitch = false;
@@ -69,15 +67,45 @@ void AReturn_To_The_MaulCharacter::UpdateSpringArmRotation(const float NewRotati
 void AReturn_To_The_MaulCharacter::MoveCursorToWorldPosition(const FVector& MousePosition, const FVector& MouseDirection)
 {
 	const auto RootPosition = this->GetActorLocation();
-	const FVector EndLocation = FMath::LinePlaneIntersection(
+
+
+	// Maybe use a raytrace to determine final middle location? Slow?
+	FCollisionQueryParams RV_TraceParams = FCollisionQueryParams(FName(TEXT("RV_Trace")), true, this);
+	RV_TraceParams.bTraceComplex = true;
+	RV_TraceParams.bReturnPhysicalMaterial = false;
+
+	//Re-initialize hit info
+	FHitResult RV_Hit(ForceInit);
+	
+	//call GetWorld() from within an actor extending class
+	GetWorld()->LineTraceSingleByChannel(
+		RV_Hit,
 		MousePosition,
-		MousePosition + (MouseDirection * 10000.0f),
-		RootPosition,
-		FVector{0.f, 0.f, 1.f});
+		MousePosition + (MouseDirection * 10000.0f), 
+		ECC_WorldStatic,
+		RV_TraceParams
+	);
+
+	if (RV_Hit.bBlockingHit)
+	{
+		const FVector EndLocation = RV_Hit.ImpactPoint;
+		const FVector FilteredPosition = FVector(EndLocation.X - RootPosition.X, EndLocation.Y - RootPosition.Y, GetHeightBeneathCursor(EndLocation) - RootPosition.Z);
 			
-	const FVector FilteredPosition = FVector(EndLocation.X - RootPosition.X, EndLocation.Y - RootPosition.Y, GetHeightBeneathCursor(EndLocation) - RootPosition.Z);
+		WorldCursor->SetRelativeLocation(FilteredPosition);
+	}
+	else
+	{
+		// If there isn't an intersection on the Trace, Place it on the RootPosition
+		const FVector EndLocation = FMath::LinePlaneIntersection(
+					   MousePosition,
+					   MousePosition + (MouseDirection * 10000.0f),
+					   RootPosition,
+					   FVector{0.f, 0.f, 1.f});
+		
+		const FVector FilteredPosition = FVector(EndLocation.X - RootPosition.X, EndLocation.Y - RootPosition.Y, GetHeightBeneathCursor(EndLocation) - RootPosition.Z);
 			
-	WorldCursor->SetRelativeLocation(FilteredPosition);
+		WorldCursor->SetRelativeLocation(FilteredPosition);
+	}
 }
 
 void AReturn_To_The_MaulCharacter::ResetCursorPosition()
