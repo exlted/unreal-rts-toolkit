@@ -23,6 +23,12 @@ class AReturn_To_The_MaulPlayerController : public APlayerController
 	GENERATED_BODY()
 
 public:
+	enum class EControlStyle
+	{
+		MouseKeyboard,
+		Gamepad
+	};
+	
 	AReturn_To_The_MaulPlayerController();
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input)
@@ -56,6 +62,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
 	UInputAction* RotateAction;
 	
+	/** Standard Camera Rotate Action */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
+	UInputAction* UserInputPosition;
+	
 protected:
 	virtual void SetupInputComponent() override;
 	
@@ -68,19 +78,19 @@ protected:
 	void OnPanTriggered(const FInputActionInstance& Instance);
 	void OnZoomTriggered(const FInputActionInstance& Instance);
 	void OnRotateTriggered(const FInputActionInstance& Instance);
-
-	void MouseControlPlayerTick(float DeltaTime) const;
-
+	void OnPositionTriggered(const FInputActionInstance& Instance);
+	
 	// Utility Functions
 	void PanScreen(const FVector& PanRate) const;
 	static float RatioBetween(float Start, float End, float Position);
-	void LazyLoadReferences();
+	void UpdateControlStyle(EControlStyle NewStyle);
 	
 private:
 	AReturn_To_The_MaulCharacter* MyCharacter;
-	
+
 	float ZoomPercent; // From 0 to 1
 	float Rotation;
+	EControlStyle CurrentStyle;
 };
 
 

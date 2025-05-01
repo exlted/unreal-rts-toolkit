@@ -1,6 +1,7 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "Return_To_The_MaulPlayerController.h"
+
 #include "GameFramework/Pawn.h"
 #include "Engine/World.h"
 #include "EnhancedInputComponent.h"
@@ -8,20 +9,28 @@
 #include "EnhancedInputSubsystems.h"
 #include "Return_To_The_MaulCharacter.h"
 #include "Engine/LocalPlayer.h"
+#include "GameFramework/InputDeviceSubsystem.h"
+#include "GameFramework/InputSettings.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
 AReturn_To_The_MaulPlayerController::AReturn_To_The_MaulPlayerController():
-  SpeedMult(1),
-  PanZonePercent(10),
-  PanCurve(nullptr),
-  DefaultMappingContext(nullptr),
-  ScrollAction(nullptr),
-  MyCharacter(nullptr),
-  ZoomPercent(1),
-  Rotation(0)
+	SpeedMult(1),
+	PanZonePercent(10),
+	PanCurve(nullptr),
+	DefaultMappingContext(nullptr),
+	ScrollAction(nullptr),
+	ZoomCurve(nullptr),
+	PitchCurve(nullptr),
+	ZoomAction(nullptr),
+	RotateAction(nullptr),
+	UserInputPosition(nullptr),
+	MyCharacter(nullptr),
+	ZoomPercent(1),
+	Rotation(0),
+	CurrentStyle()
 {
-	bShowMouseCursor = true;
+	bShowMouseCursor = false;
 	DefaultMouseCursor = EMouseCursor::Default;
 }
 
@@ -29,13 +38,89 @@ void AReturn_To_The_MaulPlayerController::BeginPlay()
 {
 	// Call the base class  
 	Super::BeginPlay();
+	
+	if (APawn* ControlledPawn = GetPawn(); ControlledPawn != nullptr && ControlledPawn->IsA<AReturn_To_The_MaulCharacter>())
+	{
+		MyCharacter = dynamic_cast<AReturn_To_The_MaulCharacter*>(ControlledPawn);
+	}
 }
 
 void AReturn_To_The_MaulPlayerController::PlayerTick(const float DeltaTime)
 {
 	Super::PlayerTick(DeltaTime);
+
+	if (const UInputDeviceSubsystem* InputDeviceSubsystem = GEngine->GetEngineSubsystem<UInputDeviceSubsystem>())
+	{
+		const FPlatformUserId UserId = GetPlatformUserId();
+		if (const FHardwareDeviceIdentifier DeviceIdentifier = InputDeviceSubsystem->GetMostRecentlyUsedHardwareDevice(UserId);
+			DeviceIdentifier.PrimaryDeviceType == EHardwareDevicePrimaryType::Gamepad)
+		{
+			UpdateControlStyle(EControlStyle::Gamepad);
+		}
+		else if (DeviceIdentifier.PrimaryDeviceType == EHardwareDevicePrimaryType::KeyboardAndMouse)
+		{
+			UpdateControlStyle(EControlStyle::MouseKeyboard);
+		}
+	}
 	
-	MouseControlPlayerTick(DeltaTime);
+	// Mouse Panning Code
+	if (CurrentStyle == EControlStyle::MouseKeyboard)
+	{
+		if(const ULocalPlayer* LocPlayer = Cast<ULocalPlayer>(Player); LocPlayer && LocPlayer->ViewportClient )
+		{
+			if (LocPlayer->ViewportClient->Viewport->HasMouseCapture())
+			{
+				if (FVector MousePosition; GetMousePosition(MousePosition.X, MousePosition.Y))
+				{
+					if (MyCharacter->GetCursorSpace() == AReturn_To_The_MaulCharacter::ECursorSpace::WorldSpace)
+					{
+						if (FVector WorldPosition, WorldDirection; DeprojectScreenPositionToWorld(MousePosition.X, MousePosition.Y, WorldPosition, WorldDirection))
+						{
+							MyCharacter->MoveCursorToWorldPosition(WorldPosition, WorldDirection);
+						}
+					}
+					
+					int32 ScreenWidth = 0, ScreenHeight = 0;
+					GetViewportSize(ScreenWidth, ScreenHeight);
+					const float XPanZone = ScreenWidth * PanZonePercent / 100;
+					const float YPanZone = ScreenHeight * PanZonePercent / 100;
+					FVector PanRate = FVector::ZeroVector;
+	
+					if (MousePosition.X < XPanZone)
+					{
+						PanRate.X = -1 * PanCurve->GetFloatValue(RatioBetween(XPanZone, 0, MousePosition.X));
+					}
+					else if (MousePosition.X > ScreenWidth - XPanZone)
+					{
+						PanRate.X = 1 * PanCurve->GetFloatValue(RatioBetween(ScreenWidth - XPanZone, ScreenWidth, MousePosition.X));
+					}
+					if (MousePosition.Y < YPanZone)
+					{
+						PanRate.Y = 1 * PanCurve->GetFloatValue(RatioBetween(YPanZone, 0, MousePosition.Y));
+					}
+					else if (MousePosition.Y > ScreenHeight - YPanZone)
+					{
+						PanRate.Y = -1 * PanCurve->GetFloatValue(RatioBetween(ScreenHeight - YPanZone, ScreenHeight, MousePosition.Y));
+					}
+	
+					if (PanRate != FVector::ZeroVector)
+					{
+						PanScreen(PanRate);
+					}
+				}
+			}
+		}
+	}
+	else
+	{
+		if (MyCharacter->GetCursorSpace() == AReturn_To_The_MaulCharacter::ECursorSpace::WorldSpace)
+		{
+			if (FVector WorldPosition, WorldDirection; DeprojectMousePositionToWorld( WorldPosition, WorldDirection))
+			{
+				MyCharacter->MoveCursorToWorldPosition(WorldPosition, WorldDirection);
+			}
+		}
+	}
 }
 
 void AReturn_To_The_MaulPlayerController::SetupInputComponent()
@@ -56,6 +141,7 @@ void AReturn_To_The_MaulPlayerController::SetupInputComponent()
 		EnhancedInputComponent->BindAction(ScrollAction, ETriggerEvent::Triggered, this, &AReturn_To_The_MaulPlayerController::OnPanTriggered);
 		EnhancedInputComponent->BindAction(ZoomAction, ETriggerEvent::Triggered, this, &AReturn_To_The_MaulPlayerController::OnZoomTriggered);
 		EnhancedInputComponent->BindAction(RotateAction, ETriggerEvent::Triggered, this, &AReturn_To_The_MaulPlayerController::OnRotateTriggered);
+		EnhancedInputComponent->BindAction(UserInputPosition, ETriggerEvent::Triggered, this, &AReturn_To_The_MaulPlayerController::OnPositionTriggered);
 	}
 	else
 	{
@@ -86,10 +172,6 @@ void AReturn_To_The_MaulPlayerController::OnZoomTriggered(const FInputActionInst
 		ZoomPercent = 0;
 	}
 	
-	if (!MyCharacter)
-	{
-		LazyLoadReferences();
-	}
 	MyCharacter->UpdateSpringArmTargetDistance(ZoomCurve->GetFloatValue(ZoomPercent));
 	MyCharacter->UpdateSpringArmPitch(PitchCurve->GetFloatValue(ZoomPercent));
 }
@@ -106,47 +188,13 @@ void AReturn_To_The_MaulPlayerController::OnRotateTriggered(const FInputActionIn
 		ZoomPercent += 365;
 	}
 
-	if (!MyCharacter)
-	{
-		LazyLoadReferences();
-	}
 	MyCharacter->UpdateSpringArmRotation(Rotation);
 }
 
-void AReturn_To_The_MaulPlayerController::MouseControlPlayerTick(float DeltaTime) const
+// ReSharper disable once CppMemberFunctionMayBeConst
+void AReturn_To_The_MaulPlayerController::OnPositionTriggered(const FInputActionInstance& Instance)
 {
-	if (double x, y; GetMousePosition(x, y))
-	{
-		int32 ScreenWidth = 0, ScreenHeight = 0;
-		GetViewportSize(ScreenWidth, ScreenHeight);
-
-		const float XPanZone = ScreenWidth * PanZonePercent / 100;
-		const float YPanZone = ScreenHeight * PanZonePercent / 100;
-
-		FVector PanRate = FVector::ZeroVector;
-		
-		if (x < XPanZone)
-		{
-			PanRate.X = -1 * PanCurve->GetFloatValue(RatioBetween(XPanZone, 0, x));
-		}
-		else if (x > ScreenWidth - XPanZone)
-		{
-			PanRate.X = 1 * PanCurve->GetFloatValue(RatioBetween(ScreenWidth - XPanZone, ScreenWidth, x));
-		}
-		if (y < YPanZone)
-		{
-			PanRate.Y = 1 * PanCurve->GetFloatValue(RatioBetween(YPanZone, 0, y));
-		}
-		else if (y > ScreenHeight - YPanZone)
-		{
-			PanRate.Y = -1 * PanCurve->GetFloatValue(RatioBetween(ScreenHeight - YPanZone, ScreenHeight, y));
-		}
-		
-		if (PanRate != FVector::ZeroVector)
-		{
-			PanScreen(PanRate);
-		}
-	}
+	// Implement switch to Mouse mode here?
 }
 
 void AReturn_To_The_MaulPlayerController::PanScreen(const FVector& PanRate) const
@@ -165,10 +213,21 @@ float AReturn_To_The_MaulPlayerController::RatioBetween(const float Start, const
 	return fabs(End - Position) / fabs(End - Start);
 }
 
-void AReturn_To_The_MaulPlayerController::LazyLoadReferences()
+void AReturn_To_The_MaulPlayerController::UpdateControlStyle(const EControlStyle NewStyle)
 {
-	if (APawn* ControlledPawn = GetPawn(); ControlledPawn != nullptr && ControlledPawn->IsA<AReturn_To_The_MaulCharacter>())
+	if (NewStyle != CurrentStyle)
 	{
-		MyCharacter = dynamic_cast<AReturn_To_The_MaulCharacter*>(ControlledPawn);
+		CurrentStyle = NewStyle;
+		switch (CurrentStyle)
+		{
+		case EControlStyle::MouseKeyboard:
+			break;
+		case EControlStyle::Gamepad:
+			MyCharacter->ResetCursorPosition();
+			int Width, Height;
+			GetViewportSize(Width, Height);
+			SetMouseLocation(Width / 2, Height / 2);
+			break;
+		}
 	}
 }
