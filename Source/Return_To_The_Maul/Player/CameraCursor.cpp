@@ -1,12 +1,12 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
-#include "Return_To_The_MaulCharacter.h"
+#include "CameraCursor.h"
 
 #include "GameFramework/PlayerController.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Engine/World.h"
 
-AReturn_To_The_MaulCharacter::AReturn_To_The_MaulCharacter()
+ACameraCursor::ACameraCursor()
   : SpringArm(nullptr)
   , WorldCursor(nullptr)
 {
@@ -20,12 +20,12 @@ AReturn_To_The_MaulCharacter::AReturn_To_The_MaulCharacter()
 	PrimaryActorTick.bStartWithTickEnabled = true;
 }
 
-void AReturn_To_The_MaulCharacter::Tick(float DeltaSeconds)
+void ACameraCursor::Tick(float DeltaSeconds)
 {
     Super::Tick(DeltaSeconds);
 }
 
-void AReturn_To_The_MaulCharacter::PostInitializeComponents()
+void ACameraCursor::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
 
@@ -43,12 +43,12 @@ void AReturn_To_The_MaulCharacter::PostInitializeComponents()
 	}
 }
 
-void AReturn_To_The_MaulCharacter::UpdateSpringArmTargetDistance(const float NewTarget)
+void ACameraCursor::UpdateSpringArmTargetDistance(const float NewTarget)
 {
 	SpringArm->TargetArmLength = NewTarget;
 }
 
-void AReturn_To_The_MaulCharacter::UpdateSpringArmPitch(const float NewPitch)
+void ACameraCursor::UpdateSpringArmPitch(const float NewPitch)
 {
 	auto Rotation = SpringArm->GetRelativeRotation();
 	Rotation.Pitch = NewPitch;
@@ -56,7 +56,7 @@ void AReturn_To_The_MaulCharacter::UpdateSpringArmPitch(const float NewPitch)
 	SpringArm->SetRelativeRotation(Rotation);
 }
 
-void AReturn_To_The_MaulCharacter::UpdateSpringArmRotation(const float NewRotation)
+void ACameraCursor::UpdateSpringArmRotation(const float NewRotation)
 {
 	auto Rotation = SpringArm->GetRelativeRotation();
 	Rotation.Yaw = NewRotation;
@@ -64,7 +64,7 @@ void AReturn_To_The_MaulCharacter::UpdateSpringArmRotation(const float NewRotati
 	SpringArm->SetRelativeRotation(Rotation);
 }
 
-void AReturn_To_The_MaulCharacter::MoveCursorToWorldPosition(const FVector& MousePosition, const FVector& MouseDirection)
+void ACameraCursor::MoveCursorToWorldPosition(const FVector& MousePosition, const FVector& MouseDirection)
 {
 	const auto RootPosition = this->GetActorLocation();
 
@@ -108,12 +108,12 @@ void AReturn_To_The_MaulCharacter::MoveCursorToWorldPosition(const FVector& Mous
 	}
 }
 
-void AReturn_To_The_MaulCharacter::ResetCursorPosition()
+void ACameraCursor::ResetCursorPosition()
 {
 	WorldCursor->SetRelativeLocation(FVector(0, 0, WorldCursor->GetRelativeLocation().Z));
 }
 
-float AReturn_To_The_MaulCharacter::GetHeightBeneathCursor(const FVector& CursorWorldPosition)
+float ACameraCursor::GetHeightBeneathCursor(const FVector& CursorWorldPosition)
 {
 	FVector MinBounds;
 	FVector MaxBounds;
@@ -139,7 +139,7 @@ float AReturn_To_The_MaulCharacter::GetHeightBeneathCursor(const FVector& Cursor
 	return Height + HeightAboveSurface;
 }
 
-float AReturn_To_The_MaulCharacter::GetClosestToScreenAtPosition(const FVector& TracePosition)
+float ACameraCursor::GetClosestToScreenAtPosition(const FVector& TracePosition)
 {
 	const auto PlayerController = GetLocalViewingPlayerController();
 
@@ -173,7 +173,7 @@ float AReturn_To_The_MaulCharacter::GetClosestToScreenAtPosition(const FVector& 
 	return -1;
 }
 
-AReturn_To_The_MaulCharacter::ECursorSpace AReturn_To_The_MaulCharacter::SwapCursor()
+ACameraCursor::ECursorSpace ACameraCursor::SwapCursor()
 {
 	switch (CursorSpace)
 	{
@@ -194,7 +194,7 @@ AReturn_To_The_MaulCharacter::ECursorSpace AReturn_To_The_MaulCharacter::SwapCur
 	return CursorSpace;
 }
 
-AReturn_To_The_MaulCharacter::ECursorSpace AReturn_To_The_MaulCharacter::GetCursorSpace()
+ACameraCursor::ECursorSpace ACameraCursor::GetCursorSpace()
 {
 	return CursorSpace;
 }

@@ -1,20 +1,20 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
-#include "Return_To_The_MaulPlayerController.h"
+#include "RTSPlayerController.h"
 
 #include "GameFramework/Pawn.h"
 #include "Engine/World.h"
 #include "EnhancedInputComponent.h"
 #include "InputActionValue.h"
 #include "EnhancedInputSubsystems.h"
-#include "Return_To_The_MaulCharacter.h"
+#include "CameraCursor.h"
 #include "Engine/LocalPlayer.h"
 #include "GameFramework/InputDeviceSubsystem.h"
 #include "GameFramework/InputSettings.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
-AReturn_To_The_MaulPlayerController::AReturn_To_The_MaulPlayerController():
+ARTSPlayerController::ARTSPlayerController():
 	SpeedMult(1),
 	PanZonePercent(10),
 	PanCurve(nullptr),
@@ -34,18 +34,18 @@ AReturn_To_The_MaulPlayerController::AReturn_To_The_MaulPlayerController():
 	DefaultMouseCursor = EMouseCursor::Default;
 }
 
-void AReturn_To_The_MaulPlayerController::BeginPlay()
+void ARTSPlayerController::BeginPlay()
 {
 	// Call the base class  
 	Super::BeginPlay();
 	
-	if (APawn* ControlledPawn = GetPawn(); ControlledPawn != nullptr && ControlledPawn->IsA<AReturn_To_The_MaulCharacter>())
+	if (APawn* ControlledPawn = GetPawn(); ControlledPawn != nullptr && ControlledPawn->IsA<ACameraCursor>())
 	{
-		MyCharacter = dynamic_cast<AReturn_To_The_MaulCharacter*>(ControlledPawn);
+		MyCharacter = dynamic_cast<ACameraCursor*>(ControlledPawn);
 	}
 }
 
-void AReturn_To_The_MaulPlayerController::PlayerTick(const float DeltaTime)
+void ARTSPlayerController::PlayerTick(const float DeltaTime)
 {
 	Super::PlayerTick(DeltaTime);
 
@@ -72,7 +72,7 @@ void AReturn_To_The_MaulPlayerController::PlayerTick(const float DeltaTime)
 			{
 				if (FVector MousePosition; GetMousePosition(MousePosition.X, MousePosition.Y))
 				{
-					if (MyCharacter->GetCursorSpace() == AReturn_To_The_MaulCharacter::ECursorSpace::WorldSpace)
+					if (MyCharacter->GetCursorSpace() == ACameraCursor::ECursorSpace::WorldSpace)
 					{
 						if (FVector WorldPosition, WorldDirection; DeprojectScreenPositionToWorld(MousePosition.X, MousePosition.Y, WorldPosition, WorldDirection))
 						{
@@ -113,7 +113,7 @@ void AReturn_To_The_MaulPlayerController::PlayerTick(const float DeltaTime)
 	}
 	else
 	{
-		if (MyCharacter->GetCursorSpace() == AReturn_To_The_MaulCharacter::ECursorSpace::WorldSpace)
+		if (MyCharacter->GetCursorSpace() == ACameraCursor::ECursorSpace::WorldSpace)
 		{
 			if (FVector WorldPosition, WorldDirection; DeprojectMousePositionToWorld( WorldPosition, WorldDirection))
 			{
@@ -123,7 +123,7 @@ void AReturn_To_The_MaulPlayerController::PlayerTick(const float DeltaTime)
 	}
 }
 
-void AReturn_To_The_MaulPlayerController::SetupInputComponent()
+void ARTSPlayerController::SetupInputComponent()
 {
 	// set up gameplay key bindings
 	Super::SetupInputComponent();
@@ -137,11 +137,11 @@ void AReturn_To_The_MaulPlayerController::SetupInputComponent()
 	// Set up action bindings
 	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(InputComponent))
 	{
-		EnhancedInputComponent->BindAction(ScrollAction, ETriggerEvent::Started, this, &AReturn_To_The_MaulPlayerController::OnInputStarted);
-		EnhancedInputComponent->BindAction(ScrollAction, ETriggerEvent::Triggered, this, &AReturn_To_The_MaulPlayerController::OnPanTriggered);
-		EnhancedInputComponent->BindAction(ZoomAction, ETriggerEvent::Triggered, this, &AReturn_To_The_MaulPlayerController::OnZoomTriggered);
-		EnhancedInputComponent->BindAction(RotateAction, ETriggerEvent::Triggered, this, &AReturn_To_The_MaulPlayerController::OnRotateTriggered);
-		EnhancedInputComponent->BindAction(UserInputPosition, ETriggerEvent::Triggered, this, &AReturn_To_The_MaulPlayerController::OnPositionTriggered);
+		EnhancedInputComponent->BindAction(ScrollAction, ETriggerEvent::Started, this, &ARTSPlayerController::OnInputStarted);
+		EnhancedInputComponent->BindAction(ScrollAction, ETriggerEvent::Triggered, this, &ARTSPlayerController::OnPanTriggered);
+		EnhancedInputComponent->BindAction(ZoomAction, ETriggerEvent::Triggered, this, &ARTSPlayerController::OnZoomTriggered);
+		EnhancedInputComponent->BindAction(RotateAction, ETriggerEvent::Triggered, this, &ARTSPlayerController::OnRotateTriggered);
+		EnhancedInputComponent->BindAction(UserInputPosition, ETriggerEvent::Triggered, this, &ARTSPlayerController::OnPositionTriggered);
 	}
 	else
 	{
@@ -149,18 +149,18 @@ void AReturn_To_The_MaulPlayerController::SetupInputComponent()
 	}
 }
 
-void AReturn_To_The_MaulPlayerController::OnInputStarted()
+void ARTSPlayerController::OnInputStarted()
 {
 	StopMovement();
 }
 
 // ReSharper disable once CppMemberFunctionMayBeConst
-void AReturn_To_The_MaulPlayerController::OnPanTriggered(const FInputActionInstance& Instance)
+void ARTSPlayerController::OnPanTriggered(const FInputActionInstance& Instance)
 {
 	PanScreen(Instance.GetValue().Get<FVector>());
 }
 
-void AReturn_To_The_MaulPlayerController::OnZoomTriggered(const FInputActionInstance& Instance)
+void ARTSPlayerController::OnZoomTriggered(const FInputActionInstance& Instance)
 {
 	ZoomPercent += .01 * Instance.GetValue().Get<float>();
 	if (ZoomPercent > 1)
@@ -176,7 +176,7 @@ void AReturn_To_The_MaulPlayerController::OnZoomTriggered(const FInputActionInst
 	MyCharacter->UpdateSpringArmPitch(PitchCurve->GetFloatValue(ZoomPercent));
 }
 
-void AReturn_To_The_MaulPlayerController::OnRotateTriggered(const FInputActionInstance& Instance)
+void ARTSPlayerController::OnRotateTriggered(const FInputActionInstance& Instance)
 {
 	Rotation += Instance.GetValue().Get<float>();
 	if (ZoomPercent > 365)
@@ -192,12 +192,12 @@ void AReturn_To_The_MaulPlayerController::OnRotateTriggered(const FInputActionIn
 }
 
 // ReSharper disable once CppMemberFunctionMayBeConst
-void AReturn_To_The_MaulPlayerController::OnPositionTriggered(const FInputActionInstance& Instance)
+void ARTSPlayerController::OnPositionTriggered(const FInputActionInstance& Instance)
 {
 	// Implement switch to Mouse mode here?
 }
 
-void AReturn_To_The_MaulPlayerController::PanScreen(const FVector& PanRate) const
+void ARTSPlayerController::PanScreen(const FVector& PanRate) const
 {
 	if (APawn* ControlledPawn = GetPawn(); ControlledPawn != nullptr)
 	{
@@ -208,12 +208,12 @@ void AReturn_To_The_MaulPlayerController::PanScreen(const FVector& PanRate) cons
 	}
 }
 
-float AReturn_To_The_MaulPlayerController::RatioBetween(const float Start, const float End, const float Position)
+float ARTSPlayerController::RatioBetween(const float Start, const float End, const float Position)
 {
 	return fabs(End - Position) / fabs(End - Start);
 }
 
-void AReturn_To_The_MaulPlayerController::UpdateControlStyle(const EControlStyle NewStyle)
+void ARTSPlayerController::UpdateControlStyle(const EControlStyle NewStyle)
 {
 	if (NewStyle != CurrentStyle)
 	{

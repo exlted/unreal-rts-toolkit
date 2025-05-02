@@ -6,19 +6,19 @@
 #include "Templates/SubclassOf.h"
 #include "GameFramework/PlayerController.h"
 #include "Curves/CurveFloat.h"
-#include "Return_To_The_MaulPlayerController.generated.h"
+#include "RTSPlayerController.generated.h"
 
 /** Forward declaration to improve compiling times */
 class UNiagaraSystem;
 class UInputMappingContext;
 class UInputAction;
 struct FInputActionInstance;
-class AReturn_To_The_MaulCharacter;
+class ACameraCursor;
 
 DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
 
 UCLASS()
-class AReturn_To_The_MaulPlayerController : public APlayerController
+class ARTSPlayerController : public APlayerController
 {
 	GENERATED_BODY()
 
@@ -29,7 +29,7 @@ public:
 		Gamepad
 	};
 	
-	AReturn_To_The_MaulPlayerController();
+	ARTSPlayerController();
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input)
 	float SpeedMult;
@@ -86,7 +86,7 @@ protected:
 	void UpdateControlStyle(EControlStyle NewStyle);
 	
 private:
-	AReturn_To_The_MaulCharacter* MyCharacter;
+	ACameraCursor* MyCharacter;
 
 	float ZoomPercent; // From 0 to 1
 	float Rotation;

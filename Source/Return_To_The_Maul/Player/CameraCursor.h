@@ -3,12 +3,12 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Return_To_The_MaulCharacter.generated.h"
+#include "CameraCursor.generated.h"
 
 class USpringArmComponent;
 
 UCLASS(Blueprintable)
-class AReturn_To_The_MaulCharacter : public APawn
+class ACameraCursor : public APawn
 {
 	GENERATED_BODY()
 
@@ -19,7 +19,7 @@ public:
 		ScreenSpace
 	};
 	
-	AReturn_To_The_MaulCharacter();
+	ACameraCursor();
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Cursor)
 	float HeightAboveSurface = 10.0;
