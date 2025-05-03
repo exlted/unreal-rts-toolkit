@@ -11,8 +11,7 @@
 #include "Engine/LocalPlayer.h"
 #include "GameFramework/InputDeviceSubsystem.h"
 #include "GameFramework/InputSettings.h"
-#include "../Interfaces/Selectable.h"
-#include "Return_To_The_Maul/Interfaces/Selectable.h"
+#include "../Utils/Math.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
@@ -232,11 +231,6 @@ void ARTSPlayerController::PanScreen(const FVector& PanRate) const
 		ControlledPawn->AddMovementInput(YawOnlyRotator.Quaternion().GetForwardVector(), PanRate.Y * SpeedMult, false);
 		ControlledPawn->AddMovementInput(YawOnlyRotator.Quaternion().GetRightVector(), PanRate.X * SpeedMult, false);
 	}
-}
-
-float ARTSPlayerController::RatioBetween(const float Start, const float End, const float Position)
-{
-	return fabs(End - Position) / fabs(End - Start);
 }
 
 void ARTSPlayerController::UpdateControlStyle(const EControlStyle NewStyle)

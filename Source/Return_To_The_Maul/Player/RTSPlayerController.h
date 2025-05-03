@@ -87,7 +87,6 @@ protected:
 	
 	// Utility Functions
 	void PanScreen(const FVector& PanRate) const;
-	static float RatioBetween(float Start, float End, float Position);
 	void UpdateControlStyle(EControlStyle NewStyle);
 	
 private:
