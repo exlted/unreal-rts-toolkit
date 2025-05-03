@@ -51,7 +51,7 @@ FString ARTSGameModeBase::InitNewPlayer(APlayerController* NewPlayerController, 
 	{
 		if (ABasePlayerState* PlayerState = NewPlayerController->GetPlayerState<ABasePlayerState>(); PlayerState != nullptr)
 		{
-			PlayerState->Faction.SpawnInitialEntities(*GetWorld(), FTransform(NewPlayerController->GetSpawnLocation()));
+			PlayerState->Faction.SpawnInitialEntities(this, FTransform(NewPlayerController->GetSpawnLocation()));
 		}
 	}
 	

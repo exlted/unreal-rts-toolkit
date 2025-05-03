@@ -22,5 +22,5 @@ class RETURN_TO_THE_MAUL_API IMovable
 
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
-	void MoveTo(const FVector& NewLocation);
+	virtual void MoveTo(const FVector& NewLocation) = 0;
 };

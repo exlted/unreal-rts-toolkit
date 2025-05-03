@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "GameFramework/DefaultPawn.h"
+#include "Return_To_The_Maul/ActorComponents/Navigation.h"
 #include "Return_To_The_Maul/Interfaces/Movable.h"
 #include "Return_To_The_Maul/Interfaces/Selectable.h"
 #include "Return_To_The_Maul/Interfaces/Targetable.h"
@@ -22,10 +24,15 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	//UNavigation* Navigation;
+	FVector GoalLocation;
+
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
 	// Called to bind functionality to input
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
+
+	virtual void MoveTo(const FVector& NewLocation) override;
 };

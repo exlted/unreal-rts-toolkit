@@ -3,19 +3,23 @@
 
 #include "BaseUnit.h"
 
+#include "Blueprint/AIBlueprintHelperLibrary.h"
+
 
 // Sets default values
 ABaseUnit::ABaseUnit()
 {
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+
+	//Navigation = CreateDefaultSubobject<UNavigation>(TEXT("Navigation"));
+	//RootComponent->AddReplicatedSubObject(Navigation);
 }
 
 // Called when the game starts or when spawned
 void ABaseUnit::BeginPlay()
 {
 	Super::BeginPlay();
-	
 }
 
 // Called every frame
@@ -28,5 +32,11 @@ void ABaseUnit::Tick(float DeltaTime)
 void ABaseUnit::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
+}
+
+void ABaseUnit::MoveTo(const FVector& NewLocation)
+{
+	UAIBlueprintHelperLibrary::SimpleMoveToLocation(GetController(), NewLocation);
+	//Navigation->Navigate(Navigation->FindPathToLocation(NewLocation));
 }
 

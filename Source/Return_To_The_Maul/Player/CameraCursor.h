@@ -32,12 +32,14 @@ public:
 	void UpdateSpringArmTargetDistance(float NewTarget);
 	void UpdateSpringArmPitch(float NewPitch);
 	void UpdateSpringArmRotation(float NewRotation);
-
+	
 	void MoveCursorToWorldPosition(const FVector& MousePosition, const FVector& MouseDirection);
 	void ResetCursorPosition();
 	
 	float GetHeightBeneathCursor(const FVector& CursorWorldPosition);
 	float GetClosestToScreenAtPosition(const FVector& TracePosition);
+	
+	FVector GetCursorLocation() const;
 
 	ECursorSpace SwapCursor();
 	ECursorSpace GetCursorSpace();

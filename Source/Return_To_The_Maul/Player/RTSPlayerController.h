@@ -6,6 +6,7 @@
 #include "Templates/SubclassOf.h"
 #include "GameFramework/PlayerController.h"
 #include "Curves/CurveFloat.h"
+#include "Return_To_The_Maul/Interfaces/Movable.h"
 #include "RTSPlayerController.generated.h"
 
 /** Forward declaration to improve compiling times */
@@ -64,7 +65,10 @@ public:
 	
 	/** Standard Camera Rotate Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
-	UInputAction* UserInputPosition;
+	UInputAction* ClickAction;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
+	UInputAction* MoveClickAction;
 	
 protected:
 	virtual void SetupInputComponent() override;
@@ -78,7 +82,8 @@ protected:
 	void OnPanTriggered(const FInputActionInstance& Instance);
 	void OnZoomTriggered(const FInputActionInstance& Instance);
 	void OnRotateTriggered(const FInputActionInstance& Instance);
-	void OnPositionTriggered(const FInputActionInstance& Instance);
+	void OnClickTriggered();
+	void OnMoveClickTriggered();
 	
 	// Utility Functions
 	void PanScreen(const FVector& PanRate) const;
@@ -87,6 +92,7 @@ protected:
 	
 private:
 	ACameraCursor* MyCharacter;
+	IMovable* SelectedCharacter;
 
 	float ZoomPercent; // From 0 to 1
 	float Rotation;

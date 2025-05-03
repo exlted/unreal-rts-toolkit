@@ -78,7 +78,7 @@ void ACameraCursor::MoveCursorToWorldPosition(const FVector& MousePosition, cons
 	FHitResult RV_Hit(ForceInit);
 	
 	//call GetWorld() from within an actor extending class
-	GetWorld()->LineTraceSingleByChannel(
+	GetWorld()->LineTraceSingleByObjectType(
 		RV_Hit,
 		MousePosition,
 		MousePosition + (MouseDirection * 10000.0f), 
@@ -157,7 +157,7 @@ float ACameraCursor::GetClosestToScreenAtPosition(const FVector& TracePosition)
 	FHitResult RV_Hit(ForceInit);
 	
 	//call GetWorld() from within an actor extending class
-	GetWorld()->LineTraceSingleByChannel(
+	GetWorld()->LineTraceSingleByObjectType(
 		RV_Hit,
 		WorldLocation,
 		WorldLocation + (WorldDirection * 10000.0f), 
@@ -171,6 +171,11 @@ float ACameraCursor::GetClosestToScreenAtPosition(const FVector& TracePosition)
 	}
 	
 	return -1;
+}
+
+FVector ACameraCursor::GetCursorLocation() const
+{
+	return WorldCursor->GetRelativeLocation() + GetActorLocation();
 }
 
 ACameraCursor::ECursorSpace ACameraCursor::SwapCursor()

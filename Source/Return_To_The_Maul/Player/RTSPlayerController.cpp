@@ -11,6 +11,8 @@
 #include "Engine/LocalPlayer.h"
 #include "GameFramework/InputDeviceSubsystem.h"
 #include "GameFramework/InputSettings.h"
+#include "../Interfaces/Selectable.h"
+#include "Return_To_The_Maul/Interfaces/Selectable.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
@@ -24,7 +26,6 @@ ARTSPlayerController::ARTSPlayerController():
 	PitchCurve(nullptr),
 	ZoomAction(nullptr),
 	RotateAction(nullptr),
-	UserInputPosition(nullptr),
 	MyCharacter(nullptr),
 	ZoomPercent(1),
 	Rotation(0),
@@ -141,7 +142,8 @@ void ARTSPlayerController::SetupInputComponent()
 		EnhancedInputComponent->BindAction(ScrollAction, ETriggerEvent::Triggered, this, &ARTSPlayerController::OnPanTriggered);
 		EnhancedInputComponent->BindAction(ZoomAction, ETriggerEvent::Triggered, this, &ARTSPlayerController::OnZoomTriggered);
 		EnhancedInputComponent->BindAction(RotateAction, ETriggerEvent::Triggered, this, &ARTSPlayerController::OnRotateTriggered);
-		EnhancedInputComponent->BindAction(UserInputPosition, ETriggerEvent::Triggered, this, &ARTSPlayerController::OnPositionTriggered);
+		EnhancedInputComponent->BindAction(ClickAction, ETriggerEvent::Triggered, this, &ARTSPlayerController::OnClickTriggered);
+		EnhancedInputComponent->BindAction(MoveClickAction, ETriggerEvent::Triggered, this, &ARTSPlayerController::OnMoveClickTriggered);
 	}
 	else
 	{
@@ -191,10 +193,34 @@ void ARTSPlayerController::OnRotateTriggered(const FInputActionInstance& Instanc
 	MyCharacter->UpdateSpringArmRotation(Rotation);
 }
 
-// ReSharper disable once CppMemberFunctionMayBeConst
-void ARTSPlayerController::OnPositionTriggered(const FInputActionInstance& Instance)
+void ARTSPlayerController::OnClickTriggered()
 {
-	// Implement switch to Mouse mode here?
+	FHitResult HitResult;
+	GetHitResultUnderCursor(ECC_Pawn, true, HitResult);
+	if (HitResult.bBlockingHit)
+	{
+		// Clicked something!
+		if (HitResult.GetActor()->Implements<UMovable>())
+		{
+			SelectedCharacter = Cast<IMovable>(HitResult.GetActor());
+		}
+		else
+		{
+			SelectedCharacter = nullptr;
+		}
+	}
+	else
+	{
+		SelectedCharacter = nullptr;
+	}
+}
+
+void ARTSPlayerController::OnMoveClickTriggered()
+{
+	if (SelectedCharacter !=nullptr)
+	{
+		SelectedCharacter->MoveTo(MyCharacter->GetCursorLocation());
+	}
 }
 
 void ARTSPlayerController::PanScreen(const FVector& PanRate) const
