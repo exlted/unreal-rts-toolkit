@@ -29,15 +29,15 @@ public:
 
 	virtual void PostInitializeComponents() override;
 
-	void UpdateSpringArmTargetDistance(float NewTarget);
-	void UpdateSpringArmPitch(float NewPitch);
-	void UpdateSpringArmRotation(float NewRotation);
+	void UpdateSpringArmTargetDistance(float NewTarget) const;
+	void UpdateSpringArmPitch(float NewPitch) const;
+	void UpdateSpringArmRotation(float NewRotation) const;
 	
-	void MoveCursorToWorldPosition(const FVector& MousePosition, const FVector& MouseDirection);
-	void ResetCursorPosition();
+	void MoveCursorToWorldPosition(const FVector& MousePosition, const FVector& MouseDirection) const;
+	void ResetCursorPosition() const;
 	
-	float GetHeightBeneathCursor(const FVector& CursorWorldPosition);
-	float GetClosestToScreenAtPosition(const FVector& TracePosition);
+	float GetHeightBeneathCursor(const FVector& CursorWorldPosition) const;
+	float GetClosestToScreenAtPosition(const FVector& TracePosition) const;
 	
 	FVector GetCursorLocation() const;
 

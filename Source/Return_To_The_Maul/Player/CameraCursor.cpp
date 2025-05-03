@@ -20,7 +20,7 @@ ACameraCursor::ACameraCursor()
 	PrimaryActorTick.bStartWithTickEnabled = true;
 }
 
-void ACameraCursor::Tick(float DeltaSeconds)
+void ACameraCursor::Tick(const float DeltaSeconds)
 {
     Super::Tick(DeltaSeconds);
 }
@@ -43,12 +43,12 @@ void ACameraCursor::PostInitializeComponents()
 	}
 }
 
-void ACameraCursor::UpdateSpringArmTargetDistance(const float NewTarget)
+void ACameraCursor::UpdateSpringArmTargetDistance(const float NewTarget) const
 {
 	SpringArm->TargetArmLength = NewTarget;
 }
 
-void ACameraCursor::UpdateSpringArmPitch(const float NewPitch)
+void ACameraCursor::UpdateSpringArmPitch(const float NewPitch) const
 {
 	auto Rotation = SpringArm->GetRelativeRotation();
 	Rotation.Pitch = NewPitch;
@@ -56,7 +56,7 @@ void ACameraCursor::UpdateSpringArmPitch(const float NewPitch)
 	SpringArm->SetRelativeRotation(Rotation);
 }
 
-void ACameraCursor::UpdateSpringArmRotation(const float NewRotation)
+void ACameraCursor::UpdateSpringArmRotation(const float NewRotation) const
 {
 	auto Rotation = SpringArm->GetRelativeRotation();
 	Rotation.Yaw = NewRotation;
@@ -64,7 +64,7 @@ void ACameraCursor::UpdateSpringArmRotation(const float NewRotation)
 	SpringArm->SetRelativeRotation(Rotation);
 }
 
-void ACameraCursor::MoveCursorToWorldPosition(const FVector& MousePosition, const FVector& MouseDirection)
+void ACameraCursor::MoveCursorToWorldPosition(const FVector& MousePosition, const FVector& MouseDirection) const
 {
 	const auto RootPosition = this->GetActorLocation();
 
@@ -102,44 +102,24 @@ void ACameraCursor::MoveCursorToWorldPosition(const FVector& MousePosition, cons
 					   RootPosition,
 					   FVector{0.f, 0.f, 1.f});
 		
-		const FVector FilteredPosition = FVector(EndLocation.X - RootPosition.X, EndLocation.Y - RootPosition.Y, GetHeightBeneathCursor(EndLocation) - RootPosition.Z);
+		const FVector FilteredPosition = FVector(EndLocation.X - RootPosition.X, EndLocation.Y - RootPosition.Y,
+			GetHeightBeneathCursor(EndLocation) - RootPosition.Z);
 			
 		WorldCursor->SetRelativeLocation(FilteredPosition);
 	}
 }
 
-void ACameraCursor::ResetCursorPosition()
+void ACameraCursor::ResetCursorPosition() const
 {
 	WorldCursor->SetRelativeLocation(FVector(0, 0, WorldCursor->GetRelativeLocation().Z));
 }
 
-float ACameraCursor::GetHeightBeneathCursor(const FVector& CursorWorldPosition)
+float ACameraCursor::GetHeightBeneathCursor(const FVector& CursorWorldPosition) const
 {
-	FVector MinBounds;
-	FVector MaxBounds;
-	
-	WorldCursor->GetLocalBounds(MinBounds, MaxBounds);
-
-	MinBounds += CursorWorldPosition;
-	MaxBounds += CursorWorldPosition;
-
-	const auto Bounds = {MinBounds, FVector{MinBounds.X, MaxBounds.Y, MinBounds.Z}, FVector{MaxBounds.X, MinBounds.Y,	MaxBounds.Z}, MaxBounds};
-	
-	float Height = 0;
-
-	for (auto Bound : Bounds)
-	{
-		float testHeight = GetClosestToScreenAtPosition(Bound);
-		if (testHeight > Height)
-		{
-			Height = testHeight;
-		}
-	}
-	
-	return Height + HeightAboveSurface;
+	return GetClosestToScreenAtPosition(CursorWorldPosition) + HeightAboveSurface;
 }
 
-float ACameraCursor::GetClosestToScreenAtPosition(const FVector& TracePosition)
+float ACameraCursor::GetClosestToScreenAtPosition(const FVector& TracePosition) const
 {
 	const auto PlayerController = GetLocalViewingPlayerController();
 
