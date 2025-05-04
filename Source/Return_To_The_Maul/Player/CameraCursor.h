@@ -45,8 +45,8 @@ public:
 	ECursorSpace GetCursorSpace() const;
 
 private:
-	USpringArmComponent* SpringArm;
-	UStaticMeshComponent* WorldCursor;
+	TWeakObjectPtr<USpringArmComponent> SpringArm;
+	TWeakObjectPtr<UStaticMeshComponent> WorldCursor;
 
 	ECursorSpace CursorSpace = ECursorSpace::WorldSpace;
 };

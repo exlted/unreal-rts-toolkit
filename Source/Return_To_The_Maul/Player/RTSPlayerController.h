@@ -90,8 +90,8 @@ protected:
 	void UpdateControlStyle(EControlStyle NewStyle);
 	
 private:
-	ACameraCursor* MyCharacter;
-	IMovable* SelectedCharacter;
+	TWeakObjectPtr<ACameraCursor> MyCharacter;
+	TScriptInterface<IMovable> SelectedCharacter;
 
 	float ZoomPercent; // From 0 to 1
 	float Rotation;

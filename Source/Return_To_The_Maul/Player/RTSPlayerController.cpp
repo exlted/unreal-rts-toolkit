@@ -15,20 +15,23 @@
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
-ARTSPlayerController::ARTSPlayerController():
-	SpeedMult(1),
-	PanZonePercent(10),
-	PanCurve(nullptr),
-	DefaultMappingContext(nullptr),
-	ScrollAction(nullptr),
-	ZoomCurve(nullptr),
-	PitchCurve(nullptr),
-	ZoomAction(nullptr),
-	RotateAction(nullptr),
-	MyCharacter(nullptr),
-	ZoomPercent(1),
-	Rotation(0),
-	CurrentStyle()
+ARTSPlayerController::ARTSPlayerController()
+:   SpeedMult(1)
+,   PanZonePercent(10)
+,   PanCurve(nullptr)
+,   DefaultMappingContext(nullptr)
+,   ScrollAction(nullptr)
+,   ZoomCurve(nullptr)
+,   PitchCurve(nullptr)
+,   ZoomAction(nullptr)
+,   RotateAction(nullptr)
+,   ClickAction(nullptr)
+,   MoveClickAction(nullptr)
+,   MyCharacter(nullptr)
+,   SelectedCharacter(nullptr)
+,   ZoomPercent(1)
+,   Rotation(0)
+,   CurrentStyle()
 {
 	bShowMouseCursor = false;
 	DefaultMouseCursor = EMouseCursor::Default;
@@ -72,11 +75,14 @@ void ARTSPlayerController::PlayerTick(const float DeltaTime)
 			{
 				if (FVector MousePosition; GetMousePosition(MousePosition.X, MousePosition.Y))
 				{
-					if (MyCharacter->GetCursorSpace() == ACameraCursor::ECursorSpace::WorldSpace)
+					if (MyCharacter != nullptr)
 					{
-						if (FVector WorldPosition, WorldDirection; DeprojectScreenPositionToWorld(MousePosition.X, MousePosition.Y, WorldPosition, WorldDirection))
+						if (MyCharacter->GetCursorSpace() == ACameraCursor::ECursorSpace::WorldSpace)
 						{
-							MyCharacter->MoveCursorToWorldPosition(WorldPosition, WorldDirection);
+							if (FVector WorldPosition, WorldDirection; DeprojectScreenPositionToWorld(MousePosition.X, MousePosition.Y, WorldPosition, WorldDirection))
+							{
+								MyCharacter->MoveCursorToWorldPosition(WorldPosition, WorldDirection);
+							}
 						}
 					}
 					
@@ -113,11 +119,14 @@ void ARTSPlayerController::PlayerTick(const float DeltaTime)
 	}
 	else
 	{
-		if (MyCharacter->GetCursorSpace() == ACameraCursor::ECursorSpace::WorldSpace)
+		if (MyCharacter != nullptr)
 		{
-			if (FVector WorldPosition, WorldDirection; DeprojectMousePositionToWorld( WorldPosition, WorldDirection))
+			if (MyCharacter->GetCursorSpace() == ACameraCursor::ECursorSpace::WorldSpace)
 			{
-				MyCharacter->MoveCursorToWorldPosition(WorldPosition, WorldDirection);
+				if (FVector WorldPosition, WorldDirection; DeprojectMousePositionToWorld( WorldPosition, WorldDirection))
+				{
+					MyCharacter->MoveCursorToWorldPosition(WorldPosition, WorldDirection);
+				}
 			}
 		}
 	}
@@ -172,9 +181,12 @@ void ARTSPlayerController::OnZoomTriggered(const FInputActionInstance& Instance)
 	{
 		ZoomPercent = 0;
 	}
-	
-	MyCharacter->UpdateSpringArmTargetDistance(ZoomCurve->GetFloatValue(ZoomPercent));
-	MyCharacter->UpdateSpringArmPitch(PitchCurve->GetFloatValue(ZoomPercent));
+
+	if (MyCharacter != nullptr)
+	{
+		MyCharacter->UpdateSpringArmTargetDistance(ZoomCurve->GetFloatValue(ZoomPercent));
+		MyCharacter->UpdateSpringArmPitch(PitchCurve->GetFloatValue(ZoomPercent));
+	}
 }
 
 void ARTSPlayerController::OnRotateTriggered(const FInputActionInstance& Instance)
@@ -189,7 +201,10 @@ void ARTSPlayerController::OnRotateTriggered(const FInputActionInstance& Instanc
 		ZoomPercent += 365;
 	}
 
-	MyCharacter->UpdateSpringArmRotation(Rotation);
+	if (MyCharacter != nullptr)
+	{
+		MyCharacter->UpdateSpringArmRotation(Rotation);
+	}
 }
 
 void ARTSPlayerController::OnClickTriggered()
@@ -201,7 +216,7 @@ void ARTSPlayerController::OnClickTriggered()
 		// Clicked something!
 		if (HitResult.GetActor()->Implements<UMovable>())
 		{
-			SelectedCharacter = Cast<IMovable>(HitResult.GetActor());
+			SelectedCharacter = TScriptInterface<IMovable>(HitResult.GetActor());
 		}
 		else
 		{
@@ -214,9 +229,10 @@ void ARTSPlayerController::OnClickTriggered()
 	}
 }
 
+// ReSharper disable once CppMemberFunctionMayBeConst
 void ARTSPlayerController::OnMoveClickTriggered()
 {
-	if (SelectedCharacter !=nullptr)
+	if (SelectedCharacter != nullptr && MyCharacter != nullptr)
 	{
 		SelectedCharacter->MoveTo(MyCharacter->GetCursorLocation());
 	}
@@ -243,7 +259,10 @@ void ARTSPlayerController::UpdateControlStyle(const EControlStyle NewStyle)
 		case EControlStyle::MouseKeyboard:
 			break;
 		case EControlStyle::Gamepad:
-			MyCharacter->ResetCursorPosition();
+			if (MyCharacter != nullptr)
+			{
+				MyCharacter->ResetCursorPosition();
+			}
 			int Width, Height;
 			GetViewportSize(Width, Height);
 			SetMouseLocation(Width / 2, Height / 2);

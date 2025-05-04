@@ -46,68 +46,82 @@ void ACameraCursor::PostInitializeComponents()
 
 void ACameraCursor::UpdateSpringArmTargetDistance(const float NewTarget) const
 {
-	SpringArm->TargetArmLength = NewTarget;
+	if (SpringArm != nullptr)
+	{
+		SpringArm->TargetArmLength = NewTarget;
+	}
 }
 
 void ACameraCursor::UpdateSpringArmPitch(const float NewPitch) const
 {
-	auto Rotation = SpringArm->GetRelativeRotation();
-	Rotation.Pitch = NewPitch;
+	if (SpringArm != nullptr)
+	{
+		auto Rotation = SpringArm->GetRelativeRotation();
+		Rotation.Pitch = NewPitch;
 		
-	SpringArm->SetRelativeRotation(Rotation);
+		SpringArm->SetRelativeRotation(Rotation);
+	}
 }
 
 void ACameraCursor::UpdateSpringArmRotation(const float NewRotation) const
 {
-	auto Rotation = SpringArm->GetRelativeRotation();
-	Rotation.Yaw = NewRotation;
+	if (SpringArm != nullptr)
+	{
+		auto Rotation = SpringArm->GetRelativeRotation();
+		Rotation.Yaw = NewRotation;
 		
-	SpringArm->SetRelativeRotation(Rotation);
+		SpringArm->SetRelativeRotation(Rotation);
+	}
 }
 
 void ACameraCursor::MoveCursorToWorldPosition(const FVector& MousePosition, const FVector& MouseDirection) const
 {
-	const auto RootPosition = this->GetActorLocation();
-
-
-	// Maybe use a raytrace to determine final middle location? Slow?
-	FCollisionQueryParams RV_TraceParams = FCollisionQueryParams(FName(TEXT("RV_Trace")), true, this);
-	RV_TraceParams.bTraceComplex = true;
-	RV_TraceParams.bReturnPhysicalMaterial = false;
-
-	//Re-initialize hit info
-	const FHitResult RV_Hit = DoSingleLineTrace(
-		this,
-		FLineSegment(MousePosition, MouseDirection, 10000.0f),
-		ECC_WorldStatic,
-		RV_TraceParams);
-
-	if (RV_Hit.bBlockingHit)
+	if (WorldCursor != nullptr)
 	{
-		const FVector EndLocation = RV_Hit.ImpactPoint;
-		const FVector FilteredPosition = FVector(EndLocation.X - RootPosition.X, EndLocation.Y - RootPosition.Y, GetHeightBeneathCursor(EndLocation) - RootPosition.Z);
+		const auto RootPosition = this->GetActorLocation();
+
+		// Maybe use a raytrace to determine final middle location? Slow?
+		FCollisionQueryParams RV_TraceParams = FCollisionQueryParams(FName(TEXT("RV_Trace")), true, this);
+		RV_TraceParams.bTraceComplex = true;
+		RV_TraceParams.bReturnPhysicalMaterial = false;
+
+		//Re-initialize hit info
+		const FHitResult RV_Hit = DoSingleLineTrace(
+			this,
+			FLineSegment(MousePosition, MouseDirection, 10000.0f),
+			ECC_WorldStatic,
+			RV_TraceParams);
+
+		if (RV_Hit.bBlockingHit)
+		{
+			const FVector EndLocation = RV_Hit.ImpactPoint;
+			const FVector FilteredPosition = FVector(EndLocation.X - RootPosition.X, EndLocation.Y - RootPosition.Y, GetHeightBeneathCursor(EndLocation) - RootPosition.Z);
 			
-		WorldCursor->SetRelativeLocation(FilteredPosition);
-	}
-	else
-	{
-		// If there isn't an intersection on the Trace, Place it on the RootPosition
-		const FVector EndLocation = FMath::LinePlaneIntersection(
-					   MousePosition,
-					   MousePosition + (MouseDirection * 10000.0f),
-					   RootPosition,
-					   FVector{0.f, 0.f, 1.f});
+			WorldCursor->SetRelativeLocation(FilteredPosition);
+		}
+		else
+		{
+			// If there isn't an intersection on the Trace, Place it on the RootPosition
+			const FVector EndLocation = FMath::LinePlaneIntersection(
+						   MousePosition,
+						   MousePosition + (MouseDirection * 10000.0f),
+						   RootPosition,
+						   FVector{0.f, 0.f, 1.f});
 		
-		const FVector FilteredPosition = FVector(EndLocation.X - RootPosition.X, EndLocation.Y - RootPosition.Y,
-			GetHeightBeneathCursor(EndLocation) - RootPosition.Z);
+			const FVector FilteredPosition = FVector(EndLocation.X - RootPosition.X, EndLocation.Y - RootPosition.Y,
+				GetHeightBeneathCursor(EndLocation) - RootPosition.Z);
 			
-		WorldCursor->SetRelativeLocation(FilteredPosition);
+			WorldCursor->SetRelativeLocation(FilteredPosition);
+		}
 	}
 }
 
 void ACameraCursor::ResetCursorPosition() const
 {
-	WorldCursor->SetRelativeLocation(FVector(0, 0, WorldCursor->GetRelativeLocation().Z));
+	if (WorldCursor != nullptr)
+	{
+		WorldCursor->SetRelativeLocation(FVector(0, 0, WorldCursor->GetRelativeLocation().Z));
+	}
 }
 
 float ACameraCursor::GetHeightBeneathCursor(const FVector& CursorWorldPosition) const
@@ -146,7 +160,11 @@ float ACameraCursor::GetClosestToScreenAtPosition(const FVector& TracePosition) 
 
 FVector ACameraCursor::GetCursorLocation() const
 {
-	return WorldCursor->GetRelativeLocation() + GetActorLocation();
+	if (WorldCursor != nullptr)
+	{
+		return WorldCursor->GetRelativeLocation() + GetActorLocation();
+	}
+	return GetActorLocation();
 }
 
 ACameraCursor::ECursorSpace ACameraCursor::SwapCursor()
