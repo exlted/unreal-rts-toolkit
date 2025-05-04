@@ -42,7 +42,7 @@ public:
 	FVector GetCursorLocation() const;
 
 	ECursorSpace SwapCursor();
-	ECursorSpace GetCursorSpace();
+	ECursorSpace GetCursorSpace() const;
 
 private:
 	USpringArmComponent* SpringArm;

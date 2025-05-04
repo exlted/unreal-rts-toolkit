@@ -5,6 +5,7 @@
 #include "GameFramework/PlayerController.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Engine/World.h"
+#include "Return_To_The_Maul/Utils/Trace.h"
 
 ACameraCursor::ACameraCursor()
   : SpringArm(nullptr)
@@ -75,16 +76,11 @@ void ACameraCursor::MoveCursorToWorldPosition(const FVector& MousePosition, cons
 	RV_TraceParams.bReturnPhysicalMaterial = false;
 
 	//Re-initialize hit info
-	FHitResult RV_Hit(ForceInit);
-	
-	//call GetWorld() from within an actor extending class
-	GetWorld()->LineTraceSingleByObjectType(
-		RV_Hit,
-		MousePosition,
-		MousePosition + (MouseDirection * 10000.0f), 
+	const FHitResult RV_Hit = DoSingleLineTrace(
+		this,
+		FLineSegment(MousePosition, MouseDirection, 10000.0f),
 		ECC_WorldStatic,
-		RV_TraceParams
-	);
+		RV_TraceParams);
 
 	if (RV_Hit.bBlockingHit)
 	{
@@ -133,24 +129,19 @@ float ACameraCursor::GetClosestToScreenAtPosition(const FVector& TracePosition) 
 	RV_TraceParams.bTraceComplex = true;
 	RV_TraceParams.bReturnPhysicalMaterial = false;
 
-	//Re-initialize hit info
-	FHitResult RV_Hit(ForceInit);
-	
-	//call GetWorld() from within an actor extending class
-	GetWorld()->LineTraceSingleByObjectType(
-		RV_Hit,
-		WorldLocation,
-		WorldLocation + (WorldDirection * 10000.0f), 
+	const FHitResult RV_Hit = DoSingleLineTrace(
+		this,
+		FLineSegment(WorldLocation, WorldDirection, 10000.0f),
 		ECC_WorldStatic,
-		RV_TraceParams
-	);
+		RV_TraceParams);
 
 	if (RV_Hit.bBlockingHit)
 	{
 		return RV_Hit.ImpactPoint.Z;
 	}
-	
-	return -1;
+
+	// If we didn't hit anything, we're probably in the void, so treat as if we hit at 0
+	return 0;
 }
 
 FVector ACameraCursor::GetCursorLocation() const
@@ -179,7 +170,7 @@ ACameraCursor::ECursorSpace ACameraCursor::SwapCursor()
 	return CursorSpace;
 }
 
-ACameraCursor::ECursorSpace ACameraCursor::GetCursorSpace()
+ACameraCursor::ECursorSpace ACameraCursor::GetCursorSpace() const
 {
 	return CursorSpace;
 }
