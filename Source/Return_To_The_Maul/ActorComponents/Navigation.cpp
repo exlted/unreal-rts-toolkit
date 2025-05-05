@@ -16,7 +16,13 @@ UNavigation::UNavigation()
 
 	// ...
 	Spline = CreateDefaultSubobject<USplineComponent>(TEXT("Spline"));
-	AddReplicatedSubObject(Spline);
+	Spline->SetAbsolute();
+	Spline->ClearSplinePoints();
+	DistanceToGoal = 0.0f;
+	GoalDistanceThreshold = 100.0f;
+	DistanceThreshold = 50.0f;
+	// How many points are we setting between the start and end of the spline (0 -> 1)
+	DistanceBetweenPoints = .01f;
 }
 
 
@@ -60,15 +66,11 @@ void UNavigation::TickComponent(float DeltaTime, ELevelTick TickType, FActorComp
 	const FVector ActorDirection = GetOwner()->GetActorRotation().Vector().GetSafeNormal2D();
 	const float Scale = FMath::Clamp(FVector::DotProduct(ActorDirection, Direction), 0.5f, 1.0f);
 	Cast<APawn>(GetOwner())->AddMovementInput(Direction, Scale);
-	
 }
 
 TArray<FVector> UNavigation::FindPathToLocation(const FVector& Location)
 {
 	TArray<FVector> Result;
-	//auto TestNav = GetWorld()->GetNavigationSystem();
-	//char* result = TCHAR_TO_ANSI(*TestNav->GetClass()->GetFName().ToString());
-	//UE_LOG(LogTemp, Error, TEXT("NavigationSystem Class Name: %hs"), result);
 	UNavigationSystemV1* NavSys = FNavigationSystem::GetCurrent<UNavigationSystemV1>(GetWorld());
 
 	if (const APawn* Pawn = Cast<APawn>(GetOwner()); NavSys && Pawn)

@@ -24,3 +24,13 @@ void ABaseBuilding::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
+void ABaseBuilding::OnSelect()
+{
+	Super::OnSelect();
+}
+
+void ABaseBuilding::OnDeselect()
+{
+	Super::OnDeselect();
+}
+

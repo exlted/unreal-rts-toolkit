@@ -23,5 +23,6 @@ class RETURN_TO_THE_MAUL_API ISelectable
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
 
-	void OnSelect();
+	virtual void OnSelect() = 0;
+	virtual void OnDeselect() = 0;
 };

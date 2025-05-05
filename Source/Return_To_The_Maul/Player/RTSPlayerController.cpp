@@ -2,6 +2,7 @@
 
 #include "RTSPlayerController.h"
 
+#include "AnimationEditorViewportClient.h"
 #include "GameFramework/Pawn.h"
 #include "Engine/World.h"
 #include "EnhancedInputComponent.h"
@@ -12,6 +13,7 @@
 #include "GameFramework/InputDeviceSubsystem.h"
 #include "GameFramework/InputSettings.h"
 #include "../Utils/Math.h"
+#include "Return_To_The_Maul/Interfaces/Selectable.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
@@ -28,7 +30,6 @@ ARTSPlayerController::ARTSPlayerController()
 ,   ClickAction(nullptr)
 ,   MoveClickAction(nullptr)
 ,   MyCharacter(nullptr)
-,   SelectedCharacter(nullptr)
 ,   ZoomPercent(1)
 ,   Rotation(0)
 ,   CurrentStyle()
@@ -213,28 +214,20 @@ void ARTSPlayerController::OnClickTriggered()
 	GetHitResultUnderCursor(ECC_Pawn, true, HitResult);
 	if (HitResult.bBlockingHit)
 	{
-		// Clicked something!
-		if (HitResult.GetActor()->Implements<UMovable>())
-		{
-			SelectedCharacter = TScriptInterface<IMovable>(HitResult.GetActor());
-		}
-		else
-		{
-			SelectedCharacter = nullptr;
-		}
+		SelectedCharacter.Select(HitResult.GetActor());
 	}
 	else
 	{
-		SelectedCharacter = nullptr;
+		SelectedCharacter.Select(nullptr);
 	}
 }
 
 // ReSharper disable once CppMemberFunctionMayBeConst
 void ARTSPlayerController::OnMoveClickTriggered()
 {
-	if (SelectedCharacter != nullptr && MyCharacter != nullptr)
+	if (SelectedCharacter.CanMove() && MyCharacter != nullptr)
 	{
-		SelectedCharacter->MoveTo(MyCharacter->GetCursorLocation());
+		SelectedCharacter.MoveTo(MyCharacter->GetCursorLocation());
 	}
 }
 

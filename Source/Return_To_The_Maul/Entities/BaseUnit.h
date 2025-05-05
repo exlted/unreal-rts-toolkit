@@ -6,13 +6,14 @@
 #include "GameFramework/Character.h"
 #include "GameFramework/DefaultPawn.h"
 #include "Return_To_The_Maul/ActorComponents/Navigation.h"
+#include "Return_To_The_Maul/ActorComponents/SelectionBox.h"
 #include "Return_To_The_Maul/Interfaces/Movable.h"
 #include "Return_To_The_Maul/Interfaces/Selectable.h"
 #include "Return_To_The_Maul/Interfaces/Targetable.h"
 #include "BaseUnit.generated.h"
 
 UCLASS()
-class RETURN_TO_THE_MAUL_API ABaseUnit : public ACharacter, public ISelectable, public IMovable, public ITargetable
+class RETURN_TO_THE_MAUL_API ABaseUnit : public APawn, public ISelectable, public IMovable, public ITargetable
 {
 	GENERATED_BODY()
 
@@ -24,7 +25,12 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	//UNavigation* Navigation;
+	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite)
+	UNavigation* Navigation;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	USelectionBox* SelectionBox;
+	
 	FVector GoalLocation;
 
 public:
@@ -34,5 +40,8 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
 
+	virtual void OnSelect() override;
+	virtual void OnDeselect() override;
+	
 	virtual void MoveTo(const FVector& NewLocation) override;
 };

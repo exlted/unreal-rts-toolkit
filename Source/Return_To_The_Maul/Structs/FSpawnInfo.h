@@ -8,9 +8,9 @@ struct FSpawnInfo
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=SpawnInfo, meta=(AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=SpawnInfo, meta=(AllowPrivateAccess = "true", AllowedClasses="BaseUnit, BaseBuilding, BaseTerrain"))
 	UClass* Entity;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=SpawnInfo, meta=(AllowPrivateAccess = "true", AllowedClasses="BaseUnit, BaseBuilding"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=SpawnInfo, meta=(AllowPrivateAccess = "true"))
 	FTransform SpawnOffset;
 };

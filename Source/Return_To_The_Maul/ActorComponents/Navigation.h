@@ -55,11 +55,11 @@ public:
 	float CurrentTime;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float GoalDistanceThreshold;
+	float GoalDistanceThreshold = 1.0f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float DistanceThreshold;
+	float DistanceThreshold = 1.0f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float DistanceBetweenPoints;
+	float DistanceBetweenPoints = 1.0f;
 };

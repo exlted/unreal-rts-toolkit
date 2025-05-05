@@ -7,8 +7,10 @@
 #include "GameFramework/PlayerController.h"
 #include "Curves/CurveFloat.h"
 #include "Return_To_The_Maul/Interfaces/Movable.h"
+#include "Return_To_The_Maul/Structs/FSelected.h"
 #include "RTSPlayerController.generated.h"
 
+class ISelectable;
 /** Forward declaration to improve compiling times */
 class UNiagaraSystem;
 class UInputMappingContext;
@@ -91,7 +93,7 @@ protected:
 	
 private:
 	TWeakObjectPtr<ACameraCursor> MyCharacter;
-	TScriptInterface<IMovable> SelectedCharacter;
+	FSelected SelectedCharacter;
 
 	float ZoomPercent; // From 0 to 1
 	float Rotation;
