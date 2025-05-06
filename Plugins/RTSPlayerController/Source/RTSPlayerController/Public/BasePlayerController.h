@@ -1,49 +1,41 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Templates/SubclassOf.h"
 #include "GameFramework/PlayerController.h"
-#include "Curves/CurveFloat.h"
-#include "Return_To_The_Maul/Interfaces/Movable.h"
-#include "Return_To_The_Maul/Structs/FSelected.h"
-#include "RTSPlayerController.generated.h"
+#include "BasePlayerController.generated.h"
 
+class IMoveUnit;
+class ISelectUnit;
+struct FInputActionInstance;
+enum class EControlStyle;
 class IRTSCursor;
 class IRTSCamera;
-class ISelectable;
-/** Forward declaration to improve compiling times */
-class UNiagaraSystem;
-class UInputMappingContext;
 class UInputAction;
-struct FInputActionInstance;
-class ACameraCursor;
+class UInputMappingContext;
 
-DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
-
+/**
+ * 
+ */
 UCLASS()
-class ARTSPlayerController : public APlayerController
+class RTSPLAYERCONTROLLER_API ABasePlayerController : public APlayerController
 {
 	GENERATED_BODY()
-
 public:
-	enum class EControlStyle
-	{
-		MouseKeyboard,
-		Gamepad
-	};
-	
-	ARTSPlayerController();
+	ABasePlayerController();
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input)
-	float SpeedMult;
+	float PanSpeed;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input)
 	float PanZonePercent;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input)
 	UCurveFloat* PanCurve;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input)
+	float ZoomSpeed;
 	
 	/** MappingContext */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
@@ -68,6 +60,23 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
 	UInputAction* MoveClickAction;
 	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
+	TScriptInterface<IRTSCamera> RTSCamera;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
+	TScriptInterface<IRTSCursor> RTSCursor;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
+	EControlStyle CurrentStyle;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
+	TScriptInterface<ISelectUnit> SelectUnit;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
+	TScriptInterface<IMoveUnit> MoveUnit;
+
+	
+	
 protected:
 	virtual void SetupInputComponent() override;
 	
@@ -76,23 +85,14 @@ protected:
 	virtual void PlayerTick(float DeltaTime) override;
 
 	/** Input handlers for SetDestination action. */
-	void OnInputStarted();
-	void OnPanTriggered(const FInputActionInstance& Instance);
-	void OnZoomTriggered(const FInputActionInstance& Instance);
-	void OnRotateTriggered(const FInputActionInstance& Instance);
-	void OnClickTriggered();
-	void OnMoveClickTriggered();
+	virtual void OnInputStarted();
+	virtual void OnPanTriggered(const FInputActionInstance& Instance);
+	virtual void OnZoomTriggered(const FInputActionInstance& Instance);
+	virtual void OnRotateTriggered(const FInputActionInstance& Instance);
+	virtual void OnClickTriggered();
+	virtual void OnMoveClickTriggered();
 	
 	// Utility Functions
 	void PanScreen(const FVector& PanRate) const;
 	void UpdateControlStyle(EControlStyle NewStyle);
-	
-private:
-	TScriptInterface<IRTSCamera> Camera;
-	TScriptInterface<IRTSCursor> Cursor;
-	FSelected SelectedCharacter;
-
-	EControlStyle CurrentStyle;
 };
-
-
