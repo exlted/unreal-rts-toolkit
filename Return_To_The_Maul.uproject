@@ -20,6 +20,14 @@
 			"TargetAllowList": [
 				"Editor"
 			]
+		},
+		{
+			"Name": "RTSCameraCursor",
+			"Enabled": true
+		},
+		{
+			"Name": "SupportFunctions",
+			"Enabled": true
 		}
 	]
 }

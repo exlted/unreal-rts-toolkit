@@ -2,18 +2,17 @@
 
 #include "RTSPlayerController.h"
 
-#include "AnimationEditorViewportClient.h"
 #include "GameFramework/Pawn.h"
 #include "Engine/World.h"
 #include "EnhancedInputComponent.h"
 #include "InputActionValue.h"
 #include "EnhancedInputSubsystems.h"
-#include "CameraCursor.h"
 #include "Engine/LocalPlayer.h"
 #include "GameFramework/InputDeviceSubsystem.h"
 #include "GameFramework/InputSettings.h"
 #include "../Utils/Math.h"
-#include "Return_To_The_Maul/Interfaces/Selectable.h"
+#include "Interfaces/RTSCamera.h"
+#include "Interfaces/RTSCursor.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
@@ -23,15 +22,10 @@ ARTSPlayerController::ARTSPlayerController()
 ,   PanCurve(nullptr)
 ,   DefaultMappingContext(nullptr)
 ,   ScrollAction(nullptr)
-,   ZoomCurve(nullptr)
-,   PitchCurve(nullptr)
 ,   ZoomAction(nullptr)
 ,   RotateAction(nullptr)
 ,   ClickAction(nullptr)
 ,   MoveClickAction(nullptr)
-,   MyCharacter(nullptr)
-,   ZoomPercent(1)
-,   Rotation(0)
 ,   CurrentStyle()
 {
 	bShowMouseCursor = false;
@@ -43,9 +37,14 @@ void ARTSPlayerController::BeginPlay()
 	// Call the base class  
 	Super::BeginPlay();
 	
-	if (APawn* ControlledPawn = GetPawn(); ControlledPawn != nullptr && ControlledPawn->IsA<ACameraCursor>())
+	APawn* ControlledPawn = GetPawn();
+	if (ControlledPawn != nullptr && ControlledPawn->Implements<URTSCamera>())
 	{
-		MyCharacter = dynamic_cast<ACameraCursor*>(ControlledPawn);
+		Camera = TScriptInterface<IRTSCamera>(ControlledPawn);
+	}
+	if (ControlledPawn != nullptr && ControlledPawn->Implements<URTSCursor>())
+	{
+		Cursor = TScriptInterface<IRTSCursor>(ControlledPawn);
 	}
 }
 
@@ -76,14 +75,11 @@ void ARTSPlayerController::PlayerTick(const float DeltaTime)
 			{
 				if (FVector MousePosition; GetMousePosition(MousePosition.X, MousePosition.Y))
 				{
-					if (MyCharacter != nullptr)
+					if (Cursor != nullptr)
 					{
-						if (MyCharacter->GetCursorSpace() == ACameraCursor::ECursorSpace::WorldSpace)
+						if (FVector WorldPosition, WorldDirection; DeprojectScreenPositionToWorld(MousePosition.X, MousePosition.Y, WorldPosition, WorldDirection))
 						{
-							if (FVector WorldPosition, WorldDirection; DeprojectScreenPositionToWorld(MousePosition.X, MousePosition.Y, WorldPosition, WorldDirection))
-							{
-								MyCharacter->MoveCursorToWorldPosition(WorldPosition, WorldDirection);
-							}
+							Cursor->MoveCursorToCameraRelativePosition(WorldPosition, WorldDirection);
 						}
 					}
 					
@@ -120,14 +116,11 @@ void ARTSPlayerController::PlayerTick(const float DeltaTime)
 	}
 	else
 	{
-		if (MyCharacter != nullptr)
+		if (Cursor != nullptr)
 		{
-			if (MyCharacter->GetCursorSpace() == ACameraCursor::ECursorSpace::WorldSpace)
+			if (FVector WorldPosition, WorldDirection; DeprojectMousePositionToWorld( WorldPosition, WorldDirection))
 			{
-				if (FVector WorldPosition, WorldDirection; DeprojectMousePositionToWorld( WorldPosition, WorldDirection))
-				{
-					MyCharacter->MoveCursorToWorldPosition(WorldPosition, WorldDirection);
-				}
+				Cursor->MoveCursorToCameraRelativePosition(WorldPosition, WorldDirection);
 			}
 		}
 	}
@@ -171,40 +164,21 @@ void ARTSPlayerController::OnPanTriggered(const FInputActionInstance& Instance)
 	PanScreen(Instance.GetValue().Get<FVector>());
 }
 
+// ReSharper disable once CppMemberFunctionMayBeConst
 void ARTSPlayerController::OnZoomTriggered(const FInputActionInstance& Instance)
 {
-	ZoomPercent += .01 * Instance.GetValue().Get<float>();
-	if (ZoomPercent > 1)
+	if (Camera != nullptr)
 	{
-		ZoomPercent = 1;
-	}
-	else if (ZoomPercent < 0)
-	{
-		ZoomPercent = 0;
-	}
-
-	if (MyCharacter != nullptr)
-	{
-		MyCharacter->UpdateSpringArmTargetDistance(ZoomCurve->GetFloatValue(ZoomPercent));
-		MyCharacter->UpdateSpringArmPitch(PitchCurve->GetFloatValue(ZoomPercent));
+		Camera->ZoomCamera(0.1 * Instance.GetValue().Get<float>());
 	}
 }
 
+// ReSharper disable once CppMemberFunctionMayBeConst
 void ARTSPlayerController::OnRotateTriggered(const FInputActionInstance& Instance)
 {
-	Rotation += Instance.GetValue().Get<float>();
-	if (ZoomPercent > 365)
+	if (Camera != nullptr)
 	{
-		ZoomPercent -= 365;
-	}
-	else if (ZoomPercent < 0)
-	{
-		ZoomPercent += 365;
-	}
-
-	if (MyCharacter != nullptr)
-	{
-		MyCharacter->UpdateSpringArmRotation(Rotation);
+		Camera->RotateCamera(Instance.GetValue().Get<float>());
 	}
 }
 
@@ -225,17 +199,17 @@ void ARTSPlayerController::OnClickTriggered()
 // ReSharper disable once CppMemberFunctionMayBeConst
 void ARTSPlayerController::OnMoveClickTriggered()
 {
-	if (SelectedCharacter.CanMove() && MyCharacter != nullptr)
+	if (SelectedCharacter.CanMove() && Cursor != nullptr)
 	{
-		SelectedCharacter.MoveTo(MyCharacter->GetCursorLocation());
+		SelectedCharacter.MoveTo(Cursor->GetCursorLocation());
 	}
 }
 
 void ARTSPlayerController::PanScreen(const FVector& PanRate) const
 {
-	if (APawn* ControlledPawn = GetPawn(); ControlledPawn != nullptr)
+	if (APawn* ControlledPawn = GetPawn(); ControlledPawn != nullptr && Camera != nullptr)
 	{
-		const auto YawOnlyRotator = FRotator(0, Rotation, 0);
+		const auto YawOnlyRotator = FRotator(0, Camera->GetRotation(), 0);
 		
 		ControlledPawn->AddMovementInput(YawOnlyRotator.Quaternion().GetForwardVector(), PanRate.Y * SpeedMult, false);
 		ControlledPawn->AddMovementInput(YawOnlyRotator.Quaternion().GetRightVector(), PanRate.X * SpeedMult, false);
@@ -252,9 +226,9 @@ void ARTSPlayerController::UpdateControlStyle(const EControlStyle NewStyle)
 		case EControlStyle::MouseKeyboard:
 			break;
 		case EControlStyle::Gamepad:
-			if (MyCharacter != nullptr)
+			if (Cursor != nullptr)
 			{
-				MyCharacter->ResetCursorPosition();
+				Cursor->ResetCursorPosition();
 			}
 			int Width, Height;
 			GetViewportSize(Width, Height);

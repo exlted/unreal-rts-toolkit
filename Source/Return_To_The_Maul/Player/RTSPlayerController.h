@@ -10,6 +10,8 @@
 #include "Return_To_The_Maul/Structs/FSelected.h"
 #include "RTSPlayerController.generated.h"
 
+class IRTSCursor;
+class IRTSCamera;
 class ISelectable;
 /** Forward declaration to improve compiling times */
 class UNiagaraSystem;
@@ -51,12 +53,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
 	UInputAction* ScrollAction;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input)
-	UCurveFloat* ZoomCurve;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input)
-	UCurveFloat* PitchCurve;
-	
 	/** Standard Camera Zoom Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
 	UInputAction* ZoomAction;
@@ -92,11 +88,10 @@ protected:
 	void UpdateControlStyle(EControlStyle NewStyle);
 	
 private:
-	TWeakObjectPtr<ACameraCursor> MyCharacter;
+	TScriptInterface<IRTSCamera> Camera;
+	TScriptInterface<IRTSCursor> Cursor;
 	FSelected SelectedCharacter;
 
-	float ZoomPercent; // From 0 to 1
-	float Rotation;
 	EControlStyle CurrentStyle;
 };
 

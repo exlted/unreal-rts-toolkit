@@ -3,8 +3,6 @@
 
 #include "BasicMovementComponent.h"
 
-#include "AnimationCompression.h"
-
 
 // Sets default values for this component's properties
 UBasicMovementComponent::UBasicMovementComponent()
@@ -40,8 +38,17 @@ void UBasicMovementComponent::TickComponent(float DeltaTime, ELevelTick TickType
 		{
 			const auto Location = Pawn->GetActorLocation();
 
-			Pawn->SetActorLocation(Location + MovementVector);
-			Pawn->SetActorRotation(MovementVector.Rotation());
+			if (const auto Forward = Pawn->GetActorForwardVector();
+				FMath::IsNearlyEqual(MovementVector.HeadingAngle(), Forward.HeadingAngle(), 1))
+			{
+				Pawn->SetActorLocation(Location + MovementVector);
+				Pawn->SetActorRotation(MovementVector.Rotation());
+			}
+			else
+			{
+				Pawn->SetActorRotation(FMath::RInterpTo(Forward.Rotation(), MovementVector.Rotation(), DeltaTime, RotationSpeed));
+			}
+
 		}
 	}
 }

@@ -6,7 +6,7 @@
 #include "FFactionInfo.generated.h"
 
 USTRUCT(BlueprintType)
-struct FFactionInfo2
+struct FFactionInfo
 {
 	GENERATED_BODY()
 	

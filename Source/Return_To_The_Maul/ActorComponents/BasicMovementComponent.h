@@ -15,7 +15,10 @@ class RETURN_TO_THE_MAUL_API UBasicMovementComponent : public UMovementComponent
 public:
 	// Sets default values for this component's properties
 	UBasicMovementComponent();
-
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input)
+	float RotationSpeed = 0.5;
+	
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;

@@ -31,7 +31,7 @@ public:
 	                           FActorComponentTickFunction* ThisTickFunction) override;
 	
 	UFUNCTION(BlueprintCallable)
-	TArray<FVector> FindPathToLocation(const FVector& Location);
+	TArray<FVector> FindPathToLocation(const FVector& Location) const;
 	
 	UFUNCTION(BlueprintCallable)
 	void Navigate(const TArray<FVector>& Path);

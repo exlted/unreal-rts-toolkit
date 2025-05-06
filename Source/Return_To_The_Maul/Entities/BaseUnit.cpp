@@ -14,7 +14,6 @@ ABaseUnit::ABaseUnit()
 	PrimaryActorTick.bCanEverTick = true;
 
 	Navigation = CreateDefaultSubobject<UNavigation>(TEXT("Navigation"));
-	RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
 	SelectionBox = CreateDefaultSubobject<USelectionBox>(TEXT("SelectionBox"));
 	SelectionBox->SetupAttachment(RootComponent);
 	SelectionBox->SetHiddenInGame(true, true);

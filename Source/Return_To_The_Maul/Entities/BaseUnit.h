@@ -13,7 +13,7 @@
 #include "BaseUnit.generated.h"
 
 UCLASS()
-class RETURN_TO_THE_MAUL_API ABaseUnit : public APawn, public ISelectable, public IMovable, public ITargetable
+class RETURN_TO_THE_MAUL_API ABaseUnit : public ACharacter, public ISelectable, public IMovable, public ITargetable
 {
 	GENERATED_BODY()
 

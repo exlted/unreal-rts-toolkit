@@ -26,8 +26,8 @@ public:
 	FName PlayerTag;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Side, meta=(AllowPrivateAccess = "true"))
-	FFactionInfo2 Faction;
+	FFactionInfo Faction;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Side, meta=(AllowPrivateAccess = "true", AllowedClasses="FactionInfo"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Side, meta=(AllowPrivateAccess = "true"))
 	int Team;
 };
