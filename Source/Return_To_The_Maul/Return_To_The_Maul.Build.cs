@@ -9,6 +9,6 @@ public class Return_To_The_Maul : ModuleRules
 		PrivateDependencyModuleNames.AddRange(new string[] { "SupportFunctions", "SupportFunctions", "SupportFunctions" });
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
-        PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "NavigationSystem", "AIModule", "Niagara", "EnhancedInput", "SupportFunctions" });
+        PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "NavigationSystem", "AIModule", "Niagara", "EnhancedInput", "SupportFunctions", "RTSUnitSystem" });
     }
 }

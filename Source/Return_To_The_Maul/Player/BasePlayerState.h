@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerState.h"
-#include "../Structs/FFactionInfo.h"
+#include "Structs/FSide.h"
 #include "BasePlayerState.generated.h"
 
 /**
@@ -16,18 +16,6 @@ class RETURN_TO_THE_MAUL_API ABasePlayerState : public APlayerState
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Side, meta=(AllowPrivateAccess = "true"))
-	FColor UnitColor;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Side, meta=(AllowPrivateAccess = "true"))
-	FString DisplayName;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Side, meta=(AllowPrivateAccess = "true"))
-	FName PlayerTag;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Side, meta=(AllowPrivateAccess = "true"))
-	FFactionInfo Faction;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Side, meta=(AllowPrivateAccess = "true"))
-	int Team;
+	UPROPERTY(EditAnywhere)
+	FSide Side;
 };
