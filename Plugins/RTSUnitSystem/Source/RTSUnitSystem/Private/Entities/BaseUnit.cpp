@@ -3,6 +3,8 @@
 
 #include "Entities/BaseUnit.h"
 
+#include "Components/CapsuleComponent.h"
+
 
 // Sets default values
 ABaseUnit::ABaseUnit()
@@ -10,10 +12,15 @@ ABaseUnit::ABaseUnit()
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	// Update Sane Defaults
+	GetMesh()->SetReceivesDecals(false);
+	GetCapsuleComponent()->SetCapsuleHalfHeight(30, true);
+	GetCapsuleComponent()->SetCapsuleRadius( 10, true);
+	
 	Navigation = CreateDefaultSubobject<UNavigation>(TEXT("Navigation"));
 	SelectionBox = CreateDefaultSubobject<USelectionBox>(TEXT("SelectionBox"));
 	SelectionBox->SetupAttachment(RootComponent);
-	SelectionBox->SetHiddenInGame(true, true);
+	SelectionBox->SetVisibility(false, true);
 
 	EntityInfo = CreateDefaultSubobject<UEntityInfo>(TEXT("EntityInfo"));
 }
@@ -38,18 +45,18 @@ void ABaseUnit::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 void ABaseUnit::OnSelect()
 {
-	SelectionBox->SetHiddenInGame(false, true);
+	SelectionBox->SetVisibility(true, true);
 }
 
 void ABaseUnit::OnDeselect()
 {
-	SelectionBox->SetHiddenInGame(true, true);
+	SelectionBox->SetVisibility(false, true);
 }
 
 void ABaseUnit::MoveTo(const FVector& NewLocation)
 {
-	//UAIBlueprintHelperLibrary::SimpleMoveToLocation(GetController(), NewLocation);
-	Navigation->Navigate(Navigation->FindPathToLocation(NewLocation));
+	UAIBlueprintHelperLibrary::SimpleMoveToLocation(Controller, NewLocation);
+	//Navigation->Navigate(Navigation->FindPathToLocation(NewLocation));
 }
 
 FSide ABaseUnit::GetSide()

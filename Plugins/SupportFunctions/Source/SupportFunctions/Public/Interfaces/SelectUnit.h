@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Enums/ESelectStyle.h"
+#include "Structs/FSelected.h"
 #include "UObject/Interface.h"
 #include "SelectUnit.generated.h"
 

@@ -6,6 +6,7 @@
 #include "EnhancedInputSubsystems.h"
 #include "Enums/EControlStyle.h"
 #include "GameFramework/InputDeviceSubsystem.h"
+#include "GameFramework/PlayerState.h"
 #include "Interfaces/RTSCamera.h"
 #include "Interfaces/RTSCursor.h"
 #include "Interfaces/SelectUnit.h"
@@ -64,6 +65,16 @@ void ABasePlayerController::BeginPlay()
 	if (!RTSCursor && ControlledPawn != nullptr && ControlledPawn->Implements<URTSCursor>())
 	{
 		RTSCursor = TScriptInterface<IRTSCursor>(ControlledPawn);
+	}
+
+	const auto State = GetPlayerState<APlayerState>();
+	if (!MoveUnit && State != nullptr && State->Implements<UMoveUnit>())
+	{
+		MoveUnit = TScriptInterface<IMoveUnit>(State);
+	}
+	if (!SelectUnit && State != nullptr && State->Implements<USelectUnit>())
+	{
+		SelectUnit = TScriptInterface<ISelectUnit>(State);
 	}
 }
 
@@ -134,7 +145,7 @@ void ABasePlayerController::PlayerTick(const float DeltaTime)
 
 void ABasePlayerController::OnInputStarted()
 {
-	// Store InputDeviceSubsystem so we're not constantly looking it up
+	// TODO: Store InputDeviceSubsystem so we're not constantly looking it up
 	if (const UInputDeviceSubsystem* InputDeviceSubsystem = GEngine->GetEngineSubsystem<UInputDeviceSubsystem>())
 	{
 		const FPlatformUserId UserId = GetPlatformUserId();
@@ -181,16 +192,41 @@ void ABasePlayerController::OnClickTriggered()
 	{
 		FHitResult HitResult;
 		GetHitResultUnderCursor(ECC_Pawn, true, HitResult);
-
+		
 		SelectUnit->SelectUnit(HitResult.GetActor(), ESelectStyle::New);
+	}
+	else
+	{
+		if (const auto State = GetPlayerState<APlayerState>(); !SelectUnit && State != nullptr && State->Implements<UMoveUnit>())
+		{
+			SelectUnit = TScriptInterface<ISelectUnit>(State);
+			// Intentional Re-entry
+			OnClickTriggered();
+		}
 	}
 }
 
 void ABasePlayerController::OnMoveClickTriggered()
 {
-	if (MoveUnit != nullptr && RTSCursor != nullptr)
+	if (SelectUnit != nullptr && MoveUnit != nullptr && RTSCursor != nullptr)
 	{
+		//MoveOrder(SelectUnit->GetSelectedUnits(), RTSCursor->GetCursorLocation());
 		MoveUnit->MoveSelectedUnit(RTSCursor->GetCursorLocation());
+	}
+	else
+	{
+		if (const auto State = GetPlayerState<APlayerState>(); !MoveUnit && State != nullptr && State->Implements<UMoveUnit>())
+		{
+			MoveUnit = TScriptInterface<IMoveUnit>(State);
+			// Intentional Re-entry
+			OnMoveClickTriggered();
+		}
+		if (const auto State = GetPlayerState<APlayerState>(); !SelectUnit && State != nullptr && State->Implements<UMoveUnit>())
+		{
+			SelectUnit = TScriptInterface<ISelectUnit>(State);
+			// Intentional Re-entry
+			OnMoveClickTriggered();
+		}
 	}
 }
 

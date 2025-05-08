@@ -33,8 +33,6 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	UEntityInfo* EntityInfo;
-	
-	FVector GoalLocation;
 
 public:
 	// Called every frame
@@ -45,7 +43,7 @@ public:
 
 	virtual void OnSelect() override;
 	virtual void OnDeselect() override;
-	
+
 	virtual void MoveTo(const FVector& NewLocation) override;
 	
 	virtual FSide GetSide() override;

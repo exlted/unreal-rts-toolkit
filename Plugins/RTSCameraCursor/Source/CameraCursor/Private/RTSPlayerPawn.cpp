@@ -3,6 +3,7 @@
 
 #include "RTSPlayerPawn.h"
 
+#include "AssetTypeCategories.h"
 #include "Utils/Trace.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/FloatingPawnMovement.h"
@@ -47,6 +48,14 @@ void ARTSPlayerPawn::BeginPlay()
 void ARTSPlayerPawn::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	static bool InitialUpdateDone = false;
+	if (!InitialUpdateDone && GetLocalViewingPlayerController() != nullptr)
+	{
+		// Handle first update
+		ChangeCursorMode(CursorMode);
+		InitialUpdateDone = true;
+	}
 }
 
 // Called to bind functionality to input
@@ -61,7 +70,7 @@ void ARTSPlayerPawn::ChangeCursorVisibility(const bool NewVisibilityState)
 	switch (CursorMode)
 	{
 	case ECursorMode::World:
-		WorldCursor->SetHiddenInGame(Visible, true);
+		WorldCursor->SetVisibility(Visible, true);
 		break;
 	case ECursorMode::Screen:
 		GetLocalViewingPlayerController()->bShowMouseCursor = Visible;
@@ -80,12 +89,12 @@ void ARTSPlayerPawn::ChangeCursorMode(const ECursorMode NewCursorMode)
 	switch (CursorMode)
 	{
 	case ECursorMode::World:
-		WorldCursor->SetHiddenInGame(false, true);
+		WorldCursor->SetVisibility(Visible, true);
 		GetLocalViewingPlayerController()->bShowMouseCursor = false;
 		break;
 	case ECursorMode::Screen:
-		WorldCursor->SetHiddenInGame(true, true);
-		GetLocalViewingPlayerController()->bShowMouseCursor = true;
+		WorldCursor->SetVisibility(false, true);
+		GetLocalViewingPlayerController()->bShowMouseCursor = Visible;
 		break;
 	}
 }
@@ -189,6 +198,15 @@ void ARTSPlayerPawn::ZoomCameraAbsolute(float NewZoom)
 	FRotator NewRotation = SpringArm->GetRelativeRotation();
 	NewRotation.Pitch = PitchCurve->GetFloatValue(ZoomLevel);
 	SpringArm->SetRelativeRotation(NewRotation);
+
+	if (fabs(NewRotation.Pitch) < SwapPitch && CursorMode == ECursorMode::World)
+	{
+		ChangeCursorMode(ECursorMode::Screen);
+	}
+	else if (fabs(NewRotation.Pitch) > SwapPitch && CursorMode == ECursorMode::Screen)
+	{
+		ChangeCursorMode(ECursorMode::World);
+	}
 }
 
 float ARTSPlayerPawn::GetZoom()

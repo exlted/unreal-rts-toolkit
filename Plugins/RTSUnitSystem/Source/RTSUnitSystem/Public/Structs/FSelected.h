@@ -3,20 +3,22 @@
 #include "CoreMinimal.h"
 #include "Interfaces/Movable.h"
 #include "Interfaces/Selectable.h"
+#include "Interfaces/Targetable.h"
 #include "FSelected.generated.h"
 
 USTRUCT(BlueprintType)
 struct FSelected
 {
 	GENERATED_BODY()
-private:
 	UPROPERTY(EditAnywhere)
 	TScriptInterface<ISelectable> SelectedUnit;
 	
 	UPROPERTY(EditAnywhere)
 	TScriptInterface<IMovable> MovableUnit;
 
-public:
+	UPROPERTY(EditAnywhere)
+	TScriptInterface<ITargetable> TargetableUnit;
+	
 	void Select(AActor* SelectedActor)
 	{
 		if (SelectedActor == SelectedUnit.GetObject())
@@ -41,6 +43,10 @@ public:
 			{
 				MovableUnit = TScriptInterface<IMovable>(SelectedActor);
 			}
+			if (SelectedActor->Implements<UTargetable>())
+			{
+				TargetableUnit = TScriptInterface<ITargetable>(SelectedActor);
+			}
 		}
 	}
 
@@ -55,5 +61,20 @@ public:
 		{
 			MovableUnit->MoveTo(NewLocation);
 		}
+	}
+
+	FSide GetSide() const
+	{
+		if (TargetableUnit != nullptr)
+		{
+			return TargetableUnit->GetSide();
+		}
+		FSide EmptySide;
+		EmptySide.PlayerTag = FName("None");
+		EmptySide.Team = -1;
+		EmptySide.UnitColor = FColor::Transparent;
+		EmptySide.Faction.InitialEntities = TArray<FSpawnInfo>();
+		
+		return EmptySide;
 	}
 };

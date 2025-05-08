@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
+#include "Structs/FSelected.h"
 #include "BasePlayerController.generated.h"
 
 class IMoveUnit;
@@ -95,4 +96,9 @@ protected:
 	// Utility Functions
 	void PanScreen(const FVector& PanRate) const;
 	void UpdateControlStyle(EControlStyle NewStyle);
+
+	// Server Functions
+	//UFUNCTION(Server, Reliable)
+	//void MoveOrder(const TArray<FSelected>& Actors, const FVector& NewLocation);
+	
 };
