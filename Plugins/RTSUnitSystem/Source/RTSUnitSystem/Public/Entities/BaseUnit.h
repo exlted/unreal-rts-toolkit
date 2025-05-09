@@ -26,6 +26,9 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UMaterial* BaseTeamMaterial;
+	
 	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite)
 	UNavigation* Navigation;
 
@@ -34,6 +37,9 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	UEntityInfo* EntityInfo;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, ReplicatedUsing = OnRep_SideChanged)
+	FSide Side;
 	
 public:
 	// Called every frame
@@ -41,6 +47,7 @@ public:
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
+	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
 
 	virtual void OnSelect() override;
 	virtual void OnDeselect() override;
@@ -50,4 +57,7 @@ public:
 
 	virtual void SetSide(FSide NewSide) override;
 	virtual FSide GetSide() override;
+
+	UFUNCTION()
+	virtual void OnRep_SideChanged();
 };

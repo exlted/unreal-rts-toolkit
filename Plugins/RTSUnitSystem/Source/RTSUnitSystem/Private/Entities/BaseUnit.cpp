@@ -4,6 +4,7 @@
 #include "Entities/BaseUnit.h"
 
 #include "Components/CapsuleComponent.h"
+#include "Net/UnrealNetwork.h"
 
 
 // Sets default values
@@ -43,6 +44,13 @@ void ABaseUnit::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 }
 
+void ABaseUnit::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ABaseUnit, Side);
+}
+
 void ABaseUnit::OnSelect()
 {
 	SelectionBox->SetVisibility(true, true);
@@ -67,16 +75,31 @@ void ABaseUnit::MoveTo(const FVector& NewLocation)
 void ABaseUnit::SetSide(const FSide NewSide)
 {
 	EntityInfo->SideInfo = NewSide;
-
+	Side = NewSide;
+	
 	for (const auto EntityInfoTags = EntityInfo->GetTags();
 		const auto& Tag : EntityInfoTags)
 	{
 		Tags.AddUnique(Tag);
+	}
+
+	if (BaseTeamMaterial != nullptr)
+	{
+		const auto TeamMaterial = UMaterialInstanceDynamic::Create(BaseTeamMaterial, this);
+		TeamMaterial->SetVectorParameterValue("TeamColor", NewSide.UnitColor);
+		GetMesh()->SetMaterial(0, TeamMaterial);
 	}
 }
 
 FSide ABaseUnit::GetSide()
 {
 	return EntityInfo->SideInfo;
+}
+
+void ABaseUnit::OnRep_SideChanged()
+{
+	const auto TeamMaterial = UMaterialInstanceDynamic::Create(BaseTeamMaterial, this);
+	TeamMaterial->SetVectorParameterValue("TeamColor", Side.UnitColor);
+	GetMesh()->SetMaterial(0, TeamMaterial);
 }
 

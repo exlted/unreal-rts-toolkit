@@ -19,4 +19,16 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	int TeamNumber = 0;
+
+	UPROPERTY(EditAnywhere)
+	TArray<FColor> TeamColors = {
+			FColor( 255, 0, 0, 255),
+			FColor(0, 255, 0, 255),
+			FColor(0, 0, 255, 255),
+			FColor(255, 255, 0, 255),
+			FColor(255, 0, 255, 255),
+			FColor(0, 255, 255, 255),
+			FColor(255, 255, 255, 255),
+			FColor(0, 0, 0, 255),
+		};
 };

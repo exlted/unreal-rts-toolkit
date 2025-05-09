@@ -52,6 +52,7 @@ FString ARTSGameModeBase::InitNewPlayer(APlayerController* NewPlayerController, 
 	{
 		if (ABasePlayerState* PlayerState = NewPlayerController->GetPlayerState<ABasePlayerState>(); PlayerState != nullptr)
 		{
+			PlayerState->SetColor(TeamColors[TeamNumber % TeamColors.Num()]);
 			PlayerState->SetTeam(TeamNumber++);
 			PlayerState->SpawnEntities(FTransform(NewPlayerController->GetSpawnLocation()));
 		}

@@ -34,6 +34,13 @@ void ABasePlayerState::SetTeam(const int TeamNumber)
 	UnitSpawningSystem->SetSide(Side);
 }
 
+void ABasePlayerState::SetColor(const FColor Color)
+{
+	Side.UnitColor = Color;
+
+	UnitSpawningSystem->SetSide(Side);
+}
+
 void ABasePlayerState::MoveSelectedUnit(const FVector& GoalPosition, int Sender)
 {
 	if (UnitSelectionSystem != nullptr)

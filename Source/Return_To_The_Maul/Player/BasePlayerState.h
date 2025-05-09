@@ -34,6 +34,7 @@ public:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 	void SetTeam(int TeamNumber);
+	void SetColor(FColor Color);
 	
 	virtual void MoveSelectedUnit(const FVector& GoalPosition, int Sender = -1) override;
 
