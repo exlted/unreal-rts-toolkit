@@ -42,6 +42,9 @@ void ARTSPlayerPawn::BeginPlay()
 	Super::BeginPlay();
 	
 	ZoomCameraAbsolute(ZoomLevel);
+	TargetCursorMode = CursorMode;
+	CursorMode = ECursorMode::Unset;
+	TargetVisibilityState = Visible;
 }
 
 // Called every frame
@@ -49,12 +52,17 @@ void ARTSPlayerPawn::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	static bool InitialUpdateDone = false;
-	if (!InitialUpdateDone && GetLocalViewingPlayerController() != nullptr)
+	if (GetLocalViewingPlayerController() != nullptr)
 	{
-		// Handle first update
-		ChangeCursorMode(CursorMode);
-		InitialUpdateDone = true;
+		if (CursorMode != TargetCursorMode)
+		{
+			ChangeCursorMode(TargetCursorMode);
+		}
+
+		if (Visible != TargetVisibilityState)
+		{
+			ChangeCursorVisibility(TargetVisibilityState);
+		}
 	}
 }
 
@@ -66,15 +74,30 @@ void ARTSPlayerPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 
 void ARTSPlayerPawn::ChangeCursorVisibility(const bool NewVisibilityState)
 {
-	Visible = NewVisibilityState;
-	switch (CursorMode)
+	TargetVisibilityState = NewVisibilityState;
+	if (GetLocalViewingPlayerController() != nullptr)
 	{
-	case ECursorMode::World:
-		WorldCursor->SetVisibility(Visible, true);
-		break;
-	case ECursorMode::Screen:
-		GetLocalViewingPlayerController()->bShowMouseCursor = Visible;
-		break;
+		if (TargetVisibilityState == true)
+		{
+			switch (CursorMode)
+			{
+			case ECursorMode::World:
+				WorldCursor->SetVisibility(true, true);
+				break;
+			case ECursorMode::Screen:
+				GetLocalViewingPlayerController()->bShowMouseCursor = true;
+				break;
+			case ECursorMode::Unset:
+				break;
+			}
+			Visible = true;
+		}
+		else
+		{
+			WorldCursor->SetVisibility(false, true);
+			GetLocalViewingPlayerController()->bShowMouseCursor = false;
+			Visible = false;
+		}
 	}
 }
 
@@ -85,17 +108,25 @@ bool ARTSPlayerPawn::GetCursorVisibility() const
 
 void ARTSPlayerPawn::ChangeCursorMode(const ECursorMode NewCursorMode)
 {
-	CursorMode = NewCursorMode;
-	switch (CursorMode)
+	TargetCursorMode = NewCursorMode;
+
+	if (GetLocalViewingPlayerController() != nullptr)
 	{
-	case ECursorMode::World:
-		WorldCursor->SetVisibility(Visible, true);
-		GetLocalViewingPlayerController()->bShowMouseCursor = false;
-		break;
-	case ECursorMode::Screen:
-		WorldCursor->SetVisibility(false, true);
-		GetLocalViewingPlayerController()->bShowMouseCursor = Visible;
-		break;
+		switch (TargetCursorMode)
+		{
+		case ECursorMode::World:
+			WorldCursor->SetVisibility(Visible, true);
+			GetLocalViewingPlayerController()->bShowMouseCursor = false;
+			CursorMode = ECursorMode::World;
+			break;
+		case ECursorMode::Screen:
+			WorldCursor->SetVisibility(false, true);
+			GetLocalViewingPlayerController()->bShowMouseCursor = Visible;
+			CursorMode = ECursorMode::Screen;
+			break;
+		case ECursorMode::Unset:
+			break;
+		}
 	}
 }
 
@@ -198,7 +229,7 @@ void ARTSPlayerPawn::ZoomCameraAbsolute(float NewZoom)
 	FRotator NewRotation = SpringArm->GetRelativeRotation();
 	NewRotation.Pitch = PitchCurve->GetFloatValue(ZoomLevel);
 	SpringArm->SetRelativeRotation(NewRotation);
-
+	
 	if (fabs(NewRotation.Pitch) < SwapPitch && CursorMode == ECursorMode::World)
 	{
 		ChangeCursorMode(ECursorMode::Screen);

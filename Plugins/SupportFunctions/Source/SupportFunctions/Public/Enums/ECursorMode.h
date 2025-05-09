@@ -6,5 +6,6 @@ UENUM()
 enum class ECursorMode
 {
 	World,
-	Screen
+	Screen,
+	Unset
 };

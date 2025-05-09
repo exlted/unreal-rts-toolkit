@@ -55,9 +55,11 @@ public:
 	
 	UPROPERTY(EditAnywhere, Category = Cursor)
 	bool Visible;
+	bool TargetVisibilityState;
 	
 	UPROPERTY(EditAnywhere, Category = Cursor)
 	ECursorMode CursorMode;
+	ECursorMode TargetCursorMode = ECursorMode::Unset;
 	
 	// Height Above the "surface" that the WorldSpace Cursor should be
 	UPROPERTY(EditAnywhere, Category = Cursor)
