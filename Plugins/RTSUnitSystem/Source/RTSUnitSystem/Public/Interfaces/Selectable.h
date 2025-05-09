@@ -25,4 +25,5 @@ public:
 
 	virtual void OnSelect() = 0;
 	virtual void OnDeselect() = 0;
+	virtual bool HasTag(FName TagName) = 0;
 };

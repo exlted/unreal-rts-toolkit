@@ -27,13 +27,3 @@ std::vector<FName> UEntityInfo::GetTags() const
 	
 	return Tags;
 }
-
-void UEntityInfo::BeginPlay()
-{
-	Super::BeginPlay();
-
-	for (const auto Tags = GetTags(); const auto& Tag : Tags)
-	{
-		GetOwner()->Tags.Add(Tag);
-	}
-}

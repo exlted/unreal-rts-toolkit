@@ -22,5 +22,5 @@ class SUPPORTFUNCTIONS_API IMoveUnit
 
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
-	virtual void MoveSelectedUnit(const FVector& GoalPosition) = 0;
+	virtual void MoveSelectedUnit(const FVector& GoalPosition, const int Sender = -1) = 0;
 };

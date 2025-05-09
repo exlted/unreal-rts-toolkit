@@ -3,34 +3,38 @@
 
 #include "ActorComponents/UnitSpawningSystem.h"
 
+#include "Blueprint/AIBlueprintHelperLibrary.h"
+#include "EntitySystem/MovieSceneEntitySystemRunner.h"
+#include "Interfaces/Spawnable.h"
+
 
 // Sets default values for this component's properties
 UUnitSpawningSystem::UUnitSpawningSystem()
 {
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
-	PrimaryComponentTick.bCanEverTick = true;
+	PrimaryComponentTick.bCanEverTick = false;
 
 	// ...
 }
 
-
-// Called when the game starts
-void UUnitSpawningSystem::BeginPlay()
+APawn* UUnitSpawningSystem::SpawnEntity(UObject* WorldContext, UClass* SpawnClass, const FTransform SpawnTransform)
 {
-	Super::BeginPlay();
+	const auto Pawn = UAIBlueprintHelperLibrary::SpawnAIFromClass(WorldContext, SpawnClass, nullptr,
+		SpawnTransform.GetLocation(), SpawnTransform.GetRotation().Rotator(), true,
+		GetOwner());
 
-	// ...
-	
+	if (Pawn->Implements<USpawnable>())
+	{
+		const auto Spawnable = TScriptInterface<ISpawnable>(Pawn);
+		Spawnable->SetSide(Side);
+	}
+
+	return Pawn;
 }
 
-
-// Called every frame
-void UUnitSpawningSystem::TickComponent(float DeltaTime, ELevelTick TickType,
-                                        FActorComponentTickFunction* ThisTickFunction)
+void UUnitSpawningSystem::SetSide(const FSide NewSide)
 {
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
-	// ...
+	Side = NewSide;
 }
 

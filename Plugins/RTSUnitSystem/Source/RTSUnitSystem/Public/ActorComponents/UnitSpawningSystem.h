@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "Structs/FSide.h"
 #include "UnitSpawningSystem.generated.h"
 
 
@@ -17,11 +18,11 @@ public:
 	UUnitSpawningSystem();
 
 protected:
-	// Called when the game starts
-	virtual void BeginPlay() override;
-
+	// Needs an FSide
+	FSide Side;
+	
 public:
-	// Called every frame
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType,
-	                           FActorComponentTickFunction* ThisTickFunction) override;
+
+	virtual APawn* SpawnEntity(UObject* WorldContext, UClass* SpawnClass, FTransform SpawnTransform);
+	virtual void SetSide(FSide NewSide);
 };

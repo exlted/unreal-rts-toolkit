@@ -57,24 +57,27 @@ void ABasePlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	APawn* ControlledPawn = GetPawn();
-	if (!RTSCamera && ControlledPawn != nullptr && ControlledPawn->Implements<URTSCamera>())
+	if (IsLocalPlayerController())
 	{
-		RTSCamera = TScriptInterface<IRTSCamera>(ControlledPawn);
-	}
-	if (!RTSCursor && ControlledPawn != nullptr && ControlledPawn->Implements<URTSCursor>())
-	{
-		RTSCursor = TScriptInterface<IRTSCursor>(ControlledPawn);
-	}
-
-	const auto State = GetPlayerState<APlayerState>();
-	if (!MoveUnit && State != nullptr && State->Implements<UMoveUnit>())
-	{
-		MoveUnit = TScriptInterface<IMoveUnit>(State);
-	}
-	if (!SelectUnit && State != nullptr && State->Implements<USelectUnit>())
-	{
-		SelectUnit = TScriptInterface<ISelectUnit>(State);
+		APawn* ControlledPawn = GetPawn();
+		if (!RTSCamera && ControlledPawn != nullptr && ControlledPawn->Implements<URTSCamera>())
+		{
+			RTSCamera = TScriptInterface<IRTSCamera>(ControlledPawn);
+		}
+		if (!RTSCursor && ControlledPawn != nullptr && ControlledPawn->Implements<URTSCursor>())
+		{
+			RTSCursor = TScriptInterface<IRTSCursor>(ControlledPawn);
+		}
+		
+		const auto State = GetPlayerState<APlayerState>();
+		if (!MoveUnit && State != nullptr && State->Implements<UMoveUnit>())
+		{
+			MoveUnit = TScriptInterface<IMoveUnit>(State);
+		}
+		if (!SelectUnit && State != nullptr && State->Implements<USelectUnit>())
+		{
+			SelectUnit = TScriptInterface<ISelectUnit>(State);
+		}
 	}
 }
 
@@ -208,9 +211,8 @@ void ABasePlayerController::OnClickTriggered()
 
 void ABasePlayerController::OnMoveClickTriggered()
 {
-	if (SelectUnit != nullptr && MoveUnit != nullptr && RTSCursor != nullptr)
+	if (MoveUnit != nullptr && RTSCursor != nullptr)
 	{
-		//MoveOrder(SelectUnit->GetSelectedUnits(), RTSCursor->GetCursorLocation());
 		MoveUnit->MoveSelectedUnit(RTSCursor->GetCursorLocation());
 	}
 	else
@@ -218,12 +220,6 @@ void ABasePlayerController::OnMoveClickTriggered()
 		if (const auto State = GetPlayerState<APlayerState>(); !MoveUnit && State != nullptr && State->Implements<UMoveUnit>())
 		{
 			MoveUnit = TScriptInterface<IMoveUnit>(State);
-			// Intentional Re-entry
-			OnMoveClickTriggered();
-		}
-		if (const auto State = GetPlayerState<APlayerState>(); !SelectUnit && State != nullptr && State->Implements<UMoveUnit>())
-		{
-			SelectUnit = TScriptInterface<ISelectUnit>(State);
 			// Intentional Re-entry
 			OnMoveClickTriggered();
 		}

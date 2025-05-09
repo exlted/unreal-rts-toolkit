@@ -10,10 +10,11 @@
 #include "Interfaces/Selectable.h"
 #include "Interfaces/Targetable.h"
 #include "ActorComponents/UEntityInfo.h"
+#include "Interfaces/Spawnable.h"
 #include "BaseUnit.generated.h"
 
 UCLASS()
-class RTSUNITSYSTEM_API ABaseUnit : public ACharacter, public ISelectable, public IMovable, public ITargetable
+class RTSUNITSYSTEM_API ABaseUnit : public ACharacter, public ISelectable, public IMovable, public ITargetable, public ISpawnable
 {
 	GENERATED_BODY()
 
@@ -33,7 +34,7 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	UEntityInfo* EntityInfo;
-
+	
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -43,8 +44,10 @@ public:
 
 	virtual void OnSelect() override;
 	virtual void OnDeselect() override;
+	virtual bool HasTag(FName TagName) override;
 
 	virtual void MoveTo(const FVector& NewLocation) override;
-	
+
+	virtual void SetSide(FSide NewSide) override;
 	virtual FSide GetSide() override;
 };

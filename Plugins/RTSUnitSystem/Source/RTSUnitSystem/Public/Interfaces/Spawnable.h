@@ -3,13 +3,13 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Enums/ESelectStyle.h"
+#include "Structs/FSide.h"
 #include "UObject/Interface.h"
-#include "SelectUnit.generated.h"
+#include "Spawnable.generated.h"
 
 // This class does not need to be modified.
 UINTERFACE()
-class SUPPORTFUNCTIONS_API USelectUnit : public UInterface
+class RTSUNITSYSTEM_API USpawnable : public UInterface
 {
 	GENERATED_BODY()
 };
@@ -17,11 +17,12 @@ class SUPPORTFUNCTIONS_API USelectUnit : public UInterface
 /**
  * 
  */
-class SUPPORTFUNCTIONS_API ISelectUnit
+class RTSUNITSYSTEM_API ISpawnable
 {
 	GENERATED_BODY()
 
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
-	virtual void SelectUnit(AActor* SelectedUnit, ESelectStyle SelectionStyle) = 0;
+
+	virtual void SetSide(const FSide NewSide) = 0;
 };

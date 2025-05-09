@@ -3,6 +3,10 @@
 
 #include "BasePlayerState.h"
 
+#include <string>
+
+#include "Net/UnrealNetwork.h"
+
 ABasePlayerState::ABasePlayerState()
 {
 	UnitSelectionSystem = CreateDefaultSubobject<UUnitSelectionSystem>("UnitSelectionSystem");
@@ -12,18 +16,34 @@ ABasePlayerState::ABasePlayerState()
 void ABasePlayerState::BeginPlay()
 {
 	Super::BeginPlay();
-
-	//if (const auto Pawn = GetPlayerController()->GetPawnOrSpectator(); Pawn != nullptr)
-	//{
-	//	Side.Faction.SpawnInitialEntities(GetWorld(), Pawn->GetTransform(), this);
-	//}
+	
+	UnitSpawningSystem->SetSide(Side);
 }
 
-void ABasePlayerState::MoveSelectedUnit(const FVector& GoalPosition)
+void ABasePlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ABasePlayerState, Side);
+}
+
+void ABasePlayerState::SetTeam(const int TeamNumber)
+{
+	Side.Team = TeamNumber;
+
+	UnitSpawningSystem->SetSide(Side);
+}
+
+void ABasePlayerState::MoveSelectedUnit(const FVector& GoalPosition, int Sender)
 {
 	if (UnitSelectionSystem != nullptr)
 	{
-		UnitSelectionSystem->MoveSelectedUnit(GoalPosition);
+		if (Sender == -1)
+		{
+			Sender = Side.Team;
+		}
+		
+		UnitSelectionSystem->MoveSelectedUnit(GoalPosition, Sender);
 	}
 }
 
@@ -32,5 +52,13 @@ void ABasePlayerState::SelectUnit(AActor* SelectedUnit, const ESelectStyle Selec
 	if (UnitSelectionSystem != nullptr)
 	{
 		UnitSelectionSystem->SelectUnit(SelectedUnit, SelectionStyle);
+	}
+}
+
+void ABasePlayerState::SpawnEntities(const FTransform& SpawnLocation)
+{
+	for (const auto [Entity, SpawnOffset] : Side.Faction.InitialEntities)
+	{
+		UnitSpawningSystem->SpawnEntity(this, Entity, SpawnLocation + SpawnOffset);
 	}
 }

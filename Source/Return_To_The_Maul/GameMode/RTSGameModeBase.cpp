@@ -3,6 +3,7 @@
 
 #include "RTSGameModeBase.h"
 
+#include "BasePlayerController.h"
 #include "GameFramework/GameSession.h"
 #include "GameFramework/PlayerState.h"
 #include "Kismet/GameplayStatics.h"
@@ -51,8 +52,8 @@ FString ARTSGameModeBase::InitNewPlayer(APlayerController* NewPlayerController, 
 	{
 		if (ABasePlayerState* PlayerState = NewPlayerController->GetPlayerState<ABasePlayerState>(); PlayerState != nullptr)
 		{
-			PlayerState->Side.Faction.SpawnInitialEntities(this,
-				FTransform(NewPlayerController->GetSpawnLocation()), PlayerState);
+			PlayerState->SetTeam(TeamNumber++);
+			PlayerState->SpawnEntities(FTransform(NewPlayerController->GetSpawnLocation()));
 		}
 	}
 	

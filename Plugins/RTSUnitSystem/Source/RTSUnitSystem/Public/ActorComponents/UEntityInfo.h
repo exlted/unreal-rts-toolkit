@@ -19,10 +19,6 @@ public:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=UnitInfo, meta=(AllowPrivateAccess = "true"))
 	EEntityType EntityType;
-	
-protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
-	
+
 	std::vector<FName> GetTags() const;
 };

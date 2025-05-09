@@ -34,6 +34,11 @@ void ABaseActor::OnDeselect()
 {
 }
 
+bool ABaseActor::HasTag(const FName TagName)
+{
+	return Tags.Contains(TagName);
+}
+
 FSide ABaseActor::GetSide()
 {
 	return EntityInfo->SideInfo;

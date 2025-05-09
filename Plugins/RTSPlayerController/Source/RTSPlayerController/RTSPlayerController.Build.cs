@@ -24,7 +24,7 @@ public class RTSPlayerController : ModuleRules
 		PublicDependencyModuleNames.AddRange(
 			new string[]
 			{
-				"Core", "RTSUnitSystem",
+				"Core",
 				// ... add other public dependencies that you statically link with here ...
 			}
 			);

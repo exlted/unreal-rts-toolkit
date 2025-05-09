@@ -53,10 +53,26 @@ void ABaseUnit::OnDeselect()
 	SelectionBox->SetVisibility(false, true);
 }
 
+bool ABaseUnit::HasTag(const FName TagName)
+{
+	return Tags.Contains(TagName);
+}
+
 void ABaseUnit::MoveTo(const FVector& NewLocation)
 {
 	UAIBlueprintHelperLibrary::SimpleMoveToLocation(Controller, NewLocation);
 	//Navigation->Navigate(Navigation->FindPathToLocation(NewLocation));
+}
+
+void ABaseUnit::SetSide(const FSide NewSide)
+{
+	EntityInfo->SideInfo = NewSide;
+
+	for (const auto EntityInfoTags = EntityInfo->GetTags();
+		const auto& Tag : EntityInfoTags)
+	{
+		Tags.AddUnique(Tag);
+	}
 }
 
 FSide ABaseUnit::GetSide()

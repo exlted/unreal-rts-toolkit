@@ -16,4 +16,7 @@ class RETURN_TO_THE_MAUL_API ARTSGameModeBase : public AGameModeBase
 
 public:
 	virtual FString InitNewPlayer(APlayerController* NewPlayerController, const FUniqueNetIdRepl& UniqueId, const FString& Options, const FString& Portal = L"") override;
+
+	UPROPERTY(EditAnywhere)
+	int TeamNumber = 0;
 };

@@ -30,12 +30,12 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType,
 	                           FActorComponentTickFunction* ThisTickFunction) override;
 
-	virtual void MoveSelectedUnit(const FVector& GoalPosition) override;
+	virtual void MoveSelectedUnit(const FVector& GoalPosition, const int Sender = -1) override;
 
 	virtual void SelectUnit(AActor* SelectedUnit, ESelectStyle SelectionStyle) override;
 	virtual TArray<FSelected> GetSelectedUnits();
 
 	// Server Functions
 	UFUNCTION(Server, Reliable)
-	virtual void MoveUnits(const TArray<FSelected>& Units, const FVector& GoalPosition);
+	virtual void MoveUnits(const TArray<FSelected>& Units, const FVector& GoalPosition, const int Sender);
 };

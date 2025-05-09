@@ -34,14 +34,9 @@ void UUnitSelectionSystem::TickComponent(float DeltaTime, ELevelTick TickType,
 	// ...
 }
 
-void UUnitSelectionSystem::MoveSelectedUnit(const FVector& GoalPosition)
+void UUnitSelectionSystem::MoveSelectedUnit(const FVector& GoalPosition, const int Sender)
 {
-	//const auto CommandSystem = URTSCommandSystem::Get();
-	//if (Selected.CanMove() && CommandSystem != nullptr)
-	//{
-	//	CommandSystem->MoveCommand(Selected.MovableUnit, Selected.GetSide(), GoalPosition);
-	//}
-	MoveUnits(GetSelectedUnits(), GoalPosition);
+	MoveUnits(GetSelectedUnits(), GoalPosition, Sender);
 }
 
 void UUnitSelectionSystem::SelectUnit(AActor* SelectedUnit, const ESelectStyle SelectionStyle)
@@ -79,12 +74,15 @@ TArray<FSelected> UUnitSelectionSystem::GetSelectedUnits()
 	return SelectedUnits;
 }
 
-void UUnitSelectionSystem::MoveUnits_Implementation(const TArray<FSelected>& Units, const FVector& GoalPosition)
+void UUnitSelectionSystem::MoveUnits_Implementation(const TArray<FSelected>& Units, const FVector& GoalPosition, const int Sender)
 {
 	// TODO: Implement Formation Support Here?
 	for (const auto& Unit : Units)
 	{
-		Unit.MoveTo(GoalPosition);
+		if (Unit.GetSide().Team == Sender)
+		{
+			Unit.MoveTo(GoalPosition);
+		}
 	}
 }
 

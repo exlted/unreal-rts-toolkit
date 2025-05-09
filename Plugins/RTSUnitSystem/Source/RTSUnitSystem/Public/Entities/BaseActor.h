@@ -31,6 +31,7 @@ public:
 
 	virtual void OnSelect() override;
 	virtual void OnDeselect() override;
+	virtual bool HasTag(FName TagName) override;
 	
 	virtual FSide GetSide() override;
 };

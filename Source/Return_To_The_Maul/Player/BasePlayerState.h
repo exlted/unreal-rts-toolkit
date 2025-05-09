@@ -20,7 +20,7 @@ class RETURN_TO_THE_MAUL_API ABasePlayerState : public APlayerState, public IMov
 	ABasePlayerState();
 	
 public:
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(Replicated, EditAnywhere)
 	FSide Side;
 
 	UPROPERTY(EditAnywhere)
@@ -30,8 +30,14 @@ public:
 	UUnitSpawningSystem* UnitSpawningSystem;
 	
 	virtual void BeginPlay() override;
+
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
+	void SetTeam(int TeamNumber);
 	
-	virtual void MoveSelectedUnit(const FVector& GoalPosition) override;
+	virtual void MoveSelectedUnit(const FVector& GoalPosition, int Sender = -1) override;
 
 	virtual void SelectUnit(AActor* SelectedUnit, ESelectStyle SelectionStyle) override;
+
+	void SpawnEntities(const FTransform& SpawnLocation);
 };
