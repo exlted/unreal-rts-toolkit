@@ -18,8 +18,20 @@ UUnitSpawningSystem::UUnitSpawningSystem()
 	// ...
 }
 
-APawn* UUnitSpawningSystem::SpawnEntity(UObject* WorldContext, UClass* SpawnClass, const FTransform SpawnTransform)
+void UUnitSpawningSystem::SpawnEntity(UObject* WorldContext, UClass* SpawnClass, const FTransform SpawnTransform)
 {
+	ServerSpawnEntity(WorldContext, SpawnClass, SpawnTransform);
+}
+
+void UUnitSpawningSystem::SetSide(FSide NewSide)
+{
+	Side = NewSide;
+}
+
+void UUnitSpawningSystem::ServerSpawnEntity_Implementation(UObject* WorldContext, UClass* SpawnClass,
+	FTransform SpawnTransform)
+{
+	
 	const auto Pawn = UAIBlueprintHelperLibrary::SpawnAIFromClass(WorldContext, SpawnClass, nullptr,
 		SpawnTransform.GetLocation(), SpawnTransform.GetRotation().Rotator(), true,
 		GetOwner());
@@ -29,12 +41,5 @@ APawn* UUnitSpawningSystem::SpawnEntity(UObject* WorldContext, UClass* SpawnClas
 		const auto Spawnable = TScriptInterface<ISpawnable>(Pawn);
 		Spawnable->SetSide(Side);
 	}
-
-	return Pawn;
-}
-
-void UUnitSpawningSystem::SetSide(const FSide NewSide)
-{
-	Side = NewSide;
 }
 

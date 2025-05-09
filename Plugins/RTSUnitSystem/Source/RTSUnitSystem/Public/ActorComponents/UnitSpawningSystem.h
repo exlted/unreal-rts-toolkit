@@ -20,9 +20,13 @@ public:
 protected:
 	// Needs an FSide
 	FSide Side;
-	
+	 
 public:
 
-	virtual APawn* SpawnEntity(UObject* WorldContext, UClass* SpawnClass, FTransform SpawnTransform);
+	virtual void SpawnEntity(UObject* WorldContext, UClass* SpawnClass, FTransform SpawnTransform);
 	virtual void SetSide(FSide NewSide);
+
+	// Server Functions
+	UFUNCTION(Server, Reliable)
+	virtual void ServerSpawnEntity(UObject* WorldContext, UClass* SpawnClass, FTransform SpawnTransform);
 };

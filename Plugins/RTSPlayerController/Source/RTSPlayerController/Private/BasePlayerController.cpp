@@ -200,7 +200,7 @@ void ABasePlayerController::OnClickTriggered()
 	}
 	else
 	{
-		if (const auto State = GetPlayerState<APlayerState>(); !SelectUnit && State != nullptr && State->Implements<UMoveUnit>())
+		if (const auto State = GetPlayerState<APlayerState>(); !SelectUnit && State != nullptr)
 		{
 			SelectUnit = TScriptInterface<ISelectUnit>(State);
 			// Intentional Re-entry

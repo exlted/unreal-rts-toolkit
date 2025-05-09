@@ -19,9 +19,16 @@ public:
 	/** Standard Camera Pan Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
 	UInputAction* DebugAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
+	UClass* DebugClassToSpawn;
+
+	FTransform SpawnTransform;
 	
 protected:
 	virtual void SetupInputComponent() override;
+
+	virtual void BeginPlay() override;
 	
 	virtual void OnDebugTriggered(const FInputActionInstance& Instance);
 };
