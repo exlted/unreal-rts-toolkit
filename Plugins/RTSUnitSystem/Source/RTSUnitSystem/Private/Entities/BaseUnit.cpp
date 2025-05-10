@@ -4,6 +4,8 @@
 #include "Entities/BaseUnit.h"
 
 #include "Components/CapsuleComponent.h"
+#include "GameFramework/PlayerState.h"
+#include "Interfaces/HasSide.h"
 #include "Net/UnrealNetwork.h"
 
 
@@ -22,6 +24,8 @@ ABaseUnit::ABaseUnit()
 	SelectionBox = CreateDefaultSubobject<USelectionBox>(TEXT("SelectionBox"));
 	SelectionBox->SetupAttachment(RootComponent);
 	SelectionBox->SetVisibility(false, true);
+	SelectionBox->SetRelativeRotation(FRotator(90, 0, 0));
+	SelectionBox->SetRelativeLocation(FVector(0, 0, -30));
 
 	EntityInfo = CreateDefaultSubobject<UEntityInfo>(TEXT("EntityInfo"));
 }
@@ -30,12 +34,22 @@ ABaseUnit::ABaseUnit()
 void ABaseUnit::BeginPlay()
 {
 	Super::BeginPlay();
+	
+	SelectionBox->AttachToComponent(RootComponent, FAttachmentTransformRules::SnapToTargetIncludingScale);
+	SelectionBox->SetVisibility(false, true);
+	SelectionBox->SetRelativeRotation(FRotator(90, 0, 0));
+	SelectionBox->SetRelativeLocation(FVector(0, 0, -30));
 }
 
 // Called every frame
 void ABaseUnit::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	if (NeedRelationUpdate)
+	{
+		UpdateTeamRelation();
+	}
 }
 
 // Called to bind functionality to input
@@ -96,10 +110,39 @@ FSide ABaseUnit::GetSide()
 	return EntityInfo->SideInfo;
 }
 
+void ABaseUnit::UpdateTeamRelation()
+{
+	NeedRelationUpdate = true;
+	
+	if (const auto PlayerController = GetWorld()->GetFirstPlayerController(); PlayerController != nullptr)
+	{
+		if (const auto State = PlayerController->GetPlayerState<APlayerState>(); State != nullptr && State->Implements<UHasSide>())
+		{
+			if (const auto LocalPlayerSide = TScriptInterface<IHasSide>(State)->GetSide();
+				LocalPlayerSide.Team == Side.Team) // Same Team
+			{
+				SelectionBox->SetUnitRelation(EUnitRelationType::Owned);
+			}
+			else if (Side.Team == -1) // Unit Unowned
+			{
+				SelectionBox->SetUnitRelation(EUnitRelationType::Neutral);
+			}
+			else
+			{
+				SelectionBox->SetUnitRelation(EUnitRelationType::Enemy);
+			}
+			NeedRelationUpdate = false;
+		}
+	}
+}
+
 void ABaseUnit::OnRep_SideChanged()
 {
 	const auto TeamMaterial = UMaterialInstanceDynamic::Create(BaseTeamMaterial, this);
 	TeamMaterial->SetVectorParameterValue("TeamColor", Side.UnitColor);
 	GetMesh()->SetMaterial(0, TeamMaterial);
+
+	
+	UpdateTeamRelation();
 }
 

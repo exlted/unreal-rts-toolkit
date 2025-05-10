@@ -25,7 +25,7 @@ public class SupportFunctions : ModuleRules
 		PublicDependencyModuleNames.AddRange(
 			new string[]
 			{
-				"Core", "GeometryCore",
+				"Core", "GeometryCore", "AIModule", 
 				// ... add other public dependencies that you statically link with here ...
 			}
 			);

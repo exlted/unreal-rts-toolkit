@@ -6,6 +6,7 @@
 #include "ActorComponents/UnitSelectionSystem.h"
 #include "ActorComponents/UnitSpawningSystem.h"
 #include "GameFramework/PlayerState.h"
+#include "Interfaces/HasSide.h"
 #include "Structs/FSide.h"
 #include "BasePlayerState.generated.h"
 
@@ -13,7 +14,7 @@
  * 
  */
 UCLASS()
-class RETURN_TO_THE_MAUL_API ABasePlayerState : public APlayerState, public IMoveUnit, public ISelectUnit
+class RETURN_TO_THE_MAUL_API ABasePlayerState : public APlayerState, public IMoveUnit, public ISelectUnit, public IHasSide
 {
 	GENERATED_BODY()
 
@@ -41,4 +42,6 @@ public:
 	virtual void SelectUnit(AActor* SelectedUnit, ESelectStyle SelectionStyle) override;
 
 	void SpawnEntities(const FTransform& SpawnLocation);
+
+	virtual FSide GetSide() override;
 };

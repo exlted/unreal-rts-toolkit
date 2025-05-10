@@ -35,3 +35,22 @@ void USelectionBox::TickComponent(float DeltaTime, ELevelTick TickType, FActorCo
 	// ...
 }
 
+void USelectionBox::SetUnitRelation(const EUnitRelationType Relation)
+{
+	switch (Relation)
+	{
+	case EUnitRelationType::Owned:
+		this->DecalMaterial = OwnedUnit;
+		break;
+	case EUnitRelationType::Friendly:
+		this->DecalMaterial = FriendlyUnit;
+		break;
+	case EUnitRelationType::Neutral:
+		this->DecalMaterial = NeutralUnit;
+		break;
+	case EUnitRelationType::Enemy:
+		this->DecalMaterial = EnemyUnit;
+		break;
+	}
+}
+

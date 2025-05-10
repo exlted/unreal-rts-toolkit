@@ -31,7 +31,7 @@ protected:
 	
 	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite)
 	UNavigation* Navigation;
-
+	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	USelectionBox* SelectionBox;
 
@@ -40,6 +40,8 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, ReplicatedUsing = OnRep_SideChanged)
 	FSide Side;
+
+	bool NeedRelationUpdate = false;
 	
 public:
 	// Called every frame
@@ -58,6 +60,8 @@ public:
 	virtual void SetSide(FSide NewSide) override;
 	virtual FSide GetSide() override;
 
+	void UpdateTeamRelation();
+	
 	UFUNCTION()
 	virtual void OnRep_SideChanged();
 };

@@ -69,3 +69,8 @@ void ABasePlayerState::SpawnEntities(const FTransform& SpawnLocation)
 		UnitSpawningSystem->SpawnEntity(this, Entity, SpawnLocation + SpawnOffset);
 	}
 }
+
+FSide ABasePlayerState::GetSide()
+{
+	return Side;
+}
