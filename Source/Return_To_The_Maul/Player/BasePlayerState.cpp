@@ -54,11 +54,16 @@ void ABasePlayerState::MoveSelectedUnit(const FVector& GoalPosition, int Sender)
 	}
 }
 
-void ABasePlayerState::SelectUnit(AActor* SelectedUnit, const ESelectStyle SelectionStyle)
+void ABasePlayerState::SelectUnit(AActor* SelectedUnit, const ESelectStyle SelectionStyle, int Sender)
 {
 	if (UnitSelectionSystem != nullptr)
 	{
-		UnitSelectionSystem->SelectUnit(SelectedUnit, SelectionStyle);
+		if (Sender == -1)
+		{
+			Sender = Side.Team;
+		}
+		
+		UnitSelectionSystem->SelectUnit(SelectedUnit, SelectionStyle, Sender);
 	}
 }
 

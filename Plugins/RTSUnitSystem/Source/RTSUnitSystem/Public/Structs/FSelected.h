@@ -18,6 +18,25 @@ struct FSelected
 
 	UPROPERTY(EditAnywhere)
 	TScriptInterface<ITargetable> TargetableUnit;
+
+	void TrySelect(AActor* PotentialSelection)
+	{
+		if (PotentialSelection != nullptr)
+		{
+			if (PotentialSelection->Implements<USelectable>())
+			{
+				SelectedUnit = TScriptInterface<ISelectable>(PotentialSelection);
+			}
+			if (PotentialSelection->Implements<UMovable>())
+			{
+				MovableUnit = TScriptInterface<IMovable>(PotentialSelection);
+			}
+			if (PotentialSelection->Implements<UTargetable>())
+			{
+				TargetableUnit = TScriptInterface<ITargetable>(PotentialSelection);
+			}
+		}
+	}
 	
 	void Select(AActor* SelectedActor)
 	{
@@ -50,6 +69,11 @@ struct FSelected
 		}
 	}
 
+	bool Selected() const
+	{
+		return SelectedUnit != nullptr;
+	}
+	
 	bool CanMove() const
 	{
 		return MovableUnit != nullptr;

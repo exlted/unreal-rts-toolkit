@@ -39,28 +39,38 @@ void UUnitSelectionSystem::MoveSelectedUnit(const FVector& GoalPosition, const i
 	MoveUnits(GetSelectedUnits(), GoalPosition, Sender);
 }
 
-void UUnitSelectionSystem::SelectUnit(AActor* SelectedUnit, const ESelectStyle SelectionStyle)
+void UUnitSelectionSystem::SelectUnit(AActor* SelectedUnit, const ESelectStyle SelectionStyle, const int Sender)
 {
 	switch (SelectionStyle)
 	{
 	case ESelectStyle::New:
 		{
-			for (auto Unit : SelectedUnits)
-			{
-				Unit.Select(nullptr);
-			}
-			SelectedUnits.Empty();
-
-			FSelected NewUnit;
-			NewUnit.Select(SelectedUnit);
-			SelectedUnits.Add(NewUnit);
+			ClearSelectedUnits();
+			SelectUnitInternal(SelectedUnit);
 			break;
 		}
 	case ESelectStyle::Add:
 		{
+			bool Clear = false;
+			if (SelectedUnits.Num() > 0)
+			{
+				// Can only multi-select units that are on your team
+				if (SelectedUnits[0].GetSide().Team != Sender)
+				{
+					Clear = true;
+				}
+			}
 			FSelected NewUnit;
-			NewUnit.Select(SelectedUnit);
-			SelectedUnits.Add(NewUnit);
+			NewUnit.TrySelect(SelectedUnit);
+			if (NewUnit.GetSide().Team == Sender)
+			{
+				// If we're currently selecting an enemy unit and Add Click on an allied unit, start a new selection
+				if (Clear)
+				{
+					ClearSelectedUnits();
+				}
+				SelectUnitInternal(SelectedUnit);
+			}
 			break;
 		}
 	case ESelectStyle::Group:
@@ -72,6 +82,25 @@ void UUnitSelectionSystem::SelectUnit(AActor* SelectedUnit, const ESelectStyle S
 TArray<FSelected> UUnitSelectionSystem::GetSelectedUnits()
 {
 	return SelectedUnits;
+}
+
+void UUnitSelectionSystem::ClearSelectedUnits()
+{
+	for (auto Unit : SelectedUnits)
+	{
+		Unit.Select(nullptr);
+	}
+	SelectedUnits.Empty();
+}
+
+void UUnitSelectionSystem::SelectUnitInternal(AActor* SelectedUnit)
+{
+	FSelected NewUnit;
+	NewUnit.Select(SelectedUnit);
+	if (NewUnit.Selected())
+	{
+		SelectedUnits.Add(NewUnit);
+	}
 }
 
 void UUnitSelectionSystem::MoveUnits_Implementation(const TArray<FSelected>& Units, const FVector& GoalPosition, const int Sender)

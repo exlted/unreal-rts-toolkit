@@ -20,5 +20,5 @@ struct FSide
 	FFactionInfo Faction;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Side, meta=(AllowPrivateAccess = "true"))
-	int Team;
+	int Team = -1;
 };

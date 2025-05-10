@@ -17,7 +17,7 @@ void ADebugPlayerController::SetupInputComponent()
 	
 	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(InputComponent))
 	{
-		EnhancedInputComponent->BindAction(DebugAction, ETriggerEvent::Triggered, this, &ADebugPlayerController::OnDebugTriggered);
+		EnhancedInputComponent->BindAction(DebugAction, ETriggerEvent::Started, this, &ADebugPlayerController::OnDebugTriggered);
 	}
 }
 

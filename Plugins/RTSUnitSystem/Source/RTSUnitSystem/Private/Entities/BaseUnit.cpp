@@ -107,7 +107,7 @@ void ABaseUnit::SetSide(const FSide NewSide)
 
 FSide ABaseUnit::GetSide()
 {
-	return EntityInfo->SideInfo;
+	return Side;
 }
 
 void ABaseUnit::UpdateTeamRelation()

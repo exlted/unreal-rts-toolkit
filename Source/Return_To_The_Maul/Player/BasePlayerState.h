@@ -39,7 +39,7 @@ public:
 	
 	virtual void MoveSelectedUnit(const FVector& GoalPosition, int Sender = -1) override;
 
-	virtual void SelectUnit(AActor* SelectedUnit, ESelectStyle SelectionStyle) override;
+	virtual void SelectUnit(AActor* SelectedUnit, ESelectStyle SelectionStyle, int Sender = -1) override;
 
 	void SpawnEntities(const FTransform& SpawnLocation);
 

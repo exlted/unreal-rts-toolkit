@@ -23,5 +23,5 @@ class SUPPORTFUNCTIONS_API ISelectUnit
 
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
-	virtual void SelectUnit(AActor* SelectedUnit, ESelectStyle SelectionStyle) = 0;
+	virtual void SelectUnit(AActor* SelectedUnit, ESelectStyle SelectionStyle, int Sender = -1) = 0;
 };

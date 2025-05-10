@@ -50,6 +50,7 @@ void ABasePlayerController::SetupInputComponent()
 		EnhancedInputComponent->BindAction(ClickAction, ETriggerEvent::Triggered, this, &ABasePlayerController::OnClickTriggered);
 		EnhancedInputComponent->BindAction(MoveClickAction, ETriggerEvent::Started, this, &ABasePlayerController::OnInputStarted);
 		EnhancedInputComponent->BindAction(MoveClickAction, ETriggerEvent::Triggered, this, &ABasePlayerController::OnMoveClickTriggered);
+		EnhancedInputComponent->BindAction(AddModifierAction, ETriggerEvent::Triggered, this, &ABasePlayerController::OnAddModifierTriggered);
 	}
 }
 
@@ -189,6 +190,17 @@ void ABasePlayerController::OnRotateTriggered(const FInputActionInstance& Instan
 	}
 }
 
+void ABasePlayerController::OnAddModifierTriggered(const FInputActionInstance& Instance)
+{
+	const auto Test = Instance.GetValue();
+	const auto Test2 = Test.Get<bool>();
+	AddModifierPressed = Test2;
+	if (AddModifierPressed)
+	{
+		OnInputStarted();
+	}
+}
+
 void ABasePlayerController::OnClickTriggered()
 {
 	if (SelectUnit != nullptr)
@@ -196,7 +208,7 @@ void ABasePlayerController::OnClickTriggered()
 		FHitResult HitResult;
 		GetHitResultUnderCursor(ECC_Pawn, true, HitResult);
 		
-		SelectUnit->SelectUnit(HitResult.GetActor(), ESelectStyle::New);
+		SelectUnit->SelectUnit(HitResult.GetActor(), AddModifierPressed ? ESelectStyle::Add : ESelectStyle::New);
 	}
 	else
 	{

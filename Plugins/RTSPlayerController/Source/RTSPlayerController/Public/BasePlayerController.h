@@ -61,6 +61,11 @@ public:
 	UInputAction* MoveClickAction;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
+	UInputAction* AddModifierAction;
+
+	bool AddModifierPressed = false;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
 	TScriptInterface<IRTSCamera> RTSCamera;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
@@ -87,6 +92,7 @@ protected:
 	virtual void OnPanTriggered(const FInputActionInstance& Instance);
 	virtual void OnZoomTriggered(const FInputActionInstance& Instance);
 	virtual void OnRotateTriggered(const FInputActionInstance& Instance);
+	virtual void OnAddModifierTriggered(const FInputActionInstance& Instance);
 	virtual void OnClickTriggered();
 	virtual void OnMoveClickTriggered();
 	
