@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Enums/UnitRelationType.h"
 #include "UObject/Interface.h"
 #include "Selectable.generated.h"
 

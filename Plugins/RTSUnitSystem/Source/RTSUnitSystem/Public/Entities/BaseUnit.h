@@ -5,16 +5,12 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "ActorComponents/Navigation.h"
-#include "ActorComponents/SelectionBox.h"
-#include "Interfaces/Movable.h"
 #include "Interfaces/Selectable.h"
-#include "Interfaces/Targetable.h"
 #include "ActorComponents/UEntityInfo.h"
-#include "Interfaces/Spawnable.h"
 #include "BaseUnit.generated.h"
 
 UCLASS()
-class RTSUNITSYSTEM_API ABaseUnit : public ACharacter, public ISelectable, public IMovable, public ITargetable, public ISpawnable
+class RTSUNITSYSTEM_API ABaseUnit : public ACharacter
 {
 	GENERATED_BODY()
 
@@ -25,21 +21,18 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UMaterial* BaseTeamMaterial;
 	
 	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite)
 	UNavigation* Navigation;
-	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-	USelectionBox* SelectionBox;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	UPROPERTY(Replicated, EditDefaultsOnly, BlueprintReadWrite)
 	UEntityInfo* EntityInfo;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, ReplicatedUsing = OnRep_SideChanged)
-	FSide Side;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	TScriptInterface<ISelectable> SelectableComponent;
 
 	bool NeedRelationUpdate = false;
 	
@@ -47,21 +40,13 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
+	
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
-	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
-
-	virtual void OnSelect() override;
-	virtual void OnDeselect() override;
-	virtual bool HasTag(FName TagName) override;
-
-	virtual void MoveTo(const FVector& NewLocation) override;
-
-	virtual void SetSide(FSide NewSide) override;
-	virtual FSide GetSide() override;
 
 	void UpdateTeamRelation();
-	
+
 	UFUNCTION()
-	virtual void OnRep_SideChanged();
+	virtual void OnSideChanged(FSide SideUpdate);
 };

@@ -8,7 +8,7 @@
 #include "BaseBuilder.generated.h"
 
 UCLASS()
-class RTSUNITSYSTEM_API ABaseBuilder : public ABaseUnit, public IBuilder
+class RTSUNITSYSTEM_API ABaseBuilder : public ABaseUnit
 {
 	GENERATED_BODY()
 

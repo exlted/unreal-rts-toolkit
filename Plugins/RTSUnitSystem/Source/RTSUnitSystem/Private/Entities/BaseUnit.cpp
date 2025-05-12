@@ -7,6 +7,7 @@
 #include "GameFramework/PlayerState.h"
 #include "Interfaces/HasSide.h"
 #include "Net/UnrealNetwork.h"
+#include "ActorComponents/SelectionBox.h"
 
 
 // Sets default values
@@ -21,11 +22,6 @@ ABaseUnit::ABaseUnit()
 	GetCapsuleComponent()->SetCapsuleRadius( 10, true);
 	
 	Navigation = CreateDefaultSubobject<UNavigation>(TEXT("Navigation"));
-	SelectionBox = CreateDefaultSubobject<USelectionBox>(TEXT("SelectionBox"));
-	SelectionBox->SetupAttachment(RootComponent);
-	SelectionBox->SetVisibility(false, true);
-	SelectionBox->SetRelativeRotation(FRotator(90, 0, 0));
-	SelectionBox->SetRelativeLocation(FVector(0, 0, -30));
 
 	EntityInfo = CreateDefaultSubobject<UEntityInfo>(TEXT("EntityInfo"));
 }
@@ -35,10 +31,19 @@ void ABaseUnit::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	SelectionBox->AttachToComponent(RootComponent, FAttachmentTransformRules::SnapToTargetIncludingScale);
-	SelectionBox->SetVisibility(false, true);
-	SelectionBox->SetRelativeRotation(FRotator(90, 0, 0));
-	SelectionBox->SetRelativeLocation(FVector(0, 0, -30));
+	const auto Selectables = GetComponentsByInterface(USelectable::StaticClass());
+	if (Selectables.Num() > 0)
+	{
+		UE_LOG(LogTemp, Display, TEXT("Implements more than 1 component that implements ISelectable"));
+	}
+	for (const auto& Selectable : Selectables)
+	{
+		SelectableComponent = Selectable;
+	}
+
+	// Subscribe for future updates & update to match existing state
+	EntityInfo->RegisterSideUpdates(this, &ABaseUnit::OnSideChanged);
+	OnSideChanged(EntityInfo->GetSide());
 }
 
 // Called every frame
@@ -52,97 +57,55 @@ void ABaseUnit::Tick(float DeltaTime)
 	}
 }
 
+void ABaseUnit::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ABaseUnit, EntityInfo);
+}
+
 // Called to bind functionality to input
 void ABaseUnit::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 }
 
-void ABaseUnit::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
-{
-	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-
-	DOREPLIFETIME(ABaseUnit, Side);
-}
-
-void ABaseUnit::OnSelect()
-{
-	SelectionBox->SetVisibility(true, true);
-}
-
-void ABaseUnit::OnDeselect()
-{
-	SelectionBox->SetVisibility(false, true);
-}
-
-bool ABaseUnit::HasTag(const FName TagName)
-{
-	return Tags.Contains(TagName);
-}
-
-void ABaseUnit::MoveTo(const FVector& NewLocation)
-{
-	UAIBlueprintHelperLibrary::SimpleMoveToLocation(Controller, NewLocation);
-	//Navigation->Navigate(Navigation->FindPathToLocation(NewLocation));
-}
-
-void ABaseUnit::SetSide(const FSide NewSide)
-{
-	EntityInfo->SideInfo = NewSide;
-	Side = NewSide;
-	
-	for (const auto EntityInfoTags = EntityInfo->GetTags();
-		const auto& Tag : EntityInfoTags)
-	{
-		Tags.AddUnique(Tag);
-	}
-
-	if (BaseTeamMaterial != nullptr)
-	{
-		const auto TeamMaterial = UMaterialInstanceDynamic::Create(BaseTeamMaterial, this);
-		TeamMaterial->SetVectorParameterValue("TeamColor", NewSide.UnitColor);
-		GetMesh()->SetMaterial(0, TeamMaterial);
-	}
-}
-
-FSide ABaseUnit::GetSide()
-{
-	return Side;
-}
-
 void ABaseUnit::UpdateTeamRelation()
 {
 	NeedRelationUpdate = true;
-	
-	if (const auto PlayerController = GetWorld()->GetFirstPlayerController(); PlayerController != nullptr)
+
+	if (SelectableComponent != nullptr && SelectableComponent.GetObject()->IsA(USelectionBox::StaticClass()))
 	{
-		if (const auto State = PlayerController->GetPlayerState<APlayerState>(); State != nullptr && State->Implements<UHasSide>())
+		const auto SelectionBox = Cast<USelectionBox>(SelectableComponent.GetObject());
+		if (const auto PlayerController = GetWorld()->GetFirstPlayerController(); PlayerController != nullptr)
 		{
-			if (const auto LocalPlayerSide = TScriptInterface<IHasSide>(State)->GetSide();
-				LocalPlayerSide.Team == Side.Team) // Same Team
+			if (const auto State = PlayerController->GetPlayerState<APlayerState>(); State != nullptr && State->Implements<UHasSide>())
 			{
-				SelectionBox->SetUnitRelation(EUnitRelationType::Owned);
+				if (const auto LocalPlayerSide = TScriptInterface<IHasSide>(State)->GetSide();
+					LocalPlayerSide.Team == EntityInfo->GetSide().Team) // Same Team
+				{
+					SelectionBox->SetUnitRelation(EUnitRelationType::Owned);
+				}
+				else if (EntityInfo->GetSide().Team == -1) // Unit Unowned
+				{
+					SelectionBox->SetUnitRelation(EUnitRelationType::Neutral);
+				}
+				else
+				{
+					SelectionBox->SetUnitRelation(EUnitRelationType::Enemy);
+				}
+				NeedRelationUpdate = false;
 			}
-			else if (Side.Team == -1) // Unit Unowned
-			{
-				SelectionBox->SetUnitRelation(EUnitRelationType::Neutral);
-			}
-			else
-			{
-				SelectionBox->SetUnitRelation(EUnitRelationType::Enemy);
-			}
-			NeedRelationUpdate = false;
 		}
 	}
 }
 
-void ABaseUnit::OnRep_SideChanged()
+void ABaseUnit::OnSideChanged(const FSide SideUpdate)
 {
 	const auto TeamMaterial = UMaterialInstanceDynamic::Create(BaseTeamMaterial, this);
-	TeamMaterial->SetVectorParameterValue("TeamColor", Side.UnitColor);
+	TeamMaterial->SetVectorParameterValue("TeamColor", SideUpdate.UnitColor);
 	GetMesh()->SetMaterial(0, TeamMaterial);
 
-	
 	UpdateTeamRelation();
 }
 

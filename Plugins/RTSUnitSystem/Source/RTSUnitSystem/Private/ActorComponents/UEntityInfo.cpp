@@ -3,6 +3,13 @@
 
 #include "ActorComponents/UEntityInfo.h"
 
+#include "Net/UnrealNetwork.h"
+
+UEntityInfo::UEntityInfo()
+{
+	SetIsReplicatedByDefault(true);
+}
+
 std::vector<FName> UEntityInfo::GetTags() const
 {
 	std::vector<FName> Tags;
@@ -26,4 +33,31 @@ std::vector<FName> UEntityInfo::GetTags() const
 	}
 	
 	return Tags;
+}
+
+FSide UEntityInfo::GetSide()
+{
+	return SideInfo;
+}
+
+void UEntityInfo::SetSide(const FSide NewSide)
+{
+	SideInfo = NewSide;
+}
+
+void UEntityInfo::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(UEntityInfo, SideInfo);
+}
+
+void UEntityInfo::OnRep_SideChanged()
+{
+	OnSideChanged.Broadcast(SideInfo);
+}
+
+FSideChanged UEntityInfo::GetEventDelegate()
+{
+	return OnSideChanged;
 }

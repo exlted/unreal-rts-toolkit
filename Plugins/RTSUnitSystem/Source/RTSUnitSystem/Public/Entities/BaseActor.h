@@ -10,7 +10,7 @@
 #include "BaseActor.generated.h"
 
 UCLASS()
-class RTSUNITSYSTEM_API ABaseActor : public AActor, public ISelectable, public ITargetable
+class RTSUNITSYSTEM_API ABaseActor : public AActor
 {
 	GENERATED_BODY()
 
@@ -29,9 +29,9 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	virtual void OnSelect() override;
-	virtual void OnDeselect() override;
-	virtual bool HasTag(FName TagName) override;
+	virtual void OnSelect();
+	virtual void OnDeselect();
+	virtual bool HasTag(FName TagName);
 	
-	virtual FSide GetSide() override;
+	virtual FSide GetSide();
 };

@@ -4,6 +4,7 @@
 #include "Interfaces/Movable.h"
 #include "Interfaces/Selectable.h"
 #include "Interfaces/Targetable.h"
+#include "Utils/ComponentUtils.h"
 #include "FSelected.generated.h"
 
 USTRUCT(BlueprintType)
@@ -23,49 +24,42 @@ struct FSelected
 	{
 		if (PotentialSelection != nullptr)
 		{
-			if (PotentialSelection->Implements<USelectable>())
-			{
-				SelectedUnit = TScriptInterface<ISelectable>(PotentialSelection);
-			}
-			if (PotentialSelection->Implements<UMovable>())
-			{
-				MovableUnit = TScriptInterface<IMovable>(PotentialSelection);
-			}
-			if (PotentialSelection->Implements<UTargetable>())
-			{
-				TargetableUnit = TScriptInterface<ITargetable>(PotentialSelection);
-			}
+			SelectedUnit = GetRelatedSingletonComponent<ISelectable, USelectable>(PotentialSelection);
+			MovableUnit = GetRelatedSingletonComponent<IMovable, UMovable>(PotentialSelection);
+			TargetableUnit = GetRelatedSingletonComponent<ITargetable, UTargetable>(PotentialSelection);
 		}
 	}
 	
 	void Select(AActor* SelectedActor)
 	{
-		if (SelectedActor == SelectedUnit.GetObject())
+		if (SelectedUnit == nullptr && SelectedActor == nullptr)
 		{
-			// no change, no work needed
 			return;
 		}
 		
-		// If we already have something selected, and we're deselecting it, let it know
 		if (SelectedUnit != nullptr)
 		{
+			if (SelectedActor == Cast<UActorComponent>(SelectedUnit.GetObject())->GetOwner())
+			{
+				// no change, no work needed
+				return;
+			}
+			
+			// If we already have something selected, and we're deselecting it, let it know
 			SelectedUnit->OnDeselect();
 			SelectedUnit = nullptr;
 			MovableUnit = nullptr;
 		}
 
-		if (SelectedActor != nullptr && SelectedActor->Implements<USelectable>())
+		if (SelectedActor != nullptr)
 		{
-			SelectedUnit = TScriptInterface<ISelectable>(SelectedActor);
+			SelectedUnit = GetRelatedSingletonComponent<ISelectable, USelectable>(SelectedActor);
+			if (SelectedUnit != nullptr)
+			{
 			SelectedUnit->OnSelect();
-			if (SelectedActor->Implements<UMovable>())
-			{
-				MovableUnit = TScriptInterface<IMovable>(SelectedActor);
 			}
-			if (SelectedActor->Implements<UTargetable>())
-			{
-				TargetableUnit = TScriptInterface<ITargetable>(SelectedActor);
-			}
+			MovableUnit = GetRelatedSingletonComponent<IMovable, UMovable>(SelectedActor);
+			TargetableUnit = GetRelatedSingletonComponent<ITargetable, UTargetable>(SelectedActor);
 		}
 	}
 

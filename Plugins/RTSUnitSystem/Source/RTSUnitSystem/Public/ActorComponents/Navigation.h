@@ -4,13 +4,14 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "Interfaces/Movable.h"
 #include "Navigation.generated.h"
 
 
 class USplineComponent;
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
-class RTSUNITSYSTEM_API UNavigation : public UActorComponent
+class RTSUNITSYSTEM_API UNavigation : public UActorComponent, public IMovable
 {
 	GENERATED_BODY()
 
@@ -29,6 +30,8 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType,
 	                           FActorComponentTickFunction* ThisTickFunction) override;
+	
+	virtual void MoveTo(const FVector& NewLocation) override;
 	
 	UFUNCTION(BlueprintCallable)
 	TArray<FVector> FindPathToLocation(const FVector& Location) const;

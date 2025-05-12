@@ -68,6 +68,11 @@ void UNavigation::TickComponent(float DeltaTime, ELevelTick TickType, FActorComp
 	Cast<APawn>(GetOwner())->AddMovementInput(Direction, Scale);
 }
 
+void UNavigation::MoveTo(const FVector& NewLocation)
+{
+	Navigate(FindPathToLocation(NewLocation));
+}
+
 TArray<FVector> UNavigation::FindPathToLocation(const FVector& Location) const
 {
 	TArray<FVector> Result;

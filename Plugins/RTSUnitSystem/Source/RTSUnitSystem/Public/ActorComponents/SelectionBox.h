@@ -6,11 +6,12 @@
 #include "Components/ActorComponent.h"
 #include "Components/DecalComponent.h"
 #include "Enums/UnitRelationType.h"
+#include "Interfaces/Selectable.h"
 #include "SelectionBox.generated.h"
 
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
-class RTSUNITSYSTEM_API USelectionBox : public UDecalComponent
+class RTSUNITSYSTEM_API USelectionBox : public UDecalComponent, public ISelectable
 {
 	GENERATED_BODY()
 
@@ -34,10 +35,16 @@ protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
+	virtual void SetDecalMaterial(UMaterialInstance* Material);
+	
 public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType,
 	                           FActorComponentTickFunction* ThisTickFunction) override;
 
 	virtual void SetUnitRelation(EUnitRelationType Relation);
+	
+	virtual void OnSelect() override;
+	virtual void OnDeselect() override;
+	virtual bool HasTag(FName TagName) override;
 };

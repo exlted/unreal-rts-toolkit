@@ -4,7 +4,7 @@
 #include "ActorComponents/UnitSpawningSystem.h"
 
 #include "Blueprint/AIBlueprintHelperLibrary.h"
-#include "EntitySystem/MovieSceneEntitySystemRunner.h"
+#include "Utils/ComponentUtils.h"
 #include "Interfaces/Spawnable.h"
 
 
@@ -36,9 +36,8 @@ void UUnitSpawningSystem::ServerSpawnEntity_Implementation(UObject* WorldContext
 		SpawnTransform.GetLocation(), SpawnTransform.GetRotation().Rotator(), true,
 		GetOwner());
 
-	if (Pawn->Implements<USpawnable>())
+	if (const auto Spawnable = GetRelatedSingletonComponent<ISpawnable, USpawnable>(Pawn); Spawnable != nullptr)
 	{
-		const auto Spawnable = TScriptInterface<ISpawnable>(Pawn);
 		Spawnable->SetSide(Side);
 	}
 }

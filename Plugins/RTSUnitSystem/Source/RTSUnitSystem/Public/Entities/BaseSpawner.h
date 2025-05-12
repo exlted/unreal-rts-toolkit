@@ -8,7 +8,7 @@
 #include "BaseSpawner.generated.h"
 
 UCLASS()
-class RTSUNITSYSTEM_API ABaseSpawner : public ABaseBuilding, public IBuilder
+class RTSUNITSYSTEM_API ABaseSpawner : public ABaseBuilding
 {
 	GENERATED_BODY()
 

@@ -14,6 +14,8 @@ class RTSUNITSYSTEM_API UTargetable : public UInterface
 	GENERATED_BODY()
 };
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FSideChanged, FSide, UpdatedSide);
+
 /**
  * 
  */
@@ -24,4 +26,23 @@ class RTSUNITSYSTEM_API ITargetable
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
 	virtual FSide GetSide() = 0;
+	
+	template <class UserClass>
+	void RegisterSideUpdatesInternal(UserClass* UserObject, void(UserClass::*Function)(FSide), FName FunctionName)
+	{
+		GetEventDelegate().__Internal_AddDynamic(UserObject, Function, FunctionName);
+	}
+
+#define RegisterSideUpdates(UserObject, FuncName) RegisterSideUpdatesInternal(UserObject, FuncName, STATIC_FUNCTION_FNAME( TEXT( #FuncName ) ))
+	
+	template <class UserClass>
+	void DeregisterSideUpdatesInternal(UserClass* UserObject, void(UserClass::*Function)(FSide), FName FunctionName)
+	{
+		GetEventDelegate().RemoveDynamic(UserObject, Function);
+	}
+
+#define DeregisterSideUpdates(UserObject, FuncName) DeregisterSideUpdatesInternal(UserObject, FuncName, STATIC_FUNCTION_FNAME( TEXT( #FuncName ) ))
+	
+private:
+	virtual FSideChanged GetEventDelegate() = 0;
 };

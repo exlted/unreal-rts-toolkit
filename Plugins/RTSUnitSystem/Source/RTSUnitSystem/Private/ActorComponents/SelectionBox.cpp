@@ -26,6 +26,14 @@ void USelectionBox::BeginPlay()
 	
 }
 
+void USelectionBox::SetDecalMaterial(UMaterialInstance* Material)
+{
+	if (Material != nullptr)
+	{
+		DecalMaterial = Material;
+	}
+}
+
 
 // Called every frame
 void USelectionBox::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -40,17 +48,34 @@ void USelectionBox::SetUnitRelation(const EUnitRelationType Relation)
 	switch (Relation)
 	{
 	case EUnitRelationType::Owned:
-		this->DecalMaterial = OwnedUnit;
+		SetDecalMaterial(OwnedUnit);
 		break;
 	case EUnitRelationType::Friendly:
-		this->DecalMaterial = FriendlyUnit;
+		SetDecalMaterial(FriendlyUnit);
 		break;
 	case EUnitRelationType::Neutral:
-		this->DecalMaterial = NeutralUnit;
+		SetDecalMaterial(NeutralUnit);
 		break;
 	case EUnitRelationType::Enemy:
-		this->DecalMaterial = EnemyUnit;
+		SetDecalMaterial(EnemyUnit);
+		break;
+	case EUnitRelationType::Unset:
 		break;
 	}
+}
+
+void USelectionBox::OnSelect()
+{
+	SetVisibility(true);
+}
+
+void USelectionBox::OnDeselect()
+{
+	SetVisibility(false);
+}
+
+bool USelectionBox::HasTag(const FName TagName)
+{
+	return GetOwner()->Tags.Contains(TagName);
 }
 
