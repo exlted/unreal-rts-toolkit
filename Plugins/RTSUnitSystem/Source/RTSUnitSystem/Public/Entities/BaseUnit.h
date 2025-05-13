@@ -28,24 +28,15 @@ protected:
 	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite)
 	UNavigation* Navigation;
 
-	UPROPERTY(Replicated, EditDefaultsOnly, BlueprintReadWrite)
-	UEntityInfo* EntityInfo;
-
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-	TScriptInterface<ISelectable> SelectableComponent;
-
-	bool NeedRelationUpdate = false;
+	UEntityInfo* EntityInfo;
 	
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-
-	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
 	
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
-
-	void UpdateTeamRelation();
 
 	UFUNCTION()
 	virtual void OnSideChanged(FSide SideUpdate);

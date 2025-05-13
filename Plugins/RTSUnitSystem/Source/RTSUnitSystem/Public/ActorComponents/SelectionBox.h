@@ -7,6 +7,7 @@
 #include "Components/DecalComponent.h"
 #include "Enums/UnitRelationType.h"
 #include "Interfaces/Selectable.h"
+#include "Interfaces/Targetable.h"
 #include "SelectionBox.generated.h"
 
 
@@ -30,12 +31,18 @@ public:
 	
 	UPROPERTY(EditAnywhere)
 	UMaterialInstance* EnemyUnit;
+
+	UPROPERTY(EditAnywhere)
+	TScriptInterface<ITargetable> TargetableComponent;
 	
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
 	virtual void SetDecalMaterial(UMaterialInstance* Material);
+
+	bool NeedRelationUpdate;
+	void UpdateTeamRelation();
 	
 public:
 	// Called every frame
@@ -47,4 +54,7 @@ public:
 	virtual void OnSelect() override;
 	virtual void OnDeselect() override;
 	virtual bool HasTag(FName TagName) override;
+
+	UFUNCTION()
+	void OnSideChanged(const FSide SideUpdate);
 };

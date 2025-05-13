@@ -3,17 +3,24 @@
 
 #include "ActorComponents/SelectionBox.h"
 
+#include "GameFramework/PlayerState.h"
+#include "Interfaces/HasSide.h"
+#include "Utils/ComponentUtils.h"
+
 
 // Sets default values for this component's properties
 USelectionBox::USelectionBox()
 {
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
-	PrimaryComponentTick.bCanEverTick = false;
+	PrimaryComponentTick.bCanEverTick = true;
+	PrimaryComponentTick.bStartWithTickEnabled = true;
+	PrimaryComponentTick.bAllowTickOnDedicatedServer = false;
 
 	SetRelativeRotation(FRotator(0, 0, 90));
 	DecalSize = FVector(10, 20, 20);
 	SetRelativeLocation(FVector(0, 0, -30));
+	SetVisibility(false);
 }
 
 
@@ -21,9 +28,14 @@ USelectionBox::USelectionBox()
 void USelectionBox::BeginPlay()
 {
 	Super::BeginPlay();
-
-	// ...
+	SetComponentTickEnabled(true);
 	
+	// ...
+	TargetableComponent = GetRelatedSingletonComponent<ITargetable, UTargetable>(GetOwner());
+	if (TargetableComponent != nullptr)
+	{
+		TargetableComponent->RegisterSideUpdates(this, &USelectionBox::OnSideChanged);
+	}
 }
 
 void USelectionBox::SetDecalMaterial(UMaterialInstance* Material)
@@ -35,12 +47,45 @@ void USelectionBox::SetDecalMaterial(UMaterialInstance* Material)
 }
 
 
+void USelectionBox::UpdateTeamRelation()
+{
+	NeedRelationUpdate = true;
+
+	if (TargetableComponent != nullptr)
+	{
+		if (const auto PlayerController = GetWorld()->GetFirstPlayerController(); PlayerController != nullptr)
+		{
+			if (const auto State = PlayerController->GetPlayerState<APlayerState>(); State != nullptr && State->Implements<UHasSide>())
+			{
+				if (const auto LocalPlayerSide = TScriptInterface<IHasSide>(State)->GetSide();
+					LocalPlayerSide.Team == TargetableComponent->GetSide().Team) // Same Team
+				{
+					SetUnitRelation(EUnitRelationType::Owned);
+				}
+				else if (TargetableComponent->GetSide().Team == -1) // Unit Unowned
+				{
+					SetUnitRelation(EUnitRelationType::Neutral);
+				}
+				else
+				{
+					SetUnitRelation(EUnitRelationType::Enemy);
+				}
+				NeedRelationUpdate = false;
+			}
+		}
+	}
+}
+
 // Called every frame
 void USelectionBox::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
 	// ...
+	if (NeedRelationUpdate)
+	{
+		UpdateTeamRelation();
+	}
 }
 
 void USelectionBox::SetUnitRelation(const EUnitRelationType Relation)
@@ -79,3 +124,7 @@ bool USelectionBox::HasTag(const FName TagName)
 	return GetOwner()->Tags.Contains(TagName);
 }
 
+void USelectionBox::OnSideChanged(const FSide SideUpdate)
+{
+	UpdateTeamRelation();
+}

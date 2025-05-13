@@ -8,6 +8,28 @@
 UEntityInfo::UEntityInfo()
 {
 	SetIsReplicatedByDefault(true);
+	PrimaryComponentTick.bCanEverTick = true;
+	PrimaryComponentTick.bStartWithTickEnabled = true;
+	PrimaryComponentTick.bAllowTickOnDedicatedServer = false;
+	PrimaryComponentTick.TickGroup = TG_PrePhysics;
+}
+
+void UEntityInfo::BeginPlay()
+{
+	Super::BeginPlay();
+	FirstTick = true;
+	SetComponentTickEnabled(true);
+}
+
+void UEntityInfo::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+{
+	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+
+	if (FirstTick)
+	{
+		FirstTick = false;
+		OnRep_SideChanged();
+	}
 }
 
 std::vector<FName> UEntityInfo::GetTags() const

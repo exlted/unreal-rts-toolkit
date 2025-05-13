@@ -26,6 +26,11 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=UnitInfo, meta=(AllowPrivateAccess = "true"))
 	FSideChanged OnSideChanged;
+
+	virtual void BeginPlay() override;
+	
+	bool FirstTick = false;
+	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 	
 	std::vector<FName> GetTags() const;
 	virtual FSide GetSide() override;
