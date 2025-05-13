@@ -44,5 +44,5 @@ public:
 #define DeregisterSideUpdates(UserObject, FuncName) DeregisterSideUpdatesInternal(UserObject, FuncName, STATIC_FUNCTION_FNAME( TEXT( #FuncName ) ))
 	
 private:
-	virtual FSideChanged GetEventDelegate() = 0;
+	virtual FSideChanged& GetEventDelegate() = 0;
 };

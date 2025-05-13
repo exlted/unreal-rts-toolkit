@@ -57,7 +57,7 @@ void UEntityInfo::OnRep_SideChanged()
 	OnSideChanged.Broadcast(SideInfo);
 }
 
-FSideChanged UEntityInfo::GetEventDelegate()
+FSideChanged& UEntityInfo::GetEventDelegate()
 {
 	return OnSideChanged;
 }

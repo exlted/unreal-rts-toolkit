@@ -24,7 +24,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=UnitInfo, meta=(AllowPrivateAccess = "true"))
 	EEntityType EntityType;
 
-	UPROPERTY()
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=UnitInfo, meta=(AllowPrivateAccess = "true"))
 	FSideChanged OnSideChanged;
 	
 	std::vector<FName> GetTags() const;
@@ -37,5 +37,5 @@ public:
 	virtual void OnRep_SideChanged();
 	
 private:
-	virtual FSideChanged GetEventDelegate() override;
+	virtual FSideChanged& GetEventDelegate() override;
 };

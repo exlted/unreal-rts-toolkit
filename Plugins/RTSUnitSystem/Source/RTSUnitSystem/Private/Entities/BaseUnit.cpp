@@ -43,7 +43,6 @@ void ABaseUnit::BeginPlay()
 
 	// Subscribe for future updates & update to match existing state
 	EntityInfo->RegisterSideUpdates(this, &ABaseUnit::OnSideChanged);
-	OnSideChanged(EntityInfo->GetSide());
 }
 
 // Called every frame
