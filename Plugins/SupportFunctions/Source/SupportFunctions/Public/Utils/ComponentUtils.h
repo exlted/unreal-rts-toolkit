@@ -23,3 +23,37 @@ static TScriptInterface<Interface> GetRelatedSingletonComponent(AActor* FromActo
 		
 	return nullptr;
 }
+
+template<class BaseComponentType>
+static TArray<BaseComponentType*> GetRelatedTypedComponents(AActor* FromActor)
+{
+	const auto Components = FromActor->GetComponents();
+	TArray<BaseComponentType*> Result;
+	for (const auto Component : Components)
+	{
+		if (Component->IsA(BaseComponentType::StaticClass()))
+		{
+			Result.Add(Component);
+		}
+	}
+	return Result;
+}
+template<class BaseComponentType>
+static BaseComponentType* GetRelatedSingletonTypedComponents(AActor* FromActor)
+{
+	auto Components = FromActor->GetComponents();
+	BaseComponentType* Result = nullptr;
+	for (auto Component : Components)
+	{
+		if (Component->IsA(BaseComponentType::StaticClass()))
+		{
+			if (Result != nullptr)
+			{
+				UE_LOG(LogTemp, Error, TEXT("Actor had more than 1 of an expected Singleton Component type"));
+				break;
+			}
+			Result = Cast<BaseComponentType>(Component);
+		}
+	}
+	return Result;
+}

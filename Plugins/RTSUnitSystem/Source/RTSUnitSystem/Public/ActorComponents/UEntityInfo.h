@@ -9,7 +9,7 @@
 #include "Interfaces/Targetable.h"
 #include "UEntityInfo.generated.h"
 
-UCLASS()
+UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class RTSUNITSYSTEM_API UEntityInfo : public UActorComponent, public ITargetable, public ISpawnable
 {
 	GENERATED_BODY()
