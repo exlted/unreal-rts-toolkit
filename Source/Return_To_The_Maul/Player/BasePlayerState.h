@@ -7,6 +7,7 @@
 #include "ActorComponents/UnitSpawningSystem.h"
 #include "GameFramework/PlayerState.h"
 #include "Interfaces/HasSide.h"
+#include "Interfaces/HasUIManager.h"
 #include "Structs/FSide.h"
 #include "BasePlayerState.generated.h"
 
@@ -15,6 +16,7 @@
  */
 UCLASS()
 class RETURN_TO_THE_MAUL_API ABasePlayerState : public APlayerState, public IMoveUnit, public ISelectUnit, public IHasSide
+	, public IHasUIManager
 {
 	GENERATED_BODY()
 
@@ -29,6 +31,9 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	UUnitSpawningSystem* UnitSpawningSystem;
+
+	UPROPERTY(EditAnywhere)
+	UUIManager* UIManager;
 	
 	virtual void BeginPlay() override;
 
@@ -44,4 +49,6 @@ public:
 	void SpawnEntities(const FTransform& SpawnLocation);
 
 	virtual FSide GetSide() override;
+
+	virtual TWeakObjectPtr<UUIManager> GetUIManager() override;
 };

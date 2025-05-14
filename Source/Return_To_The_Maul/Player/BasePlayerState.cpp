@@ -11,6 +11,7 @@ ABasePlayerState::ABasePlayerState()
 {
 	UnitSelectionSystem = CreateDefaultSubobject<UUnitSelectionSystem>("UnitSelectionSystem");
 	UnitSpawningSystem = CreateDefaultSubobject<UUnitSpawningSystem>("UnitSpawningSystem");
+	UIManager = CreateDefaultSubobject<UUIManager>("UUIManager");
 }
 
 void ABasePlayerState::BeginPlay()
@@ -78,4 +79,9 @@ void ABasePlayerState::SpawnEntities(const FTransform& SpawnLocation)
 FSide ABasePlayerState::GetSide()
 {
 	return Side;
+}
+
+TWeakObjectPtr<UUIManager> ABasePlayerState::GetUIManager()
+{
+	return UIManager;
 }

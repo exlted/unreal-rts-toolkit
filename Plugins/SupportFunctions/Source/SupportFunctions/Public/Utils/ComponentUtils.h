@@ -33,7 +33,7 @@ static TArray<BaseComponentType*> GetRelatedTypedComponents(AActor* FromActor)
 	{
 		if (Component->IsA(BaseComponentType::StaticClass()))
 		{
-			Result.Add(Component);
+			Result.Add(Cast<BaseComponentType>(Component));
 		}
 	}
 	return Result;

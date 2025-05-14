@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include "CoreMinimal.h"
+#include "Interfaces/Builder.h"
 #include "Interfaces/Movable.h"
 #include "Interfaces/Selectable.h"
 #include "Interfaces/Targetable.h"
@@ -20,6 +21,9 @@ struct FSelected
 	UPROPERTY(EditAnywhere)
 	TScriptInterface<ITargetable> TargetableUnit;
 
+	UPROPERTY(EditAnywhere)
+	TScriptInterface<IBuilder> BuilderUnit;
+
 	void TrySelect(AActor* PotentialSelection)
 	{
 		if (PotentialSelection != nullptr)
@@ -27,6 +31,7 @@ struct FSelected
 			SelectedUnit = GetRelatedSingletonComponent<ISelectable, USelectable>(PotentialSelection);
 			MovableUnit = GetRelatedSingletonComponent<IMovable, UMovable>(PotentialSelection);
 			TargetableUnit = GetRelatedSingletonComponent<ITargetable, UTargetable>(PotentialSelection);
+			BuilderUnit = GetRelatedSingletonComponent<IBuilder, UBuilder>(PotentialSelection);
 		}
 	}
 	
@@ -47,8 +52,10 @@ struct FSelected
 			
 			// If we already have something selected, and we're deselecting it, let it know
 			SelectedUnit->OnDeselect();
+			BuilderUnit->HideUI();
 			SelectedUnit = nullptr;
 			MovableUnit = nullptr;
+			BuilderUnit = nullptr;
 		}
 
 		if (SelectedActor != nullptr)
@@ -56,10 +63,15 @@ struct FSelected
 			SelectedUnit = GetRelatedSingletonComponent<ISelectable, USelectable>(SelectedActor);
 			if (SelectedUnit != nullptr)
 			{
-			SelectedUnit->OnSelect();
+				SelectedUnit->OnSelect();
 			}
 			MovableUnit = GetRelatedSingletonComponent<IMovable, UMovable>(SelectedActor);
 			TargetableUnit = GetRelatedSingletonComponent<ITargetable, UTargetable>(SelectedActor);
+			BuilderUnit = GetRelatedSingletonComponent<IBuilder, UBuilder>(SelectedActor);
+			if (BuilderUnit != nullptr)
+			{
+				BuilderUnit->DisplayUI();
+			}
 		}
 	}
 

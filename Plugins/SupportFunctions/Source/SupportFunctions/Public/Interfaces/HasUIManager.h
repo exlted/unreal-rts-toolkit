@@ -3,13 +3,13 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "ActorComponents/UIManager.h"
 #include "UObject/Interface.h"
-#include "Builder.generated.h"
+#include "HasUIManager.generated.h"
 
-struct FBuildable;
 // This class does not need to be modified.
 UINTERFACE()
-class RTSUNITSYSTEM_API UBuilder : public UInterface
+class SUPPORTFUNCTIONS_API UHasUIManager : public UInterface
 {
 	GENERATED_BODY()
 };
@@ -17,13 +17,11 @@ class RTSUNITSYSTEM_API UBuilder : public UInterface
 /**
  * 
  */
-class RTSUNITSYSTEM_API IBuilder
+class SUPPORTFUNCTIONS_API IHasUIManager
 {
 	GENERATED_BODY()
 
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
-	virtual TArray<FBuildable> GetBuildableObjects() = 0;
-	virtual void DisplayUI() = 0;
-	virtual void HideUI() = 0;
+	virtual TWeakObjectPtr<UUIManager> GetUIManager() = 0;
 };
