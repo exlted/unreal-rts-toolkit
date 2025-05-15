@@ -99,7 +99,15 @@ void UUnitSelectionSystem::SelectUnitInternal(AActor* SelectedUnit)
 	NewUnit.Select(SelectedUnit);
 	if (NewUnit.Selected())
 	{
+		if (SelectedUnits.Num() == 1)
+		{
+			SelectedUnits[0].HideUI();
+		}
 		SelectedUnits.Add(NewUnit);
+		if (SelectedUnits.Num() == 1)
+		{
+			NewUnit.ShowUI();
+		}
 	}
 }
 

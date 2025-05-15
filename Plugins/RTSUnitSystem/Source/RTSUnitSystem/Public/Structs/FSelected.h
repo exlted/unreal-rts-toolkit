@@ -68,10 +68,6 @@ struct FSelected
 			MovableUnit = GetRelatedSingletonComponent<IMovable, UMovable>(SelectedActor);
 			TargetableUnit = GetRelatedSingletonComponent<ITargetable, UTargetable>(SelectedActor);
 			BuilderUnit = GetRelatedSingletonComponent<IBuilder, UBuilder>(SelectedActor);
-			if (BuilderUnit != nullptr)
-			{
-				BuilderUnit->DisplayUI();
-			}
 		}
 	}
 
@@ -106,5 +102,21 @@ struct FSelected
 		EmptySide.Faction.InitialEntities = TArray<FSpawnInfo>();
 		
 		return EmptySide;
+	}
+
+	void ShowUI() const
+	{
+		if (BuilderUnit != nullptr)
+		{
+			BuilderUnit->DisplayUI();
+		}
+	}
+
+	void HideUI() const
+	{
+		if (BuilderUnit != nullptr)
+		{
+			BuilderUnit->HideUI();
+		}
 	}
 };
