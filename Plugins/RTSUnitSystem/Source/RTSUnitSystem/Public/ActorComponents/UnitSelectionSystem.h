@@ -42,4 +42,6 @@ public:
 protected:
 	void ClearSelectedUnits();
 	void SelectUnitInternal(AActor* SelectedUnit);
+
+	bool IsSelected(const AActor* ToSelect);
 };

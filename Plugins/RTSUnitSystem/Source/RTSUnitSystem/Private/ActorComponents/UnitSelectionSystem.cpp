@@ -51,6 +51,11 @@ void UUnitSelectionSystem::SelectUnit(AActor* SelectedUnit, const ESelectStyle S
 		}
 	case ESelectStyle::Add:
 		{
+			if (IsSelected(SelectedUnit))
+			{
+				break;
+			}
+			
 			bool Clear = false;
 			if (SelectedUnits.Num() > 0)
 			{
@@ -77,6 +82,11 @@ void UUnitSelectionSystem::SelectUnit(AActor* SelectedUnit, const ESelectStyle S
 		// Add Support for Select Groups here
 		break;
 	}
+
+	if (SelectedUnits.Num() == 1 && SelectedUnits[0].GetSide().Team != Sender)
+	{
+		SelectedUnits[0].HideBuildUI();
+	}
 }
 
 TArray<FSelected> UUnitSelectionSystem::GetSelectedUnits()
@@ -95,20 +105,38 @@ void UUnitSelectionSystem::ClearSelectedUnits()
 
 void UUnitSelectionSystem::SelectUnitInternal(AActor* SelectedUnit)
 {
+	if (IsSelected(SelectedUnit))
+	{
+		return;
+	}
+	
 	FSelected NewUnit;
 	NewUnit.Select(SelectedUnit);
 	if (NewUnit.Selected())
 	{
 		if (SelectedUnits.Num() == 1)
 		{
-			SelectedUnits[0].HideUI();
+			SelectedUnits[0].HideBuildUI();
 		}
 		SelectedUnits.Add(NewUnit);
 		if (SelectedUnits.Num() == 1)
 		{
-			NewUnit.ShowUI();
+			NewUnit.ShowBuildUI();
 		}
 	}
+}
+
+bool UUnitSelectionSystem::IsSelected(const AActor* ToSelect)
+{
+	for (const auto& Unit : SelectedUnits)
+	{
+		if (Unit.IsSameActor(ToSelect))
+		{
+			return true;
+		}
+	}
+
+	return false;
 }
 
 void UUnitSelectionSystem::MoveUnits_Implementation(const TArray<FSelected>& Units, const FVector& GoalPosition, const int Sender)

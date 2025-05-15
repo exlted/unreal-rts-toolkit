@@ -34,6 +34,24 @@ struct FSelected
 			BuilderUnit = GetRelatedSingletonComponent<IBuilder, UBuilder>(PotentialSelection);
 		}
 	}
+
+	bool IsSameActor(const AActor* That) const
+	{
+		if (That == nullptr && SelectedUnit == nullptr)
+		{
+			return true;
+		}
+
+		if (SelectedUnit != nullptr)
+		{
+			if (That == Cast<UActorComponent>(SelectedUnit.GetObject())->GetOwner())
+			{
+				return true;
+			}
+		}
+		
+		return false;
+	}
 	
 	void Select(AActor* SelectedActor)
 	{
@@ -52,7 +70,10 @@ struct FSelected
 			
 			// If we already have something selected, and we're deselecting it, let it know
 			SelectedUnit->OnDeselect();
-			BuilderUnit->HideUI();
+			if (BuilderUnit != nullptr)
+			{
+				BuilderUnit->HideUI();
+			}
 			SelectedUnit = nullptr;
 			MovableUnit = nullptr;
 			BuilderUnit = nullptr;
@@ -104,7 +125,7 @@ struct FSelected
 		return EmptySide;
 	}
 
-	void ShowUI() const
+	void ShowBuildUI() const
 	{
 		if (BuilderUnit != nullptr)
 		{
@@ -112,7 +133,7 @@ struct FSelected
 		}
 	}
 
-	void HideUI() const
+	void HideBuildUI() const
 	{
 		if (BuilderUnit != nullptr)
 		{
