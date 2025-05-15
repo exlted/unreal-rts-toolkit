@@ -38,7 +38,7 @@ public:
 	template <class UserClass>
 	void DeregisterSideUpdatesInternal(UserClass* UserObject, void(UserClass::*Function)(FSide), FName FunctionName)
 	{
-		GetEventDelegate().RemoveDynamic(UserObject, Function);
+		GetEventDelegate().__Internal_RemoveDynamic(UserObject, Function, FunctionName);
 	}
 
 #define DeregisterSideUpdates(UserObject, FuncName) DeregisterSideUpdatesInternal(UserObject, FuncName, STATIC_FUNCTION_FNAME( TEXT( #FuncName ) ))

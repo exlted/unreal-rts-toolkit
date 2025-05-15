@@ -42,32 +42,6 @@ void ABasePlayerState::SetColor(const FColor Color)
 	UnitSpawningSystem->SetSide(Side);
 }
 
-void ABasePlayerState::MoveSelectedUnit(const FVector& GoalPosition, int Sender)
-{
-	if (UnitSelectionSystem != nullptr)
-	{
-		if (Sender == -1)
-		{
-			Sender = Side.Team;
-		}
-		
-		UnitSelectionSystem->MoveSelectedUnit(GoalPosition, Sender);
-	}
-}
-
-void ABasePlayerState::SelectUnit(AActor* SelectedUnit, const ESelectStyle SelectionStyle, int Sender)
-{
-	if (UnitSelectionSystem != nullptr)
-	{
-		if (Sender == -1)
-		{
-			Sender = Side.Team;
-		}
-		
-		UnitSelectionSystem->SelectUnit(SelectedUnit, SelectionStyle, Sender);
-	}
-}
-
 void ABasePlayerState::SpawnEntities(const FTransform& SpawnLocation)
 {
 	for (const auto [Entity, SpawnOffset] : Side.Faction.InitialEntities)

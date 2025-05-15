@@ -15,7 +15,7 @@
  * 
  */
 UCLASS()
-class RETURN_TO_THE_MAUL_API ABasePlayerState : public APlayerState, public IMoveUnit, public ISelectUnit, public IHasSide
+class RETURN_TO_THE_MAUL_API ABasePlayerState : public APlayerState, public IHasSide
 	, public IHasUIManager
 {
 	GENERATED_BODY()
@@ -41,10 +41,6 @@ public:
 
 	void SetTeam(int TeamNumber);
 	void SetColor(FColor Color);
-	
-	virtual void MoveSelectedUnit(const FVector& GoalPosition, int Sender = -1) override;
-
-	virtual void SelectUnit(AActor* SelectedUnit, ESelectStyle SelectionStyle, int Sender = -1) override;
 
 	void SpawnEntities(const FTransform& SpawnLocation);
 

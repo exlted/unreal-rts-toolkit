@@ -4,12 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "Interfaces/Spawner.h"
 #include "Structs/FSide.h"
 #include "UnitSpawningSystem.generated.h"
 
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
-class RTSUNITSYSTEM_API UUnitSpawningSystem : public UActorComponent
+class RTSUNITSYSTEM_API UUnitSpawningSystem : public UActorComponent, public ISpawner
 {
 	GENERATED_BODY()
 
@@ -23,7 +24,7 @@ protected:
 	 
 public:
 
-	virtual void SpawnEntity(UObject* WorldContext, UClass* SpawnClass, FTransform SpawnTransform);
+	virtual void SpawnEntity(UObject* WorldContext, UClass* SpawnClass, FTransform SpawnTransform) override;
 	virtual void SetSide(FSide NewSide);
 
 	// Server Functions

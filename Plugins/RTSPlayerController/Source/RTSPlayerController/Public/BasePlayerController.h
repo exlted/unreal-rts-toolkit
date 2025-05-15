@@ -6,6 +6,7 @@
 #include "GameFramework/PlayerController.h"
 #include "BasePlayerController.generated.h"
 
+class IHasSide;
 class IMoveUnit;
 class ISelectUnit;
 struct FInputActionInstance;
@@ -79,6 +80,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
 	TScriptInterface<IMoveUnit> MoveUnit;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
+	TScriptInterface<IHasSide> HasSide;
 	
 protected:
 	virtual void SetupInputComponent() override;

@@ -1,4 +1,5 @@
 ﻿#pragma once
+#include "Interfaces/Builder.h"
 #include "Buildable.generated.h"
 
 USTRUCT(BlueprintType)
@@ -11,4 +12,7 @@ struct FBuildable
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FName DisplayName;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TScriptInterface<IBuilder> AssociatedBuilder;
 };

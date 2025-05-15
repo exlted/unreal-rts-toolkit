@@ -7,24 +7,27 @@
 #include "Enums/EControlStyle.h"
 #include "GameFramework/InputDeviceSubsystem.h"
 #include "GameFramework/PlayerState.h"
+#include "Interfaces/HasSide.h"
 #include "Interfaces/RTSCamera.h"
 #include "Interfaces/RTSCursor.h"
 #include "Interfaces/SelectUnit.h"
 #include "Interfaces/MoveUnit.h"
+#include "Utils/ComponentUtils.h"
 #include "Utils/Math.h"
 
 ABasePlayerController::ABasePlayerController()
-	  : PanSpeed(100)
-	  , PanZonePercent(10)
-	  , PanCurve(nullptr)
-	  , ZoomSpeed(.01f)
-	  , DefaultMappingContext(nullptr)
-	  , ScrollAction(nullptr)
-	  , ZoomAction(nullptr)
-	  , RotateAction(nullptr)
-	  , ClickAction(nullptr)
-	  , MoveClickAction(nullptr)
-	  , CurrentStyle()
+	: PanSpeed(100)
+	, PanZonePercent(10)
+	, PanCurve(nullptr)
+	, ZoomSpeed(.01f)
+	, DefaultMappingContext(nullptr)
+	, ScrollAction(nullptr)
+	, ZoomAction(nullptr)
+	, RotateAction(nullptr)
+	, ClickAction(nullptr)
+	, MoveClickAction(nullptr)
+	, AddModifierAction(nullptr)
+	, CurrentStyle()
 {
 }
 
@@ -71,13 +74,17 @@ void ABasePlayerController::BeginPlay()
 		}
 		
 		const auto State = GetPlayerState<APlayerState>();
-		if (!MoveUnit && State != nullptr && State->Implements<UMoveUnit>())
+		if (State && !MoveUnit)
 		{
-			MoveUnit = TScriptInterface<IMoveUnit>(State);
+			MoveUnit = GetRelatedSingletonComponent<IMoveUnit, UMoveUnit>(State);
 		}
-		if (!SelectUnit && State != nullptr && State->Implements<USelectUnit>())
+		if (State && !SelectUnit)
 		{
-			SelectUnit = TScriptInterface<ISelectUnit>(State);
+			SelectUnit = GetRelatedSingletonComponent<ISelectUnit, USelectUnit>(State);
+		}
+		if (State && State->Implements<UHasSide>())
+		{
+			HasSide = TScriptInterface<IHasSide>(State);
 		}
 	}
 }
@@ -203,18 +210,25 @@ void ABasePlayerController::OnAddModifierTriggered(const FInputActionInstance& I
 
 void ABasePlayerController::OnClickTriggered()
 {
-	if (SelectUnit != nullptr)
+	if (SelectUnit != nullptr && HasSide != nullptr)
 	{
 		FHitResult HitResult;
 		GetHitResultUnderCursor(ECC_Pawn, true, HitResult);
 		
-		SelectUnit->SelectUnit(HitResult.GetActor(), AddModifierPressed ? ESelectStyle::Add : ESelectStyle::New);
+		SelectUnit->SelectUnit(HitResult.GetActor(), AddModifierPressed ? ESelectStyle::Add : ESelectStyle::New, HasSide->GetSide().Team);
 	}
 	else
 	{
-		if (const auto State = GetPlayerState<APlayerState>(); !SelectUnit && State != nullptr)
+		if (const auto State = GetPlayerState<APlayerState>(); State != nullptr)
 		{
-			SelectUnit = TScriptInterface<ISelectUnit>(State);
+			if (!SelectUnit)
+			{
+				SelectUnit = GetRelatedSingletonComponent<ISelectUnit, USelectUnit>(State);
+			}
+			if (State->Implements<UHasSide>())
+			{
+				HasSide = State;
+			}
 			// Intentional Re-entry
 			OnClickTriggered();
 		}
@@ -223,15 +237,22 @@ void ABasePlayerController::OnClickTriggered()
 
 void ABasePlayerController::OnMoveClickTriggered()
 {
-	if (MoveUnit != nullptr && RTSCursor != nullptr)
+	if (MoveUnit != nullptr && RTSCursor != nullptr && HasSide != nullptr)
 	{
-		MoveUnit->MoveSelectedUnit(RTSCursor->GetCursorLocation());
+		MoveUnit->MoveSelectedUnit(RTSCursor->GetCursorLocation(), HasSide->GetSide().Team);
 	}
 	else
 	{
-		if (const auto State = GetPlayerState<APlayerState>(); !MoveUnit && State != nullptr && State->Implements<UMoveUnit>())
+		if (const auto State = GetPlayerState<APlayerState>(); State != nullptr)
 		{
-			MoveUnit = TScriptInterface<IMoveUnit>(State);
+			if (!MoveUnit)
+			{
+				MoveUnit = GetRelatedSingletonComponent<IMoveUnit, UMoveUnit>(State);
+			}
+			if (State->Implements<UHasSide>())
+			{
+				HasSide = State;
+			}
 			// Intentional Re-entry
 			OnMoveClickTriggered();
 		}

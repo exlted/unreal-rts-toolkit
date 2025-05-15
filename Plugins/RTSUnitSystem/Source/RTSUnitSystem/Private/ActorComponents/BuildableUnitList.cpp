@@ -6,6 +6,7 @@
 #include "GameFramework/PlayerState.h"
 #include "Interfaces/BuilderUI.h"
 #include "Interfaces/HasUIManager.h"
+#include "Interfaces/Spawner.h"
 
 
 // Sets default values for this component's properties
@@ -25,6 +26,10 @@ void UBuildableUnitList::BeginPlay()
 	Super::BeginPlay();
 
 	// ...
+	for (auto& BuildableClass : BuildableClasses)
+	{
+		BuildableClass.AssociatedBuilder = this;
+	}
 	
 }
 
@@ -71,6 +76,21 @@ void UBuildableUnitList::HideUI()
 			{
 				IBuilderUI::Execute_ClearBuildableItems(BuilderUI.GetObject());
 			}
+		}
+	}
+}
+
+void UBuildableUnitList::OnMenuItemClicked(UClass* SelectedClass)
+{
+	if (const auto PlayerState = GetPlayerState(); PlayerState)
+	{
+		if (const auto SpawningSystem = GetRelatedSingletonComponent<ISpawner, USpawner>(PlayerState);
+			SpawningSystem.GetObject() != nullptr)
+		{
+			FTransform SpawnTransform = GetOwner()->GetActorTransform();
+			SpawnTransform.AddToTranslation(GetOwner()->GetActorForwardVector() * 10);
+			
+			SpawningSystem->SpawnEntity(this, SelectedClass, SpawnTransform);
 		}
 	}
 }

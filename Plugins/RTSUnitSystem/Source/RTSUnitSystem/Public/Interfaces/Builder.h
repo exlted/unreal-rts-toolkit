@@ -8,7 +8,7 @@
 
 struct FBuildable;
 // This class does not need to be modified.
-UINTERFACE()
+UINTERFACE(BlueprintType, NotBlueprintable)
 class RTSUNITSYSTEM_API UBuilder : public UInterface
 {
 	GENERATED_BODY()
@@ -26,4 +26,7 @@ public:
 	virtual TArray<FBuildable> GetBuildableObjects() = 0;
 	virtual void DisplayUI() = 0;
 	virtual void HideUI() = 0;
+
+	UFUNCTION(BlueprintCallable)
+	virtual void OnMenuItemClicked(UClass* SelectedClass) = 0;
 };
