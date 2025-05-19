@@ -7,7 +7,9 @@
 #include "Utils/Trace.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/FloatingPawnMovement.h"
+#include "GameFramework/PlayerState.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Interfaces/HasUIManager.h"
 
 
 // Sets default values
@@ -70,6 +72,11 @@ void ARTSPlayerPawn::Tick(float DeltaTime)
 void ARTSPlayerPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
+	
+	FInputModeGameAndUI Input;
+	Input.SetHideCursorDuringCapture(false);
+	Input.SetLockMouseToViewportBehavior(EMouseLockMode::LockAlways);
+	GetLocalViewingPlayerController()->SetInputMode(Input);
 }
 
 void ARTSPlayerPawn::ChangeCursorVisibility(const bool NewVisibilityState)
@@ -115,15 +122,19 @@ void ARTSPlayerPawn::ChangeCursorMode(const ECursorMode NewCursorMode)
 		switch (TargetCursorMode)
 		{
 		case ECursorMode::World:
-			WorldCursor->SetVisibility(Visible, true);
-			GetLocalViewingPlayerController()->bShowMouseCursor = false;
-			CursorMode = ECursorMode::World;
-			break;
+			{
+				WorldCursor->SetVisibility(Visible, true);
+				GetLocalViewingPlayerController()->bShowMouseCursor = false;
+				CursorMode = ECursorMode::World;
+				break;
+			}
 		case ECursorMode::Screen:
-			WorldCursor->SetVisibility(false, true);
-			GetLocalViewingPlayerController()->bShowMouseCursor = Visible;
-			CursorMode = ECursorMode::Screen;
-			break;
+			{
+				WorldCursor->SetVisibility(false, true);
+				GetLocalViewingPlayerController()->bShowMouseCursor = Visible;
+				CursorMode = ECursorMode::Screen;
+				break;
+			}
 		case ECursorMode::Unset:
 			break;
 		}

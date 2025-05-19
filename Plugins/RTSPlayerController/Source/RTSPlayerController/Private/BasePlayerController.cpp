@@ -99,7 +99,7 @@ void ABasePlayerController::PlayerTick(const float DeltaTime)
 	{
 		if(const ULocalPlayer* LocPlayer = Cast<ULocalPlayer>(Player); LocPlayer && LocPlayer->ViewportClient )
 		{
-			if (LocPlayer->ViewportClient->Viewport->HasMouseCapture())
+			if (LocPlayer->ViewportClient->Viewport->HasFocus())
 			{
 				if (FVector MousePosition; GetMousePosition(MousePosition.X, MousePosition.Y))
 				{
