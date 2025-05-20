@@ -24,6 +24,19 @@ static TScriptInterface<Interface> GetRelatedSingletonComponent(AActor* FromActo
 	return nullptr;
 }
 
+template<class Interface, class UInterface>
+static TArray<TScriptInterface<Interface>> GetRelatedComponents(AActor* FromActor)
+{
+	const auto Components = FromActor->GetComponentsByInterface(UInterface::StaticClass());
+	TArray<TScriptInterface<Interface>> Results;
+	for (const auto Component : Components)
+	{
+		Results.Add(TScriptInterface<Interface>(Component));
+	}
+
+	return Results;
+}
+
 template<class BaseComponentType>
 static TArray<BaseComponentType*> GetRelatedTypedComponents(AActor* FromActor)
 {

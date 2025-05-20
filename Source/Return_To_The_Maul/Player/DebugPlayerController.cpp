@@ -7,30 +7,31 @@
 #include "EnhancedInputComponent.h"
 #include "Interfaces/RTSCursor.h"
 
-ADebugPlayerController::ADebugPlayerController()
+UDebugPlayerController::UDebugPlayerController()
 {
 }
 
-void ADebugPlayerController::SetupInputComponent()
+void UDebugPlayerController::SetupInputComponent(UEnhancedInputLocalPlayerSubsystem* Subsystem,
+	UEnhancedInputComponent* EnhancedInputComponent, APlayerController* Controller)
 {
-	Super::SetupInputComponent();
+	Super::SetupInputComponent(Subsystem, EnhancedInputComponent, Controller);
 	
-	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(InputComponent))
+	if (EnhancedInputComponent)
 	{
-		EnhancedInputComponent->BindAction(DebugAction, ETriggerEvent::Started, this, &ADebugPlayerController::OnDebugTriggered);
+		EnhancedInputComponent->BindAction(DebugAction, ETriggerEvent::Started, this, &UDebugPlayerController::OnDebugTriggered);
 	}
 }
 
-void ADebugPlayerController::BeginPlay()
+void UDebugPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 }
 
-void ADebugPlayerController::OnDebugTriggered(const FInputActionInstance& Instance)
+void UDebugPlayerController::OnDebugTriggered(const FInputActionInstance& Instance)
 {
 	if (DebugClassToSpawn != nullptr && RTSCursor != nullptr)
 	{
-		if (const auto State = GetPlayerState<ABasePlayerState>(); PlayerState != nullptr)
+		if (const auto State = PlayerController->GetPlayerState<ABasePlayerState>(); State != nullptr)
 		{
 			auto CursorLocation = RTSCursor->GetCursorLocation();
 			CursorLocation.Z += 20;

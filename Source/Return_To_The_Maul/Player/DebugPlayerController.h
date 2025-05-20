@@ -4,17 +4,18 @@
 
 #include "CoreMinimal.h"
 #include "BasePlayerController.h"
+#include "PlayerControllerComponents/BaseRTSGameplay.h"
 #include "DebugPlayerController.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class RETURN_TO_THE_MAUL_API ADebugPlayerController : public ABasePlayerController
+class RETURN_TO_THE_MAUL_API UDebugPlayerController : public UBaseRTSGameplay
 {
 	GENERATED_BODY()
 public:
-	ADebugPlayerController();
+	UDebugPlayerController();
 	
 	/** Standard Camera Pan Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
@@ -26,7 +27,8 @@ public:
 	FTransform SpawnTransform;
 	
 protected:
-	virtual void SetupInputComponent() override;
+	virtual void SetupInputComponent(UEnhancedInputLocalPlayerSubsystem* Subsystem,
+		UEnhancedInputComponent* EnhancedInputComponent, APlayerController* Controller) override;
 
 	virtual void BeginPlay() override;
 	

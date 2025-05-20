@@ -4,291 +4,91 @@
 
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
-#include "Enums/EControlStyle.h"
-#include "GameFramework/InputDeviceSubsystem.h"
-#include "GameFramework/PlayerState.h"
-#include "Interfaces/HasSide.h"
-#include "Interfaces/RTSCamera.h"
-#include "Interfaces/RTSCursor.h"
-#include "Interfaces/SelectUnit.h"
-#include "Interfaces/MoveUnit.h"
 #include "Utils/ComponentUtils.h"
-#include "Utils/Math.h"
 
 ABasePlayerController::ABasePlayerController()
-	: PanSpeed(100)
-	, PanZonePercent(10)
-	, PanCurve(nullptr)
-	, ZoomSpeed(.01f)
-	, DefaultMappingContext(nullptr)
-	, ScrollAction(nullptr)
-	, ZoomAction(nullptr)
-	, RotateAction(nullptr)
-	, ClickAction(nullptr)
-	, MoveClickAction(nullptr)
-	, AddModifierAction(nullptr)
-	, CurrentStyle()
 {
 }
 
 void ABasePlayerController::SetupInputComponent()
 {
 	Super::SetupInputComponent();
-
-	if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer()))
+	
+	Components = GetRelatedComponents<IPlayerControllerComponent, UPlayerControllerComponent>(this);
+	const auto InputSubsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer());	
+	const auto EnhancedInputComponent = Cast<UEnhancedInputComponent>(InputComponent);
+	
+	for (auto Component : Components)
 	{
-		Subsystem->AddMappingContext(DefaultMappingContext, 0);
-	}
+		Component->SetupInputComponent(InputSubsystem, EnhancedInputComponent, this);
 
-	// Set up action bindings
-	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(InputComponent))
-	{
-		EnhancedInputComponent->BindAction(ScrollAction, ETriggerEvent::Started, this, &ABasePlayerController::OnInputStarted);
-		EnhancedInputComponent->BindAction(ScrollAction, ETriggerEvent::Triggered, this, &ABasePlayerController::OnPanTriggered);
-		EnhancedInputComponent->BindAction(ZoomAction, ETriggerEvent::Started, this, &ABasePlayerController::OnInputStarted);
-		EnhancedInputComponent->BindAction(ZoomAction, ETriggerEvent::Triggered, this, &ABasePlayerController::OnZoomTriggered);
-		EnhancedInputComponent->BindAction(RotateAction, ETriggerEvent::Started, this, &ABasePlayerController::OnInputStarted);
-		EnhancedInputComponent->BindAction(RotateAction, ETriggerEvent::Triggered, this, &ABasePlayerController::OnRotateTriggered);
-		EnhancedInputComponent->BindAction(ClickAction, ETriggerEvent::Started, this, &ABasePlayerController::OnInputStarted);
-		EnhancedInputComponent->BindAction(ClickAction, ETriggerEvent::Triggered, this, &ABasePlayerController::OnClickTriggered);
-		EnhancedInputComponent->BindAction(MoveClickAction, ETriggerEvent::Started, this, &ABasePlayerController::OnInputStarted);
-		EnhancedInputComponent->BindAction(MoveClickAction, ETriggerEvent::Triggered, this, &ABasePlayerController::OnMoveClickTriggered);
-		EnhancedInputComponent->BindAction(AddModifierAction, ETriggerEvent::Triggered, this, &ABasePlayerController::OnAddModifierTriggered);
+		if (!Component->IsBaseController())
+		{
+			NamedComponents.Add(Component->GetIdentifier(), Component);
+		}
+		else
+		{
+			BaseComponents.Add(Component);
+		}
 	}
 }
 
 void ABasePlayerController::BeginPlay()
 {
 	Super::BeginPlay();
-	
-	if (IsLocalPlayerController())
-	{
-		APawn* ControlledPawn = GetPawn();
-		if (!RTSCamera && ControlledPawn != nullptr && ControlledPawn->Implements<URTSCamera>())
-		{
-			RTSCamera = TScriptInterface<IRTSCamera>(ControlledPawn);
-		}
-		if (!RTSCursor && ControlledPawn != nullptr && ControlledPawn->Implements<URTSCursor>())
-		{
-			RTSCursor = TScriptInterface<IRTSCursor>(ControlledPawn);
-		}
-		
-		const auto State = GetPlayerState<APlayerState>();
-		if (State && !MoveUnit)
-		{
-			MoveUnit = GetRelatedSingletonComponent<IMoveUnit, UMoveUnit>(State);
-		}
-		if (State && !SelectUnit)
-		{
-			SelectUnit = GetRelatedSingletonComponent<ISelectUnit, USelectUnit>(State);
-		}
-		if (State && State->Implements<UHasSide>())
-		{
-			HasSide = TScriptInterface<IHasSide>(State);
-		}
-	}
 }
 
 void ABasePlayerController::PlayerTick(const float DeltaTime)
 {
 	Super::PlayerTick(DeltaTime);
+}
 
-	
-	// Mouse Panning Code
-	if (CurrentStyle == EControlStyle::MouseKeyboard)
+TArray<FName> ABasePlayerController::GetNamedComponents()
+{
+	TArray<FName> ComponentNames;
+
+	for (auto ComponentInfo : NamedComponents)
 	{
-		if(const ULocalPlayer* LocPlayer = Cast<ULocalPlayer>(Player); LocPlayer && LocPlayer->ViewportClient )
+		ComponentNames.Add(ComponentInfo.Key);
+	}
+	
+	return ComponentNames;
+}
+
+void ABasePlayerController::PushNamedComponent(const FName Name)
+{
+	if (NamedComponents.Contains(Name))
+	{
+		if (const auto Component = NamedComponents.Find(Name); Component != nullptr)
 		{
-			if (LocPlayer->ViewportClient->Viewport->HasFocus())
+			if (ComponentStack.Num() == 0)
 			{
-				if (FVector MousePosition; GetMousePosition(MousePosition.X, MousePosition.Y))
+				for (const auto BaseComponent : BaseComponents)
 				{
-					if (RTSCursor != nullptr)
-					{
-						if (FVector WorldPosition, WorldDirection; DeprojectScreenPositionToWorld(MousePosition.X, MousePosition.Y, WorldPosition, WorldDirection))
-						{
-							RTSCursor->MoveCursorToCameraRelativePosition(WorldPosition, WorldDirection);
-						}
-					}
-					
-					int32 ScreenWidth = 0, ScreenHeight = 0;
-					GetViewportSize(ScreenWidth, ScreenHeight);
-					const float XPanZone = ScreenWidth * PanZonePercent / 100;
-					const float YPanZone = ScreenHeight * PanZonePercent / 100;
-					FVector PanRate = FVector::ZeroVector;
-	
-					if (MousePosition.X < XPanZone)
-					{
-						PanRate.X = -1 * PanCurve->GetFloatValue(RatioBetween(XPanZone, 0, MousePosition.X));
-					}
-					else if (MousePosition.X > ScreenWidth - XPanZone)
-					{
-						PanRate.X = 1 * PanCurve->GetFloatValue(RatioBetween(ScreenWidth - XPanZone, ScreenWidth, MousePosition.X));
-					}
-					if (MousePosition.Y < YPanZone)
-					{
-						PanRate.Y = 1 * PanCurve->GetFloatValue(RatioBetween(YPanZone, 0, MousePosition.Y));
-					}
-					else if (MousePosition.Y > ScreenHeight - YPanZone)
-					{
-						PanRate.Y = -1 * PanCurve->GetFloatValue(RatioBetween(ScreenHeight - YPanZone, ScreenHeight, MousePosition.Y));
-					}
-	
-					if (PanRate != FVector::ZeroVector)
-					{
-						PanScreen(PanRate);
-					}
+					BaseComponent->Disable();
 				}
 			}
+			
+			Component->GetInterface()->Enable();
+			ComponentStack.Push(*Component);
 		}
 	}
-	else
+}
+
+bool ABasePlayerController::PopComponent()
+{
+	if (const auto OldTop = ComponentStack.Pop())
 	{
-		if (RTSCursor != nullptr)
+		OldTop->Disable();
+	}
+
+	if (ComponentStack.Num() == 0)
+	{
+		for (const auto Component : BaseComponents)
 		{
-			if (FVector WorldPosition, WorldDirection; DeprojectMousePositionToWorld( WorldPosition, WorldDirection))
-			{
-				RTSCursor->MoveCursorToCameraRelativePosition(WorldPosition, WorldDirection);
-			}
+			Component->Enable();
 		}
 	}
-}
-
-void ABasePlayerController::OnInputStarted()
-{
-	// TODO: Store InputDeviceSubsystem so we're not constantly looking it up
-	if (const UInputDeviceSubsystem* InputDeviceSubsystem = GEngine->GetEngineSubsystem<UInputDeviceSubsystem>())
-	{
-		const FPlatformUserId UserId = GetPlatformUserId();
-		if (const FHardwareDeviceIdentifier DeviceIdentifier = InputDeviceSubsystem->GetMostRecentlyUsedHardwareDevice(UserId);
-			DeviceIdentifier.PrimaryDeviceType == EHardwareDevicePrimaryType::Gamepad)
-		{
-			UpdateControlStyle(EControlStyle::Gamepad);
-		}
-		else if (DeviceIdentifier.PrimaryDeviceType == EHardwareDevicePrimaryType::KeyboardAndMouse)
-		{
-			UpdateControlStyle(EControlStyle::MouseKeyboard);
-		}
-		else if (DeviceIdentifier.PrimaryDeviceType == EHardwareDevicePrimaryType::Touch)
-		{
-			UpdateControlStyle(EControlStyle::Touch);
-		}
-	}
-}
-
-void ABasePlayerController::OnPanTriggered(const FInputActionInstance& Instance)
-{
-	PanScreen(Instance.GetValue().Get<FVector>());
-}
-
-void ABasePlayerController::OnZoomTriggered(const FInputActionInstance& Instance)
-{
-	if (RTSCamera != nullptr)
-	{
-		RTSCamera->ZoomCamera(ZoomSpeed * Instance.GetValue().Get<float>());
-	}
-}
-
-void ABasePlayerController::OnRotateTriggered(const FInputActionInstance& Instance)
-{
-	if (RTSCamera != nullptr)
-	{
-		RTSCamera->RotateCamera(Instance.GetValue().Get<float>());
-	}
-}
-
-void ABasePlayerController::OnAddModifierTriggered(const FInputActionInstance& Instance)
-{
-	const auto Test = Instance.GetValue();
-	const auto Test2 = Test.Get<bool>();
-	AddModifierPressed = Test2;
-	if (AddModifierPressed)
-	{
-		OnInputStarted();
-	}
-}
-
-void ABasePlayerController::OnClickTriggered()
-{
-	if (SelectUnit != nullptr && HasSide != nullptr)
-	{
-		FHitResult HitResult;
-		GetHitResultUnderCursor(ECC_Pawn, true, HitResult);
-		
-		SelectUnit->SelectUnit(HitResult.GetActor(), AddModifierPressed ? ESelectStyle::Add : ESelectStyle::New, HasSide->GetSide().Team);
-	}
-	else
-	{
-		if (const auto State = GetPlayerState<APlayerState>(); State != nullptr)
-		{
-			if (!SelectUnit)
-			{
-				SelectUnit = GetRelatedSingletonComponent<ISelectUnit, USelectUnit>(State);
-			}
-			if (State->Implements<UHasSide>())
-			{
-				HasSide = State;
-			}
-			// Intentional Re-entry
-			OnClickTriggered();
-		}
-	}
-}
-
-void ABasePlayerController::OnMoveClickTriggered()
-{
-	if (MoveUnit != nullptr && RTSCursor != nullptr && HasSide != nullptr)
-	{
-		MoveUnit->MoveSelectedUnit(RTSCursor->GetCursorLocation(), HasSide->GetSide().Team);
-	}
-	else
-	{
-		if (const auto State = GetPlayerState<APlayerState>(); State != nullptr)
-		{
-			if (!MoveUnit)
-			{
-				MoveUnit = GetRelatedSingletonComponent<IMoveUnit, UMoveUnit>(State);
-			}
-			if (State->Implements<UHasSide>())
-			{
-				HasSide = State;
-			}
-			// Intentional Re-entry
-			OnMoveClickTriggered();
-		}
-	}
-}
-
-void ABasePlayerController::PanScreen(const FVector& PanRate) const
-{
-	if (APawn* ControlledPawn = GetPawn(); ControlledPawn != nullptr && RTSCamera != nullptr)
-	{
-		const auto YawOnlyRotator = FRotator(0, RTSCamera->GetRotation(), 0);
-		ControlledPawn->AddMovementInput(YawOnlyRotator.Quaternion().GetForwardVector(), PanRate.Y * PanSpeed, false);
-		ControlledPawn->AddMovementInput(YawOnlyRotator.Quaternion().GetRightVector(), PanRate.X * PanSpeed, false);
-	}
-}
-
-void ABasePlayerController::UpdateControlStyle(const EControlStyle NewStyle)
-{
-	if (NewStyle != CurrentStyle)
-	{
-		CurrentStyle = NewStyle;
-		switch (CurrentStyle)
-		{
-		case EControlStyle::MouseKeyboard:
-			break;
-		case EControlStyle::Gamepad:
-			if (RTSCursor != nullptr)
-			{
-				RTSCursor->ResetCursorPosition();
-			}
-			int Width, Height;
-			GetViewportSize(Width, Height);
-			SetMouseLocation(Width / 2, Height / 2);
-			break;
-		case EControlStyle::Touch:
-			break;
-		}
-	}
+	
+	return ComponentStack.Num() != 0;
 }
