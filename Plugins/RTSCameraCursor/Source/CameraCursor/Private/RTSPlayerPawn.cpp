@@ -2,6 +2,8 @@
 
 
 #include "RTSPlayerPawn.h"
+
+#include "ActorComponents/AttachmentPoint.h"
 #include "Utils/Trace.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/FloatingPawnMovement.h"

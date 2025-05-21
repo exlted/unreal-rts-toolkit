@@ -2,7 +2,7 @@
 	"FileVersion": 3,
 	"Version": 1,
 	"VersionName": "1.0",
-	"FriendlyName": "RTSUnitSystem",
+	"FriendlyName": "SimpleUIManager",
 	"Description": "",
 	"Category": "Other",
 	"CreatedBy": "",
@@ -15,22 +15,14 @@
 	"Installed": false,
 	"Modules": [
 		{
-			"Name": "RTSUnitSystem",
+			"Name": "SimpleUIManager",
 			"Type": "Runtime",
 			"LoadingPhase": "Default"
 		}
-		],
+	],
 	"Plugins": [
 		{
 			"Name": "SupportFunctions",
-			"Enabled": true
-		},
-		{
-			"Name": "RTSToolkitInterfaces",
-			"Enabled": true
-		},
-		{
-			"Name": "SimpleUIManager",
 			"Enabled": true
 		}
 	]

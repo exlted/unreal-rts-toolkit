@@ -2,9 +2,9 @@
 
 using UnrealBuildTool;
 
-public class RTSUnitSystem : ModuleRules
+public class SimpleAttachmentSystem : ModuleRules
 {
-	public RTSUnitSystem(ReadOnlyTargetRules Target) : base(Target)
+	public SimpleAttachmentSystem(ReadOnlyTargetRules Target) : base(Target)
 	{
 		PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
 		
@@ -25,7 +25,7 @@ public class RTSUnitSystem : ModuleRules
 		PublicDependencyModuleNames.AddRange(
 			new string[]
 			{
-				"Core", "AIModule", "SupportFunctions", "RTSToolkitInterfaces",
+				"Core",
 				// ... add other public dependencies that you statically link with here ...
 			}
 			);
@@ -37,8 +37,7 @@ public class RTSUnitSystem : ModuleRules
 				"CoreUObject",
 				"Engine",
 				"Slate",
-				"SlateCore",
-				"NavigationSystem", "SimpleUIManager",
+				"SlateCore", "SupportFunctions",
 				// ... add private dependencies that you statically link with here ...	
 			}
 			);

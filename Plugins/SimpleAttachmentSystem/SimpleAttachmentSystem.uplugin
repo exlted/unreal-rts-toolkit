@@ -2,7 +2,7 @@
 	"FileVersion": 3,
 	"Version": 1,
 	"VersionName": "1.0",
-	"FriendlyName": "UIManager",
+	"FriendlyName": "SimpleAttachmentSystem",
 	"Description": "",
 	"Category": "Other",
 	"CreatedBy": "",
@@ -15,7 +15,7 @@
 	"Installed": false,
 	"Modules": [
 		{
-			"Name": "UIManager",
+			"Name": "SimpleAttachmentSystem",
 			"Type": "Runtime",
 			"LoadingPhase": "Default"
 		}

@@ -8,7 +8,7 @@
 
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
-class UIMANAGER_API UBaseUIComponent : public UActorComponent
+class SIMPLEUIMANAGER_API UBaseUIComponent : public UActorComponent
 {
 	GENERATED_BODY()
 

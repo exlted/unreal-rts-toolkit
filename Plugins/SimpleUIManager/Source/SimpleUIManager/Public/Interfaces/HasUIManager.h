@@ -9,7 +9,7 @@
 
 // This class does not need to be modified.
 UINTERFACE()
-class UIMANAGER_API UHasUIManager : public UInterface
+class SIMPLEUIMANAGER_API UHasUIManager : public UInterface
 {
 	GENERATED_BODY()
 };
@@ -17,7 +17,7 @@ class UIMANAGER_API UHasUIManager : public UInterface
 /**
  * 
  */
-class UIMANAGER_API IHasUIManager
+class SIMPLEUIMANAGER_API IHasUIManager
 {
 	GENERATED_BODY()
 

@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
 #include "Enums/ECursorMode.h"
+#include "Interfaces/Attachable.h"
 #include "Interfaces/RTSCamera.h"
 #include "Interfaces/RTSCursor.h"
 #include "RTSPlayerPawn.generated.h"

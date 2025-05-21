@@ -10,7 +10,7 @@ public class CameraCursor : ModuleRules
             new string[]
             {
                 "Core",
-                "SupportFunctions", "RTSToolkitInterfaces"
+                "SupportFunctions", "RTSToolkitInterfaces", "SimpleAttachmentSystem"
             }
         );
 
@@ -21,7 +21,7 @@ public class CameraCursor : ModuleRules
                 "Engine",
                 "Slate",
                 "SlateCore",
-                "UMG", "UIManager"
+                "UMG", "SimpleUIManager"
             }
         );
     }

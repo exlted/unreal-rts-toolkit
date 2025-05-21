@@ -31,7 +31,11 @@
 			"Enabled": true
 		},
 		{
-			"Name": "UIManager",
+			"Name": "SimpleAttachmentSystem",
+			"Enabled": true
+		},
+		{
+			"Name": "SimpleUIManager",
 			"Enabled": true
 		}
 	]
