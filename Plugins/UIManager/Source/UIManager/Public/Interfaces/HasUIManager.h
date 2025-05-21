@@ -3,13 +3,13 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Structs/FSide.h"
+#include "ActorComponents/UIManager.h"
 #include "UObject/Interface.h"
-#include "HasSide.generated.h"
+#include "HasUIManager.generated.h"
 
 // This class does not need to be modified.
 UINTERFACE()
-class SUPPORTFUNCTIONS_API UHasSide : public UInterface
+class UIMANAGER_API UHasUIManager : public UInterface
 {
 	GENERATED_BODY()
 };
@@ -17,11 +17,11 @@ class SUPPORTFUNCTIONS_API UHasSide : public UInterface
 /**
  * 
  */
-class SUPPORTFUNCTIONS_API IHasSide
+class UIMANAGER_API IHasUIManager
 {
 	GENERATED_BODY()
 
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
-	virtual FSide GetSide() = 0;
+	virtual TWeakObjectPtr<UUIManager> GetUIManager() = 0;
 };

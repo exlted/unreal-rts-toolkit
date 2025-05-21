@@ -9,7 +9,7 @@
 
 // This class does not need to be modified.
 UINTERFACE()
-class SUPPORTFUNCTIONS_API URTSCursor : public UInterface
+class RTSTOOLKITINTERFACES_API URTSCursor : public UInterface
 {
 	GENERATED_BODY()
 };
@@ -18,7 +18,7 @@ class SUPPORTFUNCTIONS_API URTSCursor : public UInterface
 /**
  * 
  */
-class SUPPORTFUNCTIONS_API IRTSCursor
+class RTSTOOLKITINTERFACES_API IRTSCursor
 {
 	GENERATED_BODY()
 

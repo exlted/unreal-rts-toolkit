@@ -3,13 +3,13 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "ActorComponents/UIManager.h"
+#include "Enums/ESelectStyle.h"
 #include "UObject/Interface.h"
-#include "HasUIManager.generated.h"
+#include "SelectUnit.generated.h"
 
 // This class does not need to be modified.
 UINTERFACE()
-class SUPPORTFUNCTIONS_API UHasUIManager : public UInterface
+class RTSTOOLKITINTERFACES_API USelectUnit : public UInterface
 {
 	GENERATED_BODY()
 };
@@ -17,11 +17,11 @@ class SUPPORTFUNCTIONS_API UHasUIManager : public UInterface
 /**
  * 
  */
-class SUPPORTFUNCTIONS_API IHasUIManager
+class RTSTOOLKITINTERFACES_API ISelectUnit
 {
 	GENERATED_BODY()
 
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
-	virtual TWeakObjectPtr<UUIManager> GetUIManager() = 0;
+	virtual void SelectUnit(AActor* SelectedUnit, ESelectStyle SelectionStyle, int Sender = -1) = 0;
 };

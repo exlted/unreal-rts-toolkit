@@ -2,12 +2,9 @@
 
 
 #include "RTSPlayerPawn.h"
-
-#include "AssetTypeCategories.h"
 #include "Utils/Trace.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/FloatingPawnMovement.h"
-#include "GameFramework/PlayerState.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Interfaces/HasUIManager.h"
 

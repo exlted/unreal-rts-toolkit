@@ -25,6 +25,14 @@
 		{
 			"Name": "SupportFunctions",
 			"Enabled": true
+		},
+		{
+			"Name": "RTSToolkitInterfaces",
+			"Enabled": true
+		},
+		{
+			"Name": "UIManager",
+			"Enabled": true
 		}
 	]
 }

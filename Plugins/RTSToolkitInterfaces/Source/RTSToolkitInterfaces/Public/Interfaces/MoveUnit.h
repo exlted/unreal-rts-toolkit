@@ -3,13 +3,12 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Enums/ESelectStyle.h"
 #include "UObject/Interface.h"
-#include "SelectUnit.generated.h"
+#include "MoveUnit.generated.h"
 
 // This class does not need to be modified.
 UINTERFACE()
-class SUPPORTFUNCTIONS_API USelectUnit : public UInterface
+class RTSTOOLKITINTERFACES_API UMoveUnit : public UInterface
 {
 	GENERATED_BODY()
 };
@@ -17,11 +16,11 @@ class SUPPORTFUNCTIONS_API USelectUnit : public UInterface
 /**
  * 
  */
-class SUPPORTFUNCTIONS_API ISelectUnit
+class RTSTOOLKITINTERFACES_API IMoveUnit
 {
 	GENERATED_BODY()
 
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
-	virtual void SelectUnit(AActor* SelectedUnit, ESelectStyle SelectionStyle, int Sender = -1) = 0;
+	virtual void MoveSelectedUnit(const FVector& GoalPosition, const int Sender = -1) = 0;
 };

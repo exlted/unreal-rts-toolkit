@@ -6,12 +6,11 @@
 #include "BaseUIComponent.h"
 #include "Components/ActorComponent.h"
 #include "Utils/ComponentUtils.h"
-#include "UObject/WeakObjectPtr.h"
 #include "UIManager.generated.h"
 
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
-class SUPPORTFUNCTIONS_API UUIManager : public UActorComponent
+class UIMANAGER_API UUIManager : public UActorComponent
 {
 	GENERATED_BODY()
 

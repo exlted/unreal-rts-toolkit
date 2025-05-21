@@ -2,14 +2,15 @@
 
 using UnrealBuildTool;
 
-public class RTSPlayerController : ModuleRules
+public class RTSToolkitInterfaces : ModuleRules
 {
-	public RTSPlayerController(ReadOnlyTargetRules Target) : base(Target)
+	public RTSToolkitInterfaces(ReadOnlyTargetRules Target) : base(Target)
 	{
 		PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
 		
 		PublicIncludePaths.AddRange(
 			new string[] {
+				// ... add public include paths required here ...
 			}
 			);
 				
@@ -24,7 +25,7 @@ public class RTSPlayerController : ModuleRules
 		PublicDependencyModuleNames.AddRange(
 			new string[]
 			{
-				"Core", "EnhancedInput", "SupportFunctions", "RTSToolkitInterfaces",
+				"Core", "AIModule",
 				// ... add other public dependencies that you statically link with here ...
 			}
 			);
@@ -36,9 +37,7 @@ public class RTSPlayerController : ModuleRules
 				"CoreUObject",
 				"Engine",
 				"Slate",
-				"SlateCore", 
-				"SupportFunctions", 
-				"EnhancedInput",
+				"SlateCore",
 				// ... add private dependencies that you statically link with here ...	
 			}
 			);

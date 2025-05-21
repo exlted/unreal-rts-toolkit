@@ -25,7 +25,7 @@ public class RTSUnitSystem : ModuleRules
 		PublicDependencyModuleNames.AddRange(
 			new string[]
 			{
-				"Core", "AIModule", "SupportFunctions",
+				"Core", "AIModule", "SupportFunctions", "RTSToolkitInterfaces",
 				// ... add other public dependencies that you statically link with here ...
 			}
 			);
@@ -38,7 +38,7 @@ public class RTSUnitSystem : ModuleRules
 				"Engine",
 				"Slate",
 				"SlateCore",
-				"NavigationSystem",
+				"NavigationSystem", "UIManager",
 				// ... add private dependencies that you statically link with here ...	
 			}
 			);

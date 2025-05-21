@@ -2,9 +2,6 @@
 
 
 #include "BasePlayerState.h"
-
-#include <string>
-
 #include "Net/UnrealNetwork.h"
 
 ABasePlayerState::ABasePlayerState()

@@ -3,12 +3,13 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Structs/FSide.h"
 #include "UObject/Interface.h"
-#include "MoveUnit.generated.h"
+#include "HasSide.generated.h"
 
 // This class does not need to be modified.
 UINTERFACE()
-class SUPPORTFUNCTIONS_API UMoveUnit : public UInterface
+class RTSTOOLKITINTERFACES_API UHasSide : public UInterface
 {
 	GENERATED_BODY()
 };
@@ -16,11 +17,11 @@ class SUPPORTFUNCTIONS_API UMoveUnit : public UInterface
 /**
  * 
  */
-class SUPPORTFUNCTIONS_API IMoveUnit
+class RTSTOOLKITINTERFACES_API IHasSide
 {
 	GENERATED_BODY()
 
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
-	virtual void MoveSelectedUnit(const FVector& GoalPosition, const int Sender = -1) = 0;
+	virtual FSide GetSide() = 0;
 };

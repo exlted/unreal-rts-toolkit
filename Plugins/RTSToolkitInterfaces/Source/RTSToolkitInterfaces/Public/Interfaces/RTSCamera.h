@@ -8,7 +8,7 @@
 
 // This class does not need to be modified.
 UINTERFACE()
-class SUPPORTFUNCTIONS_API URTSCamera : public UInterface
+class RTSTOOLKITINTERFACES_API URTSCamera : public UInterface
 {
 	GENERATED_BODY()
 };
@@ -16,7 +16,7 @@ class SUPPORTFUNCTIONS_API URTSCamera : public UInterface
 /**
  * 
  */
-class SUPPORTFUNCTIONS_API IRTSCamera
+class RTSTOOLKITINTERFACES_API IRTSCamera
 {
 	GENERATED_BODY()
 
