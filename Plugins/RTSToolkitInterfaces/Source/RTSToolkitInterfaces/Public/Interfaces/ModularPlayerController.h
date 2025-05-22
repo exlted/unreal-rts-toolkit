@@ -8,7 +8,7 @@
 
 // This class does not need to be modified.
 UINTERFACE()
-class RTSPLAYERCONTROLLER_API UModularPlayerController : public UInterface
+class RTSTOOLKITINTERFACES_API UModularPlayerController : public UInterface
 {
 	GENERATED_BODY()
 };
@@ -16,7 +16,7 @@ class RTSPLAYERCONTROLLER_API UModularPlayerController : public UInterface
 /**
  * 
  */
-class RTSPLAYERCONTROLLER_API IModularPlayerController
+class RTSTOOLKITINTERFACES_API IModularPlayerController
 {
 	GENERATED_BODY()
 

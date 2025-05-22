@@ -26,6 +26,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UMeshComponent* MeshComponent;
 
+	bool Enabled = true;
+	
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
@@ -37,4 +39,6 @@ public:
 
 	UFUNCTION()
 	void OnSideChanged(const FSide SideUpdate);
+
+	void Disable();
 };

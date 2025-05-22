@@ -29,6 +29,7 @@ void ABasePlayerController::SetupInputComponent()
 		else
 		{
 			BaseComponents.Add(Component);
+			Component->Enable();
 		}
 	}
 }
@@ -77,16 +78,19 @@ void ABasePlayerController::PushNamedComponent(const FName Name)
 
 bool ABasePlayerController::PopComponent()
 {
-	if (const auto OldTop = ComponentStack.Pop())
+	if (ComponentStack.Num() > 0)
 	{
-		OldTop->Disable();
-	}
-
-	if (ComponentStack.Num() == 0)
-	{
-		for (const auto Component : BaseComponents)
+		if (const auto OldTop = ComponentStack.Pop())
 		{
-			Component->Enable();
+			OldTop->Disable();
+		}
+
+		if (ComponentStack.Num() == 0)
+		{
+			for (const auto Component : BaseComponents)
+			{
+				Component->Enable();
+			}
 		}
 	}
 	

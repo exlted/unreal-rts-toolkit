@@ -46,7 +46,7 @@ void UTeamColorizer::TickComponent(float DeltaTime, ELevelTick TickType, FActorC
 
 void UTeamColorizer::OnSideChanged(const FSide SideUpdate)
 {
-	if (MeshComponent != nullptr)
+	if (MeshComponent != nullptr && Enabled)
 	{
 		const auto TeamMaterial = UMaterialInstanceDynamic::Create(BaseTeamMaterial, this);
 		TeamMaterial->SetVectorParameterValue("TeamColor", SideUpdate.UnitColor);
@@ -54,5 +54,10 @@ void UTeamColorizer::OnSideChanged(const FSide SideUpdate)
 		// How do we configurably get a Mesh to set a Material to?
 		MeshComponent->SetMaterial(0, TeamMaterial);
 	}
+}
+
+void UTeamColorizer::Disable()
+{
+	Enabled = false;
 }
 

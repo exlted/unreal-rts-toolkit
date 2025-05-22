@@ -16,6 +16,11 @@ void ABasePlayerState::BeginPlay()
 	Super::BeginPlay();
 	
 	UnitSpawningSystem->SetSide(Side);
+
+	if (!UIManager)
+	{
+		UIManager = GetRelatedSingletonTypedComponents<UUIManager>(this);
+	}
 }
 
 void ABasePlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

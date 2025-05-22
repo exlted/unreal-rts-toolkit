@@ -23,4 +23,6 @@ class RTSUNITSYSTEM_API ISpawner
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
 	virtual void SpawnEntity(UObject* WorldContext, UClass* SpawnClass, FTransform SpawnTransform) = 0;
+	virtual void SpawnPlayerDefinedEntity(UObject* WorldContext, UClass* SpawnClass) = 0;
+	virtual void FinishPlayerDefinedEntity(UObject* WorldContext) = 0;
 };

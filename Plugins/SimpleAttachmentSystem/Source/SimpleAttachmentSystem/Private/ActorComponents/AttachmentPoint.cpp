@@ -39,6 +39,11 @@ FName UAttachmentPoint::GetSlotName() const
 	return Name;
 }
 
+void UAttachmentPoint::SetSlotName(const FName NewName)
+{
+	Name = NewName;
+}
+
 void UAttachmentPoint::AttachTo(const TWeakObjectPtr<AActor> ToAttach)
 {
 	AttachedObject = ToAttach;

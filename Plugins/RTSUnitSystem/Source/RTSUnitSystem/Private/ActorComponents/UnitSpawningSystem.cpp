@@ -3,6 +3,8 @@
 
 #include "ActorComponents/UnitSpawningSystem.h"
 
+#include "ActorComponents/Ghosted.h"
+#include "ActorComponents/TeamColorizer.h"
 #include "Blueprint/AIBlueprintHelperLibrary.h"
 #include "Utils/ComponentUtils.h"
 #include "Interfaces/Spawnable.h"
@@ -21,6 +23,32 @@ UUnitSpawningSystem::UUnitSpawningSystem()
 void UUnitSpawningSystem::SpawnEntity(UObject* WorldContext, UClass* SpawnClass, const FTransform SpawnTransform)
 {
 	ServerSpawnEntity(WorldContext, SpawnClass, SpawnTransform);
+}
+
+void UUnitSpawningSystem::SpawnPlayerDefinedEntity(UObject* WorldContext, UClass* SpawnClass)
+{
+	const auto GhostedClass = GhostedSubclass.Get();
+	if (GhostedClass != nullptr)
+	{
+		PlayerSpawnedActor = WorldContext->GetWorld()->SpawnActor(SpawnClass);
+		for (const auto Colorizers = GetRelatedTypedComponents<UTeamColorizer>(PlayerSpawnedActor);
+			 const auto& Colorizer : Colorizers)
+		{
+			Colorizer->Disable();
+		}
+		PlayerSpawnedActor->AddComponentByClass(GhostedClass, false, FTransform::Identity, false);
+	}
+}
+
+void UUnitSpawningSystem::FinishPlayerDefinedEntity(UObject* WorldContext)
+{
+	if (PlayerSpawnedActor != nullptr)
+	{
+		ServerSpawnEntity(WorldContext, PlayerSpawnedActor->GetClass(), PlayerSpawnedActor->GetTransform());
+
+		PlayerSpawnedActor->Destroy();
+		PlayerSpawnedActor = nullptr;
+	}
 }
 
 void UUnitSpawningSystem::SetSide(FSide NewSide)

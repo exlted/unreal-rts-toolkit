@@ -14,5 +14,8 @@ struct FBuildable
 	FName DisplayName;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool PlayerDefinedLocation;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TScriptInterface<IBuilder> AssociatedBuilder;
 };

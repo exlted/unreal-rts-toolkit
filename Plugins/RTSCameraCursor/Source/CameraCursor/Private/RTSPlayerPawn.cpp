@@ -34,7 +34,12 @@ ARTSPlayerPawn::ARTSPlayerPawn()
 	WorldCursor->SetCollisionEnabled(ECollisionEnabled::Type::NoCollision);
 	WorldCursor->SetCollisionResponseToChannels(ECR_Ignore);
 
+	CursorAttachment = CreateDefaultSubobject<UAttachmentPoint>("CursorAttachment");
+	CursorAttachment->SetupAttachment(WorldCursor);
+	CursorAttachment->SetSlotName("Cursor");
+	
 	MovementComponent = CreateDefaultSubobject<UFloatingPawnMovement>("FloatingPawnMovement");
+	AttachmentHandler = CreateDefaultSubobject<UAttachmentHandler>("AttachmentHandler");
 }
 
 // Called when the game starts or when spawned
@@ -88,7 +93,7 @@ void ARTSPlayerPawn::ChangeCursorVisibility(const bool NewVisibilityState)
 			switch (CursorMode)
 			{
 			case ECursorMode::World:
-				WorldCursor->SetVisibility(true, true);
+				WorldCursor->SetVisibility(true, false);
 				break;
 			case ECursorMode::Screen:
 				GetLocalViewingPlayerController()->bShowMouseCursor = true;
@@ -100,7 +105,7 @@ void ARTSPlayerPawn::ChangeCursorVisibility(const bool NewVisibilityState)
 		}
 		else
 		{
-			WorldCursor->SetVisibility(false, true);
+			WorldCursor->SetVisibility(false, false);
 			GetLocalViewingPlayerController()->bShowMouseCursor = false;
 			Visible = false;
 		}
@@ -122,14 +127,14 @@ void ARTSPlayerPawn::ChangeCursorMode(const ECursorMode NewCursorMode)
 		{
 		case ECursorMode::World:
 			{
-				WorldCursor->SetVisibility(Visible, true);
+				WorldCursor->SetVisibility(Visible, false);
 				GetLocalViewingPlayerController()->bShowMouseCursor = false;
 				CursorMode = ECursorMode::World;
 				break;
 			}
 		case ECursorMode::Screen:
 			{
-				WorldCursor->SetVisibility(false, true);
+				WorldCursor->SetVisibility(false, false);
 				GetLocalViewingPlayerController()->bShowMouseCursor = Visible;
 				CursorMode = ECursorMode::Screen;
 				break;

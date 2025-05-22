@@ -38,7 +38,7 @@ public class RTSUnitSystem : ModuleRules
 				"Engine",
 				"Slate",
 				"SlateCore",
-				"NavigationSystem", "SimpleUIManager",
+				"NavigationSystem", "SimpleUIManager", "SimpleAttachmentSystem",
 				// ... add private dependencies that you statically link with here ...	
 			}
 			);

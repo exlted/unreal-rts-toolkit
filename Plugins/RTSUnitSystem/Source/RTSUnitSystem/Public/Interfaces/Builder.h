@@ -28,5 +28,5 @@ public:
 	virtual void HideUI() = 0;
 
 	UFUNCTION(BlueprintCallable)
-	virtual void OnMenuItemClicked(UClass* SelectedClass) = 0;
+	virtual void OnMenuItemClicked(UClass* SelectedClass, bool PlayerDefinedLocation) = 0;
 };

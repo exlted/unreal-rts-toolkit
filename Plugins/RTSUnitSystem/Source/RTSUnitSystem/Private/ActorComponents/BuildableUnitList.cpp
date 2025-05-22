@@ -80,7 +80,7 @@ void UBuildableUnitList::HideUI()
 	}
 }
 
-void UBuildableUnitList::OnMenuItemClicked(UClass* SelectedClass)
+void UBuildableUnitList::OnMenuItemClicked(UClass* SelectedClass, bool PlayerDefinedLocation)
 {
 	if (const auto PlayerState = GetPlayerState(); PlayerState)
 	{
@@ -89,8 +89,15 @@ void UBuildableUnitList::OnMenuItemClicked(UClass* SelectedClass)
 		{
 			FTransform SpawnTransform = GetOwner()->GetActorTransform();
 			SpawnTransform.AddToTranslation(GetOwner()->GetActorForwardVector() * 10);
-			
-			SpawningSystem->SpawnEntity(this, SelectedClass, SpawnTransform);
+
+			if (PlayerDefinedLocation)
+			{
+				SpawningSystem->SpawnPlayerDefinedEntity(this, SelectedClass);
+			}
+			else
+			{
+				SpawningSystem->SpawnEntity(this, SelectedClass, SpawnTransform);
+			}
 		}
 	}
 }

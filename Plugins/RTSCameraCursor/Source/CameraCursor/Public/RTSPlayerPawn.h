@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "ActorComponents/AttachmentHandler.h"
 #include "GameFramework/Pawn.h"
 #include "Enums/ECursorMode.h"
 #include "Interfaces/Attachable.h"
@@ -48,11 +49,16 @@ public:
 	UPROPERTY(EditAnywhere, Category = Camera)
 	UCurveFloat* PitchCurve;
 
+	UPROPERTY(EditAnywhere, Category = Camera)
+	UAttachmentHandler* AttachmentHandler;
+	
 	// CURSOR INFORMATION
 	// Cursor Components
 	// World Space Cursor
 	UPROPERTY(EditAnywhere, Category = Cursor)
 	UStaticMeshComponent* WorldCursor;
+	UPROPERTY(EditAnywhere, Category = Cursor)
+	UAttachmentPoint* CursorAttachment;
 	
 	UPROPERTY(EditAnywhere, Category = Cursor)
 	bool Visible;
