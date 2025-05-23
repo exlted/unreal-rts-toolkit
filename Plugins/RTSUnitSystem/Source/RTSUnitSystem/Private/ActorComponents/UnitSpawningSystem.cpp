@@ -40,15 +40,32 @@ void UUnitSpawningSystem::SpawnPlayerDefinedEntity(UObject* WorldContext, UClass
 	}
 }
 
-void UUnitSpawningSystem::FinishPlayerDefinedEntity(UObject* WorldContext)
+void UUnitSpawningSystem::FinishPlayerDefinedEntity(UObject* WorldContext, const bool AddMultiple)
 {
 	if (PlayerSpawnedActor != nullptr)
 	{
 		ServerSpawnEntity(WorldContext, PlayerSpawnedActor->GetClass(), PlayerSpawnedActor->GetTransform());
 
+		if (!AddMultiple)
+		{
+			PlayerSpawnedActor->Destroy();
+			PlayerSpawnedActor = nullptr;
+		}
+	}
+}
+
+void UUnitSpawningSystem::CancelPlayerDefinedEntity()
+{
+	if (PlayerSpawnedActor)
+	{
 		PlayerSpawnedActor->Destroy();
 		PlayerSpawnedActor = nullptr;
 	}
+}
+
+TWeakObjectPtr<AActor> UUnitSpawningSystem::GetPlayerDefinedEntity()
+{
+	return PlayerSpawnedActor;
 }
 
 void UUnitSpawningSystem::SetSide(FSide NewSide)

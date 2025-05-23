@@ -8,7 +8,7 @@
 
 // This class does not need to be modified.
 UINTERFACE()
-class RTSUNITSYSTEM_API USpawner : public UInterface
+class RTSTOOLKITINTERFACES_API USpawner : public UInterface
 {
 	GENERATED_BODY()
 };
@@ -16,7 +16,7 @@ class RTSUNITSYSTEM_API USpawner : public UInterface
 /**
  * 
  */
-class RTSUNITSYSTEM_API ISpawner
+class RTSTOOLKITINTERFACES_API ISpawner
 {
 	GENERATED_BODY()
 
@@ -24,5 +24,7 @@ class RTSUNITSYSTEM_API ISpawner
 public:
 	virtual void SpawnEntity(UObject* WorldContext, UClass* SpawnClass, FTransform SpawnTransform) = 0;
 	virtual void SpawnPlayerDefinedEntity(UObject* WorldContext, UClass* SpawnClass) = 0;
-	virtual void FinishPlayerDefinedEntity(UObject* WorldContext) = 0;
+	virtual void FinishPlayerDefinedEntity(UObject* WorldContext, bool AddMultiple) = 0;
+	virtual void CancelPlayerDefinedEntity() = 0;
+	virtual TWeakObjectPtr<AActor> GetPlayerDefinedEntity() = 0;
 };

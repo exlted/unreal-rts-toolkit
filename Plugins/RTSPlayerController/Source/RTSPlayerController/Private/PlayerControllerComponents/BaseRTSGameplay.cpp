@@ -75,7 +75,7 @@ void UBaseRTSGameplay::TickComponent(float DeltaTime, ELevelTick TickType,
 
 	// ...
 
-	if (!PlayerController || !Enabled)
+	if (!PlayerController)
 	{
 		return;
 	}

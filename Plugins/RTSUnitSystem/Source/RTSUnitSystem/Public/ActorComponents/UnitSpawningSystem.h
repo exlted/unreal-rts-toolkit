@@ -31,7 +31,10 @@ public:
 
 	virtual void SpawnEntity(UObject* WorldContext, UClass* SpawnClass, FTransform SpawnTransform) override;
 	virtual void SpawnPlayerDefinedEntity(UObject* WorldContext, UClass* SpawnClass) override;
-	virtual void FinishPlayerDefinedEntity(UObject* WorldContext) override;
+	virtual void FinishPlayerDefinedEntity(UObject* WorldContext, bool AddMultiple) override;
+	virtual void CancelPlayerDefinedEntity() override;
+	virtual TWeakObjectPtr<AActor> GetPlayerDefinedEntity() override;
+	
 	virtual void SetSide(FSide NewSide);
 
 	// Server Functions
