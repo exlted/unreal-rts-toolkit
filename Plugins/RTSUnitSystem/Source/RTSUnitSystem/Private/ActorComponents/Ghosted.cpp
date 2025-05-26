@@ -6,6 +6,7 @@
 #include "Components/CapsuleComponent.h"
 #include "Interfaces/Attachable.h"
 #include "Interfaces/ModularPlayerController.h"
+#include "Utils/ActorUtils.h"
 #include "Utils/ComponentUtils.h"
 
 
@@ -64,16 +65,12 @@ void UGhosted::BeginPlay()
 	}
 	
 	// Switch Control Mode to Building mode
-	if (Controller->Implements<UModularPlayerController>())
+	if (const auto ModularController = GetSingletonInterface<IModularPlayerController, UModularPlayerController>(Controller);
+		ModularController != nullptr)
 	{
-		if (const auto ModularController = TScriptInterface<IModularPlayerController>(Controller);
-			ModularController != nullptr)
-		{
-			ModularController->PushNamedComponent("Building");
-		}
+		ModularController->PushNamedComponent("Building");
 		ActionCount++;
 	}
-
 	// Turn off collision
 	GetOwner()->SetActorEnableCollision(false);
 
