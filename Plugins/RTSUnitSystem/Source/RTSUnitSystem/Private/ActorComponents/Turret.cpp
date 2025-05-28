@@ -3,6 +3,9 @@
 
 #include "ActorComponents/Turret.h"
 
+#include "Interfaces/TurretWeapon.h"
+#include "Utils/ComponentUtils.h"
+
 
 // Sets default values for this component's properties
 UTurret::UTurret()
@@ -21,7 +24,8 @@ void UTurret::BeginPlay()
 	Super::BeginPlay();
 
 	// ...
-	
+
+	Weapon = GetRelatedSingletonComponent<ITurretWeapon, UTurretWeapon>(GetOwner());
 }
 
 
@@ -31,5 +35,40 @@ void UTurret::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponen
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
 	// ...
+	if (Timeout <= 0.0f)
+	{
+		if (Fired == false)
+		{
+			if (ValidTargets.Num() > 0 && Weapon != nullptr)
+			{
+				Fired = true;
+				Weapon->FireAtTarget(ValidTargets[0]);
+			}
+		}
+	}
+	else if (Timeout > 0.0f)
+	{
+		Timeout -= DeltaTime;
+	}
+}
+
+void UTurret::SetCurrentTargetsInRange(TArray<AActor*> Targets)
+{
+	ValidTargets = Targets;
+}
+
+void UTurret::SetWeaponTimeout(float NewTimeout)
+{
+	Timeout = NewTimeout;
+	Fired = false;
+}
+
+void UTurret::TargetKilled()
+{
+}
+
+void UTurret::BlockAction()
+{
+	Fired = true;
 }
 

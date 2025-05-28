@@ -8,6 +8,7 @@
 #include "Blueprint/AIBlueprintHelperLibrary.h"
 #include "Utils/ComponentUtils.h"
 #include "Interfaces/Spawnable.h"
+#include "Interfaces/TurretController.h"
 
 
 // Sets default values for this component's properties
@@ -31,12 +32,20 @@ void UUnitSpawningSystem::SpawnPlayerDefinedEntity(UObject* WorldContext, UClass
 	if (GhostedClass != nullptr)
 	{
 		PlayerSpawnedActor = WorldContext->GetWorld()->SpawnActor(SpawnClass);
-		for (const auto Colorizers = GetRelatedTypedComponents<UTeamColorizer>(PlayerSpawnedActor);
-			 const auto& Colorizer : Colorizers)
+		if (PlayerSpawnedActor != nullptr)
 		{
-			Colorizer->Disable();
+			for (const auto Colorizers = GetRelatedTypedComponents<UTeamColorizer>(PlayerSpawnedActor);
+				 const auto& Colorizer : Colorizers)
+			{
+				Colorizer->Disable();
+			}
+			if (const auto Turret = GetRelatedSingletonComponent<ITurretController, UTurretController>(PlayerSpawnedActor);
+				Turret != nullptr)
+			{
+				Turret->BlockAction();
+			}
+			PlayerSpawnedActor->AddComponentByClass(GhostedClass, false, FTransform::Identity, false);
 		}
-		PlayerSpawnedActor->AddComponentByClass(GhostedClass, false, FTransform::Identity, false);
 	}
 }
 

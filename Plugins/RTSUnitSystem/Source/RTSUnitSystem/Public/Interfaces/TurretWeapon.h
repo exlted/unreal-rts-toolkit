@@ -24,7 +24,7 @@ class RTSUNITSYSTEM_API ITurretWeapon
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
 	// From Turret Controller
-	virtual void FireAtTarget(TScriptInterface<ITargetable> Target) = 0;
+	virtual void FireAtTarget(AActor* Target) = 0;
 	// From Bullet
 	virtual void TargetKilled() = 0;
 };

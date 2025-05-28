@@ -3,33 +3,30 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Actors/BaseHomingBullet.h"
 #include "Components/ActorComponent.h"
 #include "Interfaces/TurretController.h"
-#include "Turret.generated.h"
+#include "Interfaces/TurretWeapon.h"
+#include "Weapon.generated.h"
 
-
-class ITurretWeapon;
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
-class RTSUNITSYSTEM_API UTurret : public UActorComponent, public ITurretController
+class RTSUNITSYSTEM_API UWeapon : public UActorComponent, public ITurretWeapon
 {
 	GENERATED_BODY()
 
 public:
 	// Sets default values for this component's properties
-	UTurret();
+	UWeapon();
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Config)
+	TSubclassOf<ABaseHomingBullet> BulletClass;
+	
+	UPROPERTY(EditAnywhere)
+	TScriptInterface<ITurretController> Controller;
 
 	UPROPERTY(EditAnywhere)
-	TScriptInterface<ITurretWeapon> Weapon;
-
-	UPROPERTY(EditAnywhere)
-	TArray<AActor*> ValidTargets;
-
-	UPROPERTY(EditAnywhere)
-	float Timeout = -1;
-
-	UPROPERTY(EditAnywhere)
-	bool Fired = false;
+	float WeaponTimeout = 5.0f;
 	
 protected:
 	// Called when the game starts
@@ -41,12 +38,8 @@ public:
 	                           FActorComponentTickFunction* ThisTickFunction) override;
 
 	
-	// From Turret Collider
-	virtual void SetCurrentTargetsInRange(TArray<AActor*> Targets) override;
-
-	// From Turret Weapon
-	virtual void SetWeaponTimeout(float NewTimeout) override;
+	// From Turret Controller
+	virtual void FireAtTarget(AActor* Target) override;
+	// From Bullet
 	virtual void TargetKilled() override;
-
-	virtual void BlockAction() override;
 };

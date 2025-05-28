@@ -24,9 +24,12 @@ class RTSUNITSYSTEM_API ITurretController
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
 	// From Turret Collider
-	virtual void SetCurrentTargetsInRange(TArray<TScriptInterface<ITargetable>> Targets) = 0;
+	virtual void SetCurrentTargetsInRange(TArray<AActor*> Targets) = 0;
 
 	// From Turret Weapon
 	virtual void SetWeaponTimeout(float Timeout) = 0;
 	virtual void TargetKilled() = 0;
+
+	// For Ghost Mode
+	virtual void BlockAction() = 0;
 };
