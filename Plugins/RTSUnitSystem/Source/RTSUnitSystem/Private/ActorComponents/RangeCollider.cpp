@@ -3,6 +3,7 @@
 
 #include "ActorComponents/RangeCollider.h"
 
+#include "Interfaces/Damagable.h"
 #include "Interfaces/Targetable.h"
 #include "Utils/ComponentUtils.h"
 
@@ -85,9 +86,12 @@ void URangeCollider::OverlapBegin(UPrimitiveComponent* OverlappedComponent, AAct
 		
 		if (OtherTeam != ThisTeam)
 		{
-			// Check if the Actor can be attacked
-			ValidTargets.AddUnique(OtherActor);
-			Controller->SetCurrentTargetsInRange(ValidTargets);
+			if (const auto Damagable = GetRelatedSingletonComponent<IDamagable, UDamagable>(OtherActor);
+				Damagable != nullptr && Damagable->IsDamagable())
+			{
+				ValidTargets.AddUnique(OtherActor);
+				Controller->SetCurrentTargetsInRange(ValidTargets);
+			}
 		}
 	}
 }

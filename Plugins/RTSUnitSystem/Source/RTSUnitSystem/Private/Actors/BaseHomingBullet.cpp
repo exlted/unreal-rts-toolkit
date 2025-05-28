@@ -3,6 +3,7 @@
 
 #include "Actors/BaseHomingBullet.h"
 
+#include "Interfaces/Damagable.h"
 #include "Utils/ComponentUtils.h"
 
 
@@ -33,9 +34,15 @@ void ABaseHomingBullet::BeginPlay()
 void ABaseHomingBullet::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
+	
 	if (Ready)
 	{
+		if (Target == nullptr)
+		{
+			Destroy();
+			return;
+		}
+		
 		const auto TargetLocation = Target->GetActorLocation();
 		const auto MyLocation = GetActorLocation();
 
@@ -52,6 +59,15 @@ void ABaseHomingBullet::OverlapBegin(UPrimitiveComponent* OverlappedComponent, A
 	// If the overlapped actor is damageable, deal damage to them and delete
 	if (OtherActor == Target)
 	{
+		if (const auto Damagable = GetRelatedSingletonComponent<IDamagable, UDamagable>(OtherActor);
+			Damagable != nullptr)
+		{
+			if (Damagable->DoDamage(this->Damage))
+			{
+				Weapon->TargetKilled();
+			}
+		}
+		
 		Destroy();
 	}
 }

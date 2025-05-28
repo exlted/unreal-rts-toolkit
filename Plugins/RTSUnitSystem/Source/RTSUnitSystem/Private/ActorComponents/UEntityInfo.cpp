@@ -79,6 +79,23 @@ void UEntityInfo::OnRep_SideChanged()
 	OnSideChanged.Broadcast(SideInfo);
 }
 
+bool UEntityInfo::IsDamagable()
+{
+	return !Invulnerable;
+}
+
+bool UEntityInfo::DoDamage(const float Amount)
+{
+	Health -= Amount;
+
+	if (Health <= 0)
+	{
+		GetOwner()->Destroy();
+		return true;
+	}
+	return false;
+}
+
 FSideChanged& UEntityInfo::GetEventDelegate()
 {
 	return OnSideChanged;
