@@ -35,7 +35,7 @@ public:
 	float MaxHealth;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=UnitInfo, meta=(AllowPrivateAccess = "true"))
-	bool Invulnerable;
+	TMap<EDamageSource, bool> Invulnerable;
 	
 	virtual void BeginPlay() override;
 	
@@ -52,7 +52,7 @@ public:
 	virtual void OnRep_SideChanged();
 
 
-	virtual bool IsDamagable() override;
+	virtual bool IsDamagableBy(EDamageSource Source) override;
 	// returns true when dealt damage kills
 	virtual bool DoDamage(float Amount) override;
 	

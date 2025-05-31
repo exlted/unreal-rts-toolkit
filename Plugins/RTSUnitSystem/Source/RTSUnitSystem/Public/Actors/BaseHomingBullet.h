@@ -17,7 +17,7 @@ public:
 	ABaseHomingBullet();
 
 	UPROPERTY(EditAnywhere)
-	AActor* Target;
+	TWeakObjectPtr<AActor> Target;
 
 	UPROPERTY(EditAnywhere)
 	TScriptInterface<ITurretWeapon> Weapon;

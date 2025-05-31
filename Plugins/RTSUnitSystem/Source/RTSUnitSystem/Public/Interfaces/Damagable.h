@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Enums/DamageSources.h"
 #include "UObject/Interface.h"
 #include "Damagable.generated.h"
 
@@ -23,7 +24,7 @@ class RTSUNITSYSTEM_API IDamagable
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
 
-	virtual bool IsDamagable() = 0;
+	virtual bool IsDamagableBy(EDamageSource Source) = 0;
 	// returns true when dealt damage kills
 	virtual bool DoDamage(float Amount) = 0;
 	

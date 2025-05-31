@@ -2,8 +2,11 @@
 
 
 #include "ActorComponents/Navigation.h"
+
+#include "AIController.h"
 #include "Components/SplineComponent.h"
 #include "NavigationSystem.h"
+#include "Blueprint/AIBlueprintHelperLibrary.h"
 #include "NavFilters/NavigationQueryFilter.h"
 
 
@@ -70,7 +73,8 @@ void UNavigation::TickComponent(float DeltaTime, ELevelTick TickType, FActorComp
 
 void UNavigation::MoveTo(const FVector& NewLocation)
 {
-	Navigate(FindPathToLocation(NewLocation));
+	//Navigate(FindPathToLocation(NewLocation));
+	UAIBlueprintHelperLibrary::SimpleMoveToLocation(UAIBlueprintHelperLibrary::GetAIController(GetOwner()), NewLocation);
 }
 
 TArray<FVector> UNavigation::FindPathToLocation(const FVector& Location) const

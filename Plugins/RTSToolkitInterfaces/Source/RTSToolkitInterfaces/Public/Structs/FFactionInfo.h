@@ -15,7 +15,7 @@ struct FFactionInfo
 	
 	void SpawnInitialEntities(UObject* WorldContext, const FTransform& SpawnLocation, AActor* SpawnOwner)
 	{
-		for (const auto [Entity, SpawnOffset] : InitialEntities)
+		for (const auto [Entity, SpawnOffset, Stats] : InitialEntities)
 		{
 			const FTransform SpawnTransform = SpawnLocation + SpawnOffset;
 			//World.SpawnActor(Entity, &SpawnTransform);

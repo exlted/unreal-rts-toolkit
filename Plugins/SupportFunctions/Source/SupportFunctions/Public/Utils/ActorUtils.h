@@ -2,6 +2,15 @@
 #include "CoreMinimal.h"
 #include "ComponentUtils.h"
 
+static TWeakObjectPtr<APlayerState> GetPlayerState(const AActor* WorldContext)
+{
+	if (WorldContext->GetWorld() != nullptr && WorldContext->GetWorld()->GetFirstPlayerController() != nullptr)
+	{
+		return WorldContext->GetWorld()->GetFirstPlayerController()->GetPlayerState<APlayerState>();
+	}
+	return nullptr;
+}
+
 template<class Interface, class UInterface>
 static TScriptInterface<Interface> GetSingletonInterface(AActor* FromActor)
 {

@@ -25,7 +25,6 @@ void UUnitSpawningSystem::SpawnEntity(UObject* WorldContext, UClass* SpawnClass,
 {
 	ServerSpawnEntity(WorldContext, SpawnClass, SpawnTransform);
 }
-
 void UUnitSpawningSystem::SpawnPlayerDefinedEntity(UObject* WorldContext, UClass* SpawnClass)
 {
 	const auto GhostedClass = GhostedSubclass.Get();
@@ -85,7 +84,6 @@ void UUnitSpawningSystem::SetSide(FSide NewSide)
 void UUnitSpawningSystem::ServerSpawnEntity_Implementation(UObject* WorldContext, UClass* SpawnClass,
 	FTransform SpawnTransform)
 {
-	
 	const auto Pawn = UAIBlueprintHelperLibrary::SpawnAIFromClass(WorldContext, SpawnClass, nullptr,
 		SpawnTransform.GetLocation(), SpawnTransform.GetRotation().Rotator(), true,
 		GetOwner());

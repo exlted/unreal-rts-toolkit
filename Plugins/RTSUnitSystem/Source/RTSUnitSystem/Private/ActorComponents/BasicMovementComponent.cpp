@@ -38,6 +38,9 @@ void UBasicMovementComponent::TickComponent(float DeltaTime, ELevelTick TickType
 		{
 			const auto Location = Pawn->GetActorLocation();
 
+			// Move From ActorLocation towards MovementInputVector, but first we have to orient towards the direction we'll move in
+			
+
 			if (const auto Forward = Pawn->GetActorForwardVector();
 				FMath::IsNearlyEqual(MovementVector.HeadingAngle(), Forward.HeadingAngle(), 1))
 			{

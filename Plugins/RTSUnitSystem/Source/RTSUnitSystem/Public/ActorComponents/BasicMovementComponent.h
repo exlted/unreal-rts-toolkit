@@ -15,9 +15,14 @@ class RTSUNITSYSTEM_API UBasicMovementComponent : public UMovementComponent
 public:
 	// Sets default values for this component's properties
 	UBasicMovementComponent();
-	
+
+	// Degrees per second
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input)
-	float RotationSpeed = 0.5;
+	float RotationSpeed = 10; 
+
+	// Units per second
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input)
+	float MovementSpeed = 1;
 	
 protected:
 	// Called when the game starts

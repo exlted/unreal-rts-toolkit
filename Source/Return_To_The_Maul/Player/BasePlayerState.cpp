@@ -3,6 +3,7 @@
 
 #include "BasePlayerState.h"
 #include "Net/UnrealNetwork.h"
+#include "Return_To_The_Maul/GameMode/RTSGameModeBase.h"
 
 ABasePlayerState::ABasePlayerState()
 {
@@ -30,7 +31,7 @@ void ABasePlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 	DOREPLIFETIME(ABasePlayerState, Side);
 }
 
-void ABasePlayerState::SetTeam(const int TeamNumber)
+void ABasePlayerState::SetPlayerNum(const int TeamNumber)
 {
 	Side.Team = TeamNumber;
 
@@ -46,7 +47,7 @@ void ABasePlayerState::SetColor(const FColor Color)
 
 void ABasePlayerState::SpawnEntities(const FTransform& SpawnLocation)
 {
-	for (const auto [Entity, SpawnOffset] : Side.Faction.InitialEntities)
+	for (const auto [Entity, SpawnOffset, Stats] : Side.Faction.InitialEntities)
 	{
 		UnitSpawningSystem->SpawnEntity(this, Entity, SpawnLocation + SpawnOffset);
 	}
@@ -60,4 +61,9 @@ FSide ABasePlayerState::GetSide()
 TWeakObjectPtr<UUIManager> ABasePlayerState::GetUIManager()
 {
 	return UIManager;
+}
+
+void ABasePlayerState::StartNextWave_Implementation()
+{
+	GetWorld()->GetAuthGameMode<ARTSGameModeBase>()->StartNextWave();
 }

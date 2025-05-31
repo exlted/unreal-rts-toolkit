@@ -87,7 +87,7 @@ void URangeCollider::OverlapBegin(UPrimitiveComponent* OverlappedComponent, AAct
 		if (OtherTeam != ThisTeam)
 		{
 			if (const auto Damagable = GetRelatedSingletonComponent<IDamagable, UDamagable>(OtherActor);
-				Damagable != nullptr && Damagable->IsDamagable())
+				Damagable != nullptr && Damagable->IsDamagableBy(EDamageSource::Projectile))
 			{
 				ValidTargets.AddUnique(OtherActor);
 				Controller->SetCurrentTargetsInRange(ValidTargets);

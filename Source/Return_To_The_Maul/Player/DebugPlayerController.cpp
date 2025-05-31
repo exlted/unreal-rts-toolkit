@@ -5,21 +5,43 @@
 
 #include "BasePlayerState.h"
 #include "EnhancedInputComponent.h"
-#include "Interfaces/RTSCursor.h"
 
 UDebugPlayerController::UDebugPlayerController()
 {
 }
 
-void UDebugPlayerController::SetupInputComponent(UEnhancedInputLocalPlayerSubsystem* Subsystem,
-	UEnhancedInputComponent* EnhancedInputComponent, APlayerController* Controller)
+void UDebugPlayerController::Enable()
 {
-	Super::SetupInputComponent(Subsystem, EnhancedInputComponent, Controller);
+}
+
+void UDebugPlayerController::Disable()
+{
+}
+
+void UDebugPlayerController::SetupInputComponent(UEnhancedInputLocalPlayerSubsystem* Subsystem,
+                                                 UEnhancedInputComponent* EnhancedInputComponent, APlayerController* Controller)
+{
+	if (Subsystem)
+	{
+		Subsystem->AddMappingContext(MappingContext, 0);
+	}
 	
 	if (EnhancedInputComponent)
 	{
-		EnhancedInputComponent->BindAction(DebugAction, ETriggerEvent::Started, this, &UDebugPlayerController::OnDebugTriggered);
+		EnhancedInputComponent->BindAction(DebugAction, ETriggerEvent::Triggered, this, &UDebugPlayerController::OnDebugTriggered);
 	}
+	
+	PlayerController = Controller;
+}
+
+bool UDebugPlayerController::IsBaseController()
+{
+		return true;
+}
+
+FName UDebugPlayerController::GetIdentifier()
+{
+	return FName("Debug");
 }
 
 void UDebugPlayerController::BeginPlay()
@@ -29,14 +51,8 @@ void UDebugPlayerController::BeginPlay()
 
 void UDebugPlayerController::OnDebugTriggered(const FInputActionInstance& Instance)
 {
-	if (DebugClassToSpawn != nullptr && RTSCursor != nullptr)
+	if (const auto State = PlayerController->GetPlayerState<ABasePlayerState>(); State != nullptr)
 	{
-		if (const auto State = PlayerController->GetPlayerState<ABasePlayerState>(); State != nullptr)
-		{
-			auto CursorLocation = RTSCursor->GetCursorLocation();
-			CursorLocation.Z += 20;
-			
-			State->UnitSpawningSystem->SpawnEntity(this, DebugClassToSpawn, FTransform(CursorLocation));
-		}
+		State->StartNextWave();
 	}
 }

@@ -19,6 +19,9 @@ struct FSide
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Side, meta=(AllowPrivateAccess = "true"))
 	FFactionInfo Faction;
 	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Side, meta=(AllowPrivateAccess = "true"))	
+	int PlayerNumber;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Side, meta=(AllowPrivateAccess = "true"))
 	int Team = -1;
 };

@@ -12,6 +12,11 @@ UEntityInfo::UEntityInfo()
 	PrimaryComponentTick.bStartWithTickEnabled = true;
 	PrimaryComponentTick.bAllowTickOnDedicatedServer = false;
 	PrimaryComponentTick.TickGroup = TG_PrePhysics;
+
+	for (int i = 0; i < static_cast<int>(EDamageSource::Count); i++)
+	{
+		Invulnerable.Add(FDamageSourceConstants::DamageSourceList[i], false);
+	}
 }
 
 void UEntityInfo::BeginPlay()
@@ -79,9 +84,20 @@ void UEntityInfo::OnRep_SideChanged()
 	OnSideChanged.Broadcast(SideInfo);
 }
 
-bool UEntityInfo::IsDamagable()
+bool UEntityInfo::IsDamagableBy(const EDamageSource Source)
 {
-	return !Invulnerable;
+	if (Source == EDamageSource::Count)
+	{
+		UE_LOG(LogTemp, Error, TEXT("Damage Source was an invalid value (Count)"))
+		return false;
+	}
+	
+	if (Invulnerable.Contains(Source))
+	{
+		return !Invulnerable[Source];
+	}
+	// Default to vulnerable
+	return true;
 }
 
 bool UEntityInfo::DoDamage(const float Amount)

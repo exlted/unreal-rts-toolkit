@@ -39,7 +39,7 @@ public:
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
-	void SetTeam(int TeamNumber);
+	void SetPlayerNum(int TeamNumber);
 	void SetColor(FColor Color);
 
 	void SpawnEntities(const FTransform& SpawnLocation);
@@ -47,4 +47,7 @@ public:
 	virtual FSide GetSide() override;
 
 	virtual TWeakObjectPtr<UUIManager> GetUIManager() override;
+
+	UFUNCTION(Server, Reliable)
+	void StartNextWave();
 };

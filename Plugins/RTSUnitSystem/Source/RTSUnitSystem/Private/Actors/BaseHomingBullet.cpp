@@ -37,13 +37,15 @@ void ABaseHomingBullet::Tick(float DeltaTime)
 	
 	if (Ready)
 	{
-		if (Target == nullptr)
+		if (!Target.IsValid())
 		{
 			Destroy();
 			return;
 		}
+
+		const auto Actor = Target.Pin();
 		
-		const auto TargetLocation = Target->GetActorLocation();
+		const auto TargetLocation = Actor->GetActorLocation();
 		const auto MyLocation = GetActorLocation();
 
 		auto MyDirection = TargetLocation - MyLocation;
@@ -57,7 +59,8 @@ void ABaseHomingBullet::OverlapBegin(UPrimitiveComponent* OverlappedComponent, A
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	// If the overlapped actor is damageable, deal damage to them and delete
-	if (OtherActor == Target)
+	if (const auto Actor = Target.Pin();
+		Actor != nullptr && OtherActor == Actor.Get())
 	{
 		if (const auto Damagable = GetRelatedSingletonComponent<IDamagable, UDamagable>(OtherActor);
 			Damagable != nullptr)

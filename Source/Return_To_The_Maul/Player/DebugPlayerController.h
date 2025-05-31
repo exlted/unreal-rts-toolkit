@@ -3,34 +3,41 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "BasePlayerController.h"
 #include "PlayerControllerComponents/BaseRTSGameplay.h"
 #include "DebugPlayerController.generated.h"
 
 /**
  * 
  */
-UCLASS()
-class RETURN_TO_THE_MAUL_API UDebugPlayerController : public UBaseRTSGameplay
+UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
+class RETURN_TO_THE_MAUL_API UDebugPlayerController : public UActorComponent, public IPlayerControllerComponent
 {
 	GENERATED_BODY()
 public:
 	UDebugPlayerController();
 	
+	/** MappingContext */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
+	UInputMappingContext* MappingContext;
+	
 	/** Standard Camera Pan Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
 	UInputAction* DebugAction;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
-	UClass* DebugClassToSpawn;
+	virtual void Enable() override;
+	virtual void Disable() override;
 
-	FTransform SpawnTransform;
+	virtual void SetupInputComponent(UEnhancedInputLocalPlayerSubsystem* Subsystem,
+		UEnhancedInputComponent* EnhancedInputComponent, APlayerController* PlayerController) override;
+
+	virtual bool IsBaseController() override;
+	virtual FName GetIdentifier() override;
 	
 protected:
-	virtual void SetupInputComponent(UEnhancedInputLocalPlayerSubsystem* Subsystem,
-		UEnhancedInputComponent* EnhancedInputComponent, APlayerController* Controller) override;
-
 	virtual void BeginPlay() override;
 	
 	virtual void OnDebugTriggered(const FInputActionInstance& Instance);
+
+	
+	APlayerController* PlayerController;
 };

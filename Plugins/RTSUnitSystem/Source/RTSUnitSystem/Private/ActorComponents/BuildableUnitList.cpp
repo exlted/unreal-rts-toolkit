@@ -82,7 +82,7 @@ void UBuildableUnitList::HideUI()
 
 void UBuildableUnitList::OnMenuItemClicked(UClass* SelectedClass, bool PlayerDefinedLocation)
 {
-	if (const auto PlayerState = GetPlayerState(); PlayerState)
+	if (const auto PlayerState = GetPlayerState(); PlayerState != nullptr)
 	{
 		if (const auto SpawningSystem = GetRelatedSingletonComponent<ISpawner, USpawner>(PlayerState);
 			SpawningSystem.GetObject() != nullptr)
