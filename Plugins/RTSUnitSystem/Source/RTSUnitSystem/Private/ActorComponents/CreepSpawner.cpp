@@ -72,7 +72,7 @@ void UCreepSpawner::SpawnCreep()
 			WaypointHolder != nullptr)
 		{
 			// TODO: Use the whole path, and not just the first node
-			Movable->MoveTo(WaypointHolder->GetPath()[0]);
+			Movable->MoveTo(WaypointHolder->GetFirstNode());
 		}
 	}
 	

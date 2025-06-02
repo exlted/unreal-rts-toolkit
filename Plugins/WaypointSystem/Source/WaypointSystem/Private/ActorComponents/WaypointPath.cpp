@@ -57,3 +57,12 @@ TArray<FVector> UWaypointPath::GetPath()
 	return Path;
 }
 
+AActor* UWaypointPath::GetFirstNode()
+{
+	if (FirstNode.IsValid())
+	{
+		return FirstNode.Get();
+	}
+	return nullptr;
+}
+

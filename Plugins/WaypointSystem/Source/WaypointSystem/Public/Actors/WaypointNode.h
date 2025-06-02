@@ -20,6 +20,9 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category = "WaypointNode", EditInstanceOnly)
 	TWeakObjectPtr<AWaypointNode> NextNode;
 	
+	UPROPERTY(EditDefaultsOnly, Category = "WaypointNode")
+	UPrimitiveComponent* CollisionMesh;
+	
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -27,4 +30,8 @@ protected:
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+	
+	UFUNCTION()
+	void OverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
+		int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult);
 };

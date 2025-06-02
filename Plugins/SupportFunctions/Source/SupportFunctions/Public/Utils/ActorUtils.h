@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include "CoreMinimal.h"
+#include "GameFramework/PlayerState.h"
 #include "ComponentUtils.h"
 
 static TWeakObjectPtr<APlayerState> GetPlayerState(const AActor* WorldContext)
@@ -42,7 +43,10 @@ static TScriptInterface<Interface> GetSingletonInterface(AActor* FromActor)
 			UE_LOG(LogTemp, Error, TEXT("Actor had more than 1 of an expected Singleton Component type"));
 			return nullptr;
 		}
-		Result = Components[0];
+		if (Components.Num() == 1)
+		{
+			Result = Components[0];
+		}
 	}
 	
 	

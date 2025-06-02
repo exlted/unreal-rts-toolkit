@@ -32,6 +32,7 @@ public:
 	                           FActorComponentTickFunction* ThisTickFunction) override;
 	
 	virtual void MoveTo(const FVector& NewLocation) override;
+	virtual void MoveTo(AActor* NewTarget) override;
 	
 	UFUNCTION(BlueprintCallable)
 	TArray<FVector> FindPathToLocation(const FVector& Location) const;

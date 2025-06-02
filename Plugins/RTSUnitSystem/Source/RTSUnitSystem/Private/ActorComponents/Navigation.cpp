@@ -77,6 +77,11 @@ void UNavigation::MoveTo(const FVector& NewLocation)
 	UAIBlueprintHelperLibrary::SimpleMoveToLocation(UAIBlueprintHelperLibrary::GetAIController(GetOwner()), NewLocation);
 }
 
+void UNavigation::MoveTo(AActor* NewTarget)
+{
+	UAIBlueprintHelperLibrary::SimpleMoveToActor(UAIBlueprintHelperLibrary::GetAIController(GetOwner()), NewTarget);
+}
+
 TArray<FVector> UNavigation::FindPathToLocation(const FVector& Location) const
 {
 	TArray<FVector> Result;

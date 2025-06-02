@@ -3,24 +3,24 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Actors/WaypointNode.h"
 #include "Components/ActorComponent.h"
-#include "Interfaces/WaypointHolder.h"
-#include "WaypointPath.generated.h"
+#include "Interfaces/Movable.h"
+#include "Interfaces/WaypointFollower.h"
+#include "WaypointNavigator.generated.h"
 
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
-class WAYPOINTSYSTEM_API UWaypointPath : public UActorComponent, public IWaypointHolder
+class RTSUNITSYSTEM_API UWaypointNavigator : public UActorComponent, public IWaypointFollower, public IMovable
 {
 	GENERATED_BODY()
 
 public:
 	// Sets default values for this component's properties
-	UWaypointPath();
-	
-	UPROPERTY(EditInstanceOnly, BlueprintReadOnly, Category = "WaypointNode")
-	TWeakObjectPtr<AWaypointNode> FirstNode;
+	UWaypointNavigator();
 
+	UPROPERTY(EditAnywhere)
+	AActor* CurrentTarget;
+	
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
@@ -29,7 +29,10 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType,
 	                           FActorComponentTickFunction* ThisTickFunction) override;
-
-	virtual TArray<FVector> GetPath() override;
-	virtual AActor* GetFirstNode() override;
+	
+	virtual void MoveTo(const FVector& NewLocation);
+	virtual void MoveTo(AActor* NewTarget);
+	
+	virtual AActor* GetCurrentTarget() override;
+	virtual void SetNewTarget(AActor* NewTarget) override;
 };

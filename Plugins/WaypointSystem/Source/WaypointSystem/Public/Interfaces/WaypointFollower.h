@@ -4,11 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "UObject/Interface.h"
-#include "Movable.generated.h"
+#include "WaypointFollower.generated.h"
 
 // This class does not need to be modified.
 UINTERFACE()
-class RTSUNITSYSTEM_API UMovable : public UInterface
+class WAYPOINTSYSTEM_API UWaypointFollower : public UInterface
 {
 	GENERATED_BODY()
 };
@@ -16,12 +16,12 @@ class RTSUNITSYSTEM_API UMovable : public UInterface
 /**
  * 
  */
-class RTSUNITSYSTEM_API IMovable
+class WAYPOINTSYSTEM_API IWaypointFollower
 {
 	GENERATED_BODY()
 
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
-	virtual void MoveTo(const FVector& NewLocation) = 0;
-	virtual void MoveTo(AActor* NewLocation) = 0;
+	virtual AActor* GetCurrentTarget() = 0;
+	virtual void SetNewTarget(AActor* NewTarget) = 0;
 };

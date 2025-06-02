@@ -37,7 +37,7 @@ public class WaypointSystem : ModuleRules
 				"CoreUObject",
 				"Engine",
 				"Slate",
-				"SlateCore",
+				"SlateCore", "SupportFunctions",
 				// ... add private dependencies that you statically link with here ...	
 			}
 			);
