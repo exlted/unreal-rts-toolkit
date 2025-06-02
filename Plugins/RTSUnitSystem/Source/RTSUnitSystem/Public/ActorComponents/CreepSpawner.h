@@ -8,6 +8,8 @@
 #include "CreepSpawner.generated.h"
 
 
+class ITargetable;
+
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class RTSUNITSYSTEM_API UCreepSpawner : public UActorComponent, public IAutoSpawner
 {
@@ -19,6 +21,10 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	TArray<FWave> Waves;
+
+	UPROPERTY(EditAnywhere)
+	TScriptInterface<ITargetable> Targetable;
+	
 	int CurrentWave = -1;
 	int CreepIndex = INT_MAX;
 

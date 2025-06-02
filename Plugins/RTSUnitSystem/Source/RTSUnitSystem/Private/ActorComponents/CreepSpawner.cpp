@@ -3,6 +3,7 @@
 
 #include "ActorComponents/CreepSpawner.h"
 
+#include "ActorComponents/SpawnLocation.h"
 #include "Blueprint/AIBlueprintHelperLibrary.h"
 #include "GameFramework/GameModeBase.h"
 #include "GameFramework/PlayerState.h"
@@ -10,6 +11,7 @@
 #include "Interfaces/Movable.h"
 #include "Interfaces/Spawnable.h"
 #include "Interfaces/Spawner.h"
+#include "Interfaces/Targetable.h"
 #include "Interfaces/WaypointHolder.h"
 #include "Utils/ActorUtils.h"
 #include "Utils/ComponentUtils.h"
@@ -42,6 +44,11 @@ void UCreepSpawner::BeginPlay()
 			GameController->RegisterSpawner(this);
 		}
 	}
+
+	if (!Targetable)
+	{
+		Targetable = GetRelatedSingletonComponent<ITargetable, UTargetable>(GetOwner());
+ 	}
 }
 
 
@@ -52,17 +59,30 @@ void UCreepSpawner::SpawnCreep()
 	// Spawn the requested creep with the requested stats
 	const auto ToSpawn = Waves[CurrentWave].CreepsToSpawn[CreepIndex];
 	
-	FTransform SpawnTransform = GetOwner()->GetActorTransform();
+	FTransform SpawnTransform;
+	if (const auto SpawnLocation = GetRelatedSingletonTypedComponents<USpawnLocation>(GetOwner());
+		SpawnLocation != nullptr)
+	{
+		SpawnTransform = SpawnLocation->GetComponentTransform();
+	}
+	else
+	{
+		SpawnTransform = GetOwner()->GetActorTransform();
+	}
 	SpawnTransform += ToSpawn.SpawnOffset;
 	
 	const auto Pawn = UAIBlueprintHelperLibrary::SpawnAIFromClass(GetOwner(), ToSpawn.Entity, nullptr,
 		SpawnTransform.GetLocation(), SpawnTransform.GetRotation().Rotator(), true,
 		GetOwner());
 
-	//if (const auto Spawnable = GetRelatedSingletonComponent<ISpawnable, USpawnable>(Pawn); Spawnable != nullptr)
-	//{
-	//	Spawnable->SetSide(Side);
-	//}
+	if (Targetable != nullptr)
+	{
+		if (const auto Spawnable = GetRelatedSingletonComponent<ISpawnable, USpawnable>(Pawn);
+			Spawnable != nullptr)
+		{
+			Spawnable->SetSide(Targetable->GetSide());
+		}
+	}
 	
 	if (const auto Movable = GetRelatedSingletonComponent<IMovable, UMovable>(Pawn);
 		Movable != nullptr)
