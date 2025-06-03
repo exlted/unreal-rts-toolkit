@@ -36,6 +36,9 @@ public:
 	USpringArmComponent* SpringArm;
 	UPROPERTY(EditAnywhere, Category = Camera)
 	UCameraComponent* Camera;
+	
+	UPROPERTY(EditAnywhere, Category = Cursor)
+	float CameraHeightAboveSurface = 50.0;
 
 	// Value from 0 to 1, used to look up from ZoomCurve and PitchCurve
 	UPROPERTY(EditAnywhere, Category = Camera)

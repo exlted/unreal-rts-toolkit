@@ -25,6 +25,7 @@ ARTSPlayerPawn::ARTSPlayerPawn()
 	SpringArm->TargetArmLength = 2500.0f;
 	SpringArm->SetRelativeRotation(FRotator(-85.0f, 0.0, 0.0f));
 	SpringArm->bEnableCameraRotationLag = true;
+	SpringArm->bDoCollisionTest = false;
 	
 	Camera = CreateDefaultSubobject<UCameraComponent>("Camera");
 	Camera->SetupAttachment(SpringArm);
@@ -69,6 +70,21 @@ void ARTSPlayerPawn::Tick(float DeltaTime)
 		{
 			ChangeCursorVisibility(TargetVisibilityState);
 		}
+	}
+
+	// Float above Terrain always
+	const UE::Geometry::TSegment3<double> Segment = {
+		GetActorLocation(),
+		UE::Math::TVector<double> {0, 0, -1},
+		CameraHeightAboveSurface * 10
+	};
+	const FName TraceTag("MyTraceTag");
+	const FCollisionQueryParams RV_TraceParams = FCollisionQueryParams(TraceTag, false, this);
+	
+	if (const auto Hit = DoSingleLineTrace(this, Segment, FName("IgnoreOnlyPawn"), RV_TraceParams);
+		Hit.bBlockingHit)
+	{
+		SetActorLocation(FVector{Segment.Center.X, Segment.Center.Y, Hit.Location.Z + CameraHeightAboveSurface});
 	}
 }
 
@@ -134,7 +150,7 @@ void ARTSPlayerPawn::ChangeCursorMode(const ECursorMode NewCursorMode)
 			}
 		case ECursorMode::Screen:
 			{
-				WorldCursor->SetVisibility(false, false);
+				WorldCursor->SetVisibility(Visible, false);
 				GetLocalViewingPlayerController()->bShowMouseCursor = Visible;
 				CursorMode = ECursorMode::Screen;
 				break;
