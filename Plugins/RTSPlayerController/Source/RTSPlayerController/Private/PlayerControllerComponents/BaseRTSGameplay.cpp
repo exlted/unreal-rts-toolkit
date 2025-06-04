@@ -85,7 +85,7 @@ void UBaseRTSGameplay::TickComponent(float DeltaTime, ELevelTick TickType,
 	{
 		if(const ULocalPlayer* LocPlayer = PlayerController->GetLocalPlayer(); LocPlayer && LocPlayer->ViewportClient )
 		{
-			if (LocPlayer->ViewportClient->Viewport->HasFocus())
+			if (LocPlayer->ViewportClient->Viewport->IsForegroundWindow())
 			{
 				if (FVector MousePosition; PlayerController->GetMousePosition(MousePosition.X, MousePosition.Y))
 				{
