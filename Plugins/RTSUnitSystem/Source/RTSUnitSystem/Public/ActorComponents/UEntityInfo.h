@@ -51,7 +51,6 @@ public:
 	UFUNCTION()
 	virtual void OnRep_SideChanged();
 
-
 	virtual bool IsDamagableBy(EDamageSource Source) override;
 	// returns true when dealt damage kills
 	virtual bool DoDamage(float Amount) override;
