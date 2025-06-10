@@ -150,7 +150,7 @@ void ARTSPlayerPawn::ChangeCursorMode(const ECursorMode NewCursorMode)
 			}
 		case ECursorMode::Screen:
 			{
-				WorldCursor->SetVisibility(Visible, false);
+				WorldCursor->SetVisibility(false, false);
 				GetLocalViewingPlayerController()->bShowMouseCursor = Visible;
 				CursorMode = ECursorMode::Screen;
 				break;
