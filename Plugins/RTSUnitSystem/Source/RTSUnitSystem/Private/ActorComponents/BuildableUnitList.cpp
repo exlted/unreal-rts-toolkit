@@ -78,6 +78,7 @@ void UBuildableUnitList::OnMenuItemClicked_Implementation(const FBuildable& Requ
 {
 	if (const auto PlayerState = GetPlayerState(); PlayerState != nullptr)
 	{
+		//TODO: This needs to be reworked so that it only pays the cost after the player completes the action
 		if (const auto EconomyManager = GetRelatedSingletonTypedComponents<UPlayerEconomyManager>(PlayerState);
 			EconomyManager != nullptr)
 		{
