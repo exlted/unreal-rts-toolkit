@@ -4,15 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
-#include "Interfaces/HasEconomyManager.h"
 #include "Structs/ResourceData.h"
 #include "PlayerEconomyManager.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FResourceUpdatedSignature, FResourceData, UpdatedResource);
 
-
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
-class RTSECONOMYSYSTEM_API UPlayerEconomyManager : public UActorComponent, public IHasEconomyManager
+class RTSECONOMYSYSTEM_API UPlayerEconomyManager : public UActorComponent
 {
 	GENERATED_BODY()
 
@@ -44,6 +42,10 @@ public:
 	void AddToCurrentValue(const FName ResourceName, const int AddedAmount);
 	UFUNCTION(BlueprintCallable)
 	void AddToMaxValue(const FName ResourceName, const int AddedAmount);
+	UFUNCTION(BlueprintCallable)
+	int GetCurrentValue(const FName ResourceName) const;
+	UFUNCTION(BlueprintCallable)
+	int GetMaxValue(const FName ResourceName) const;
 
 	UFUNCTION(BlueprintCallable)
 	void InitializeState();
@@ -51,6 +53,9 @@ public:
 	UFUNCTION()
 	virtual void OnRep_ResourcesChanged(TArray<FResourceData> PreRepValue);
 
-	UFUNCTION(BlueprintCallable)
-	virtual UPlayerEconomyManager* GetEconomyManager() override;
+protected:
+	UFUNCTION(Server, Reliable)
+	void AddToCurrentValue_Internal(const FName ResourceName, const int AddedAmount);
+	UFUNCTION(Server, Reliable)
+	void AddToMaxValue_Internal(const FName ResourceName, const int AddedAmount);
 };

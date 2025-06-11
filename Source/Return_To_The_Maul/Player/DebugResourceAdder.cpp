@@ -4,7 +4,6 @@
 #include "DebugResourceAdder.h"
 
 #include "ActorComponents/PlayerEconomyManager.h"
-#include "Interfaces/HasEconomyManager.h"
 #include "Utils/ComponentUtils.h"
 
 
@@ -21,10 +20,10 @@ UDebugResourceAdder::UDebugResourceAdder()
 
 void UDebugResourceAdder::AddGold()
 {
-	if (const auto EconomyManager = GetRelatedSingletonComponent<IHasEconomyManager, UHasEconomyManager>(GetOwner());
+	if (const auto EconomyManager = GetRelatedSingletonTypedComponents<UPlayerEconomyManager>(GetOwner());
 		EconomyManager != nullptr)
 	{
-		EconomyManager->GetEconomyManager()->AddToCurrentValue(FName("Gold"), 50);
+		EconomyManager->AddToCurrentValue(FName("Gold"), 50);
 	}
 }
 
@@ -36,7 +35,11 @@ void UDebugResourceAdder::BeginPlay()
 	// ...
 	SpawnDelegate.BindUFunction(this, FName("AddGold"));
 
-	GetOwner()->GetWorldTimerManager().SetTimer(SpawnTimer, SpawnDelegate, 1.0, true);
+	// Do this on the Client only
+	if (GetWorld()->GetAuthGameMode() == nullptr)
+	{
+		GetOwner()->GetWorldTimerManager().SetTimer(SpawnTimer, SpawnDelegate, 1.0, true);
+	}
 }
 
 

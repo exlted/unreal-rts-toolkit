@@ -40,6 +40,10 @@
 		{
 			"Name": "WaypointSystem",
 			"Enabled": true
+		},
+		{
+			"Name": "RTSEconomySystem",
+			"Enabled": true
 		}
 	]
 }

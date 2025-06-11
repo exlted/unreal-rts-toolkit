@@ -1,5 +1,5 @@
 ﻿#pragma once
-#include "Interfaces/Builder.h"
+#include "Structs/ResourceCost.h"
 #include "Buildable.generated.h"
 
 USTRUCT(BlueprintType)
@@ -17,5 +17,5 @@ struct FBuildable
 	bool PlayerDefinedLocation;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TScriptInterface<IBuilder> AssociatedBuilder;
+	TArray<FResourceCost> BuildCost;
 };

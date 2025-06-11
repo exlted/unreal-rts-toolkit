@@ -4,11 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "UObject/Interface.h"
+#include "Structs/Buildable.h"
 #include "Builder.generated.h"
 
-struct FBuildable;
 // This class does not need to be modified.
-UINTERFACE(BlueprintType, NotBlueprintable)
+UINTERFACE(Blueprintable)
 class RTSUNITSYSTEM_API UBuilder : public UInterface
 {
 	GENERATED_BODY()
@@ -27,6 +27,11 @@ public:
 	virtual void DisplayUI() = 0;
 	virtual void HideUI() = 0;
 
-	UFUNCTION(BlueprintCallable)
-	virtual void OnMenuItemClicked(UClass* SelectedClass, bool PlayerDefinedLocation) = 0;
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	void OnMenuItemClicked(const FBuildable& RequestedItem);
+
+	virtual void OnMenuItemClicked_Implementation(const FBuildable& RequestedItem)
+	{
+		UE_LOG(LogTemp, Error, TEXT("OnMenuItemClicked Called Without Overriding Function"));
+	}
 };

@@ -46,28 +46,36 @@ void UPlayerEconomyManager::GetLifetimeReplicatedProps(TArray<class FLifetimePro
 
 void UPlayerEconomyManager::AddToCurrentValue(const FName ResourceName, const int AddedAmount)
 {
-	for (auto& Resource : Resources)
-	{
-		if (Resource.Name == ResourceName)
-		{
-			Resource.CurrentValue += AddedAmount;
-			OnResourceUpdated.Broadcast(Resource);
-			break;
-		}
-	}
+	AddToCurrentValue_Internal(ResourceName, AddedAmount);
 }
 
 void UPlayerEconomyManager::AddToMaxValue(const FName ResourceName, const int AddedAmount)
+{
+	AddToMaxValue_Internal(ResourceName, AddedAmount);
+}
+
+int UPlayerEconomyManager::GetCurrentValue(const FName ResourceName) const
 {
 	for (auto& Resource : Resources)
 	{
 		if (Resource.Name == ResourceName)
 		{
-			Resource.MaxValue += AddedAmount;
-			OnResourceUpdated.Broadcast(Resource);
-			break;
+			return Resource.CurrentValue;
 		}
 	}
+	return -1;
+}
+
+int UPlayerEconomyManager::GetMaxValue(const FName ResourceName) const
+{
+	for (auto& Resource : Resources)
+	{
+		if (Resource.Name == ResourceName)
+		{
+			return Resource.MaxValue;
+		}
+	}
+	return -1;
 }
 
 
@@ -116,8 +124,29 @@ void UPlayerEconomyManager::OnRep_ResourcesChanged(TArray<FResourceData> PreRepV
 	}
 }
 
-UPlayerEconomyManager* UPlayerEconomyManager::GetEconomyManager()
+void UPlayerEconomyManager::AddToMaxValue_Internal_Implementation(const FName ResourceName, const int AddedAmount)
 {
-	return this;
+	for (auto& Resource : Resources)
+	{
+		if (Resource.Name == ResourceName)
+		{
+			Resource.MaxValue += AddedAmount;
+			OnResourceUpdated.Broadcast(Resource);
+			break;
+		}
+	}
+}
+
+void UPlayerEconomyManager::AddToCurrentValue_Internal_Implementation(const FName ResourceName, const int AddedAmount)
+{
+	for (auto& Resource : Resources)
+	{
+		if (Resource.Name == ResourceName)
+		{
+			Resource.CurrentValue += AddedAmount;
+			OnResourceUpdated.Broadcast(Resource);
+			break;
+		}
+	}
 }
 

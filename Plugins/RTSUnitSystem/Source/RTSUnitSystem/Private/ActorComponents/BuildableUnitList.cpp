@@ -3,6 +3,7 @@
 
 #include "ActorComponents/BuildableUnitList.h"
 
+#include "ActorComponents/PlayerEconomyManager.h"
 #include "GameFramework/PlayerState.h"
 #include "Interfaces/BuilderUI.h"
 #include "Interfaces/HasUIManager.h"
@@ -24,13 +25,6 @@ UBuildableUnitList::UBuildableUnitList()
 void UBuildableUnitList::BeginPlay()
 {
 	Super::BeginPlay();
-
-	// ...
-	for (auto& BuildableClass : BuildableClasses)
-	{
-		BuildableClass.AssociatedBuilder = this;
-	}
-	
 }
 
 
@@ -58,7 +52,7 @@ void UBuildableUnitList::DisplayUI()
 			const auto BuilderUI = UIManager->GetComponentByInterface<IBuilderUI, UBuilderUI>();
 			if (BuilderUI.GetObject() != nullptr)
 			{
-				IBuilderUI::Execute_AddBuildableItems(BuilderUI.GetObject(), BuildableClasses);
+				IBuilderUI::Execute_AddBuildableItems(BuilderUI.GetObject(), BuildableClasses, this);
 			}
 		}
 	}
@@ -80,23 +74,53 @@ void UBuildableUnitList::HideUI()
 	}
 }
 
-void UBuildableUnitList::OnMenuItemClicked(UClass* SelectedClass, bool PlayerDefinedLocation)
+void UBuildableUnitList::OnMenuItemClicked_Implementation(const FBuildable& RequestedItem)
 {
 	if (const auto PlayerState = GetPlayerState(); PlayerState != nullptr)
 	{
+		if (const auto EconomyManager = GetRelatedSingletonTypedComponents<UPlayerEconomyManager>(PlayerState);
+			EconomyManager != nullptr)
+		{
+			TArray<FResourceCost> AppliedCosts;
+			
+			for (const auto& Cost : RequestedItem.BuildCost)
+			{
+				if (EconomyManager->GetCurrentValue(Cost.Resource) > Cost.Cost)
+				{
+					AppliedCosts.Add(Cost);
+					EconomyManager->AddToCurrentValue(Cost.Resource, Cost.Cost * -1);
+				}
+				else
+				{
+					break;
+				}
+			}
+			
+			if (RequestedItem.BuildCost.Num() > AppliedCosts.Num())
+			{
+				// Failed to apply all costs, revert and return;
+				for (const auto& [Resource, Cost] : AppliedCosts)
+				{
+					EconomyManager->AddToCurrentValue(Resource, Cost);
+				}
+				
+				return;
+			}
+		}
+		
 		if (const auto SpawningSystem = GetRelatedSingletonComponent<ISpawner, USpawner>(PlayerState);
 			SpawningSystem.GetObject() != nullptr)
 		{
 			FTransform SpawnTransform = GetOwner()->GetActorTransform();
 			SpawnTransform.AddToTranslation(GetOwner()->GetActorForwardVector() * 10);
 
-			if (PlayerDefinedLocation)
+			if (RequestedItem.PlayerDefinedLocation)
 			{
-				SpawningSystem->SpawnPlayerDefinedEntity(this, SelectedClass);
+				SpawningSystem->SpawnPlayerDefinedEntity(this, RequestedItem.Class);
 			}
 			else
 			{
-				SpawningSystem->SpawnEntity(this, SelectedClass, SpawnTransform);
+				SpawningSystem->SpawnEntity(this, RequestedItem.Class, SpawnTransform);
 			}
 		}
 	}

@@ -39,7 +39,7 @@ public:
 	virtual void DisplayUI() override;
 	virtual void HideUI() override;
 
-	virtual void OnMenuItemClicked(UClass* SelectedClass, bool PlayerDefinedLocation) override;
+	virtual void OnMenuItemClicked_Implementation(const FBuildable& RequestedItem) override;
 
 private:
 	APlayerState* GetPlayerState() const;
