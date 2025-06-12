@@ -1,21 +1,16 @@
 ﻿#pragma once
-#include "Structs/ResourceCost.h"
+#include "Objects/ResourceCost.h"
+#include "Structs/UnitInfo.h"
 #include "Buildable.generated.h"
 
 USTRUCT(BlueprintType)
 struct FBuildable
 {
 	GENERATED_BODY()
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	UClass* Class;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FName DisplayName;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(RowType=UnitInfo))
+	FDataTableRowHandle UnitInfo;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool PlayerDefinedLocation;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TArray<FResourceCost> BuildCost;
 };

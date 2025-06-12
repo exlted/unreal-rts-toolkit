@@ -58,6 +58,7 @@ void UCreepSpawner::SpawnCreep()
 
 	// Spawn the requested creep with the requested stats
 	const auto ToSpawn = Waves[CurrentWave].CreepsToSpawn[CreepIndex];
+	const auto UnitInfo = ToSpawn.EntityInfo.GetRow<FUnitInfo>("RequestedToBuild");
 	
 	FTransform SpawnTransform;
 	if (const auto SpawnLocation = GetRelatedSingletonTypedComponents<USpawnLocation>(GetOwner());
@@ -71,7 +72,7 @@ void UCreepSpawner::SpawnCreep()
 	}
 	SpawnTransform += ToSpawn.SpawnOffset;
 	
-	const auto Pawn = UAIBlueprintHelperLibrary::SpawnAIFromClass(GetOwner(), ToSpawn.Entity, nullptr,
+	const auto Pawn = UAIBlueprintHelperLibrary::SpawnAIFromClass(GetOwner(), UnitInfo->Class, nullptr,
 		SpawnTransform.GetLocation(), SpawnTransform.GetRotation().Rotator(), true,
 		GetOwner());
 
@@ -81,6 +82,7 @@ void UCreepSpawner::SpawnCreep()
 			Spawnable != nullptr)
 		{
 			Spawnable->SetSide(Targetable->GetSide());
+			Spawnable->SetTableRow(ToSpawn.EntityInfo);
 		}
 	}
 	

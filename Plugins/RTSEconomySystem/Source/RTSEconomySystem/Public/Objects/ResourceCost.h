@@ -8,7 +8,7 @@ struct FResourceCost
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(GetOptions="EconomySettings.GetResourceTypes"))
 	FName Resource;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)

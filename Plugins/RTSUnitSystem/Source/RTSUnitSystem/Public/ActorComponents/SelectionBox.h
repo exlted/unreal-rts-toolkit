@@ -34,6 +34,8 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	TScriptInterface<ITargetable> TargetableComponent;
+
+	FDataTableRowHandle AssociatedRow;
 	
 protected:
 	// Called when the game starts

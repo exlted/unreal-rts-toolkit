@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include "CoreMinimal.h"
+#include "EconomySettings.h"
 #include "ResourceData.generated.h"
 
 USTRUCT(BlueprintType)
@@ -9,7 +10,7 @@ struct FResourceData
 	GENERATED_BODY()
 
 	// In Game Const
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(GetOptions="EconomySettings.GetResourceTypes"))
 	FName Name;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)

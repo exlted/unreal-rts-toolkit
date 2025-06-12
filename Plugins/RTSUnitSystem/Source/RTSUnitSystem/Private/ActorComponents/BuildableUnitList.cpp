@@ -76,6 +76,8 @@ void UBuildableUnitList::HideUI()
 
 void UBuildableUnitList::OnMenuItemClicked_Implementation(const FBuildable& RequestedItem)
 {
+	const auto UnitInfo = RequestedItem.UnitInfo.GetRow<FUnitInfo>("RequestedToBuild");
+	
 	if (const auto PlayerState = GetPlayerState(); PlayerState != nullptr)
 	{
 		//TODO: This needs to be reworked so that it only pays the cost after the player completes the action
@@ -84,7 +86,8 @@ void UBuildableUnitList::OnMenuItemClicked_Implementation(const FBuildable& Requ
 		{
 			TArray<FResourceCost> AppliedCosts;
 			
-			for (const auto& Cost : RequestedItem.BuildCost)
+			
+			for (const auto& Cost : UnitInfo->Cost)
 			{
 				if (EconomyManager->GetCurrentValue(Cost.Resource) > Cost.Cost)
 				{
@@ -97,7 +100,7 @@ void UBuildableUnitList::OnMenuItemClicked_Implementation(const FBuildable& Requ
 				}
 			}
 			
-			if (RequestedItem.BuildCost.Num() > AppliedCosts.Num())
+			if (UnitInfo->Cost.Num() > AppliedCosts.Num())
 			{
 				// Failed to apply all costs, revert and return;
 				for (const auto& [Resource, Cost] : AppliedCosts)
@@ -117,11 +120,11 @@ void UBuildableUnitList::OnMenuItemClicked_Implementation(const FBuildable& Requ
 
 			if (RequestedItem.PlayerDefinedLocation)
 			{
-				SpawningSystem->SpawnPlayerDefinedEntity(this, RequestedItem.Class);
+				SpawningSystem->SpawnPlayerDefinedEntity(this, RequestedItem.UnitInfo);
 			}
 			else
 			{
-				SpawningSystem->SpawnEntity(this, RequestedItem.Class, SpawnTransform);
+				SpawningSystem->SpawnEntity(this, RequestedItem.UnitInfo, SpawnTransform);
 			}
 		}
 	}

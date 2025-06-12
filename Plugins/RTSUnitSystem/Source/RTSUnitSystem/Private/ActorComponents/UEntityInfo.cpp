@@ -43,7 +43,8 @@ std::vector<FName> UEntityInfo::GetTags() const
 
 	Tags.push_back(SideInfo.PlayerTag);
 
-	switch (EntityType)
+	switch (const auto Row = TableRow.GetRow<FUnitInfo>("Getting Associated Row");
+		Row->Type)
 	{
 	case EEntityType::Unit:
 		Tags.push_back("Unit");
@@ -72,11 +73,17 @@ void UEntityInfo::SetSide(const FSide NewSide)
 	SideInfo = NewSide;
 }
 
+void UEntityInfo::SetTableRow(const FDataTableRowHandle NewRowHandle)
+{
+	TableRow = NewRowHandle;
+}
+
 void UEntityInfo::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(UEntityInfo, SideInfo);
+	DOREPLIFETIME(UEntityInfo, TableRow);
 }
 
 void UEntityInfo::OnRep_SideChanged()

@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
-#include "Structs/ResourceData.h"
+#include "Objects/ResourceData.h"
 #include "PlayerEconomyManager.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FResourceUpdatedSignature, FResourceData, UpdatedResource);

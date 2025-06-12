@@ -25,7 +25,7 @@ public class RTSToolkitInterfaces : ModuleRules
 		PublicDependencyModuleNames.AddRange(
 			new string[]
 			{
-				"Core", "AIModule",
+				"Core", "AIModule", "RTSEconomySystem",
 				// ... add other public dependencies that you statically link with here ...
 			}
 			);

@@ -91,12 +91,12 @@ void UPlayerEconomyManager::OnRep_ResourcesChanged(TArray<FResourceData> PreRepV
 {
 	TMap<FName, FResourceData> ResourceMap;
 
-	for (auto& Resource : PreRepValue)
+	for (const auto& Resource : PreRepValue)
 	{
 		ResourceMap.Add(Resource.Name, Resource);
 	}
 
-	for (auto& Resource : Resources)
+	for (const auto& Resource : Resources)
 	{
 		if (const auto UpdatedResource = ResourceMap.Find(Resource.Name);
 			UpdatedResource != nullptr)

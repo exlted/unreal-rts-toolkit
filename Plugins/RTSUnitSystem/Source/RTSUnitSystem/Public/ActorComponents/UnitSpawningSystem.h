@@ -26,11 +26,12 @@ protected:
 	// Needs an FSide
 	FSide Side;
 	AActor* PlayerSpawnedActor;
+	FDataTableRowHandle PlayerSpawnedActorTableRow;
 	 
 public:
 
-	virtual void SpawnEntity(UObject* WorldContext, UClass* SpawnClass, FTransform SpawnTransform) override;
-	virtual void SpawnPlayerDefinedEntity(UObject* WorldContext, UClass* SpawnClass) override;
+	virtual void SpawnEntity(UObject* WorldContext, FDataTableRowHandle EntityInfo, FTransform SpawnTransform) override;
+	virtual void SpawnPlayerDefinedEntity(UObject* WorldContext, FDataTableRowHandle EntityInfo) override;
 	virtual void FinishPlayerDefinedEntity(UObject* WorldContext, bool AddMultiple) override;
 	virtual void CancelPlayerDefinedEntity() override;
 	virtual TWeakObjectPtr<AActor> GetPlayerDefinedEntity() override;
@@ -39,5 +40,5 @@ public:
 
 	// Server Functions
 	UFUNCTION(Server, Reliable)
-	virtual void ServerSpawnEntity(UObject* WorldContext, UClass* SpawnClass, FTransform SpawnTransform);
+	virtual void ServerSpawnEntity(UObject* WorldContext, FDataTableRowHandle EntityInfo, FTransform SpawnTransform);
 };

@@ -5,6 +5,7 @@
 
 #include "ActorComponents/Ghosted.h"
 #include "ActorComponents/TeamColorizer.h"
+#include "ActorComponents/UEntityInfo.h"
 #include "Blueprint/AIBlueprintHelperLibrary.h"
 #include "Utils/ComponentUtils.h"
 #include "Interfaces/Spawnable.h"
@@ -21,16 +22,18 @@ UUnitSpawningSystem::UUnitSpawningSystem()
 	// ...
 }
 
-void UUnitSpawningSystem::SpawnEntity(UObject* WorldContext, UClass* SpawnClass, const FTransform SpawnTransform)
+void UUnitSpawningSystem::SpawnEntity(UObject* WorldContext, const FDataTableRowHandle EntityInfo, const FTransform SpawnTransform)
 {
-	ServerSpawnEntity(WorldContext, SpawnClass, SpawnTransform);
+	ServerSpawnEntity(WorldContext, EntityInfo, SpawnTransform);
 }
-void UUnitSpawningSystem::SpawnPlayerDefinedEntity(UObject* WorldContext, UClass* SpawnClass)
+void UUnitSpawningSystem::SpawnPlayerDefinedEntity(UObject* WorldContext, FDataTableRowHandle EntityInfo)
 {
 	const auto GhostedClass = GhostedSubclass.Get();
 	if (GhostedClass != nullptr)
 	{
-		PlayerSpawnedActor = WorldContext->GetWorld()->SpawnActor(SpawnClass);
+		const auto UnitInfo = EntityInfo.GetRow<FUnitInfo>("");
+		PlayerSpawnedActorTableRow = EntityInfo;
+		PlayerSpawnedActor = WorldContext->GetWorld()->SpawnActor(UnitInfo->Class);
 		if (PlayerSpawnedActor != nullptr)
 		{
 			for (const auto Colorizers = GetRelatedTypedComponents<UTeamColorizer>(PlayerSpawnedActor);
@@ -52,7 +55,7 @@ void UUnitSpawningSystem::FinishPlayerDefinedEntity(UObject* WorldContext, const
 {
 	if (PlayerSpawnedActor != nullptr)
 	{
-		ServerSpawnEntity(WorldContext, PlayerSpawnedActor->GetClass(), PlayerSpawnedActor->GetTransform());
+		ServerSpawnEntity(WorldContext, PlayerSpawnedActorTableRow, PlayerSpawnedActor->GetTransform());
 
 		if (!AddMultiple)
 		{
@@ -81,16 +84,25 @@ void UUnitSpawningSystem::SetSide(FSide NewSide)
 	Side = NewSide;
 }
 
-void UUnitSpawningSystem::ServerSpawnEntity_Implementation(UObject* WorldContext, UClass* SpawnClass,
+void UUnitSpawningSystem::ServerSpawnEntity_Implementation(UObject* WorldContext, FDataTableRowHandle EntityInfo,
 	FTransform SpawnTransform)
 {
-	const auto Pawn = UAIBlueprintHelperLibrary::SpawnAIFromClass(WorldContext, SpawnClass, nullptr,
-		SpawnTransform.GetLocation(), SpawnTransform.GetRotation().Rotator(), true,
-		GetOwner());
-
-	if (const auto Spawnable = GetRelatedSingletonComponent<ISpawnable, USpawnable>(Pawn); Spawnable != nullptr)
+	if (!EntityInfo.IsNull())
 	{
-		Spawnable->SetSide(Side);
+		const auto Entity = EntityInfo.GetRow<FUnitInfo>("");
+	
+		const auto Pawn = UAIBlueprintHelperLibrary::SpawnAIFromClass(WorldContext, Entity->Class, nullptr,
+			SpawnTransform.GetLocation(), SpawnTransform.GetRotation().Rotator(), true,
+			GetOwner());
+
+		if (Pawn != nullptr)
+		{
+			if (const auto Spawnable = GetRelatedSingletonComponent<ISpawnable, USpawnable>(Pawn); Spawnable != nullptr)
+			{
+				Spawnable->SetSide(Side);
+				Spawnable->SetTableRow(EntityInfo);
+			}
+		}
 	}
 }
 

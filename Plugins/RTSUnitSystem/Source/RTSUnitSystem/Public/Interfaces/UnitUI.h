@@ -3,13 +3,12 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Structs/FSide.h"
 #include "UObject/Interface.h"
-#include "Spawnable.generated.h"
+#include "UnitUI.generated.h"
 
 // This class does not need to be modified.
-UINTERFACE()
-class RTSUNITSYSTEM_API USpawnable : public UInterface
+UINTERFACE(Blueprintable, BlueprintType)
+class RTSUNITSYSTEM_API UUnitUI : public UInterface
 {
 	GENERATED_BODY()
 };
@@ -17,13 +16,15 @@ class RTSUNITSYSTEM_API USpawnable : public UInterface
 /**
  * 
  */
-class RTSUNITSYSTEM_API ISpawnable
+class RTSUNITSYSTEM_API  IUnitUI
 {
 	GENERATED_BODY()
 
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	void AddUnit(FDataTableRowHandle UnitInfo);
 
-	virtual void SetSide(const FSide NewSide) = 0;
-	virtual void SetTableRow(const FDataTableRowHandle) = 0;
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	void RemoveUnit(FDataTableRowHandle UnitInfo);
 };

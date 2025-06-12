@@ -17,9 +17,10 @@ struct FFactionInfo
 	{
 		for (const auto [Entity, SpawnOffset, Stats] : InitialEntities)
 		{
+			const auto UnitInfo = Entity.GetRow<FUnitInfo>("RequestedToBuild");
 			const FTransform SpawnTransform = SpawnLocation + SpawnOffset;
-			//World.SpawnActor(Entity, &SpawnTransform);
-			UAIBlueprintHelperLibrary::SpawnAIFromClass(WorldContext, Entity, nullptr,
+			
+			UAIBlueprintHelperLibrary::SpawnAIFromClass(WorldContext, UnitInfo->Class, nullptr,
 				SpawnTransform.GetLocation(), SpawnTransform.GetRotation().Rotator(), true,
 				SpawnOwner);
 		}

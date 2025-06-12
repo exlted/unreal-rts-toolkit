@@ -3,8 +3,11 @@
 
 #include "ActorComponents/SelectionBox.h"
 
+#include "ActorComponents/UEntityInfo.h"
 #include "GameFramework/PlayerState.h"
 #include "Interfaces/HasSide.h"
+#include "Interfaces/UnitUI.h"
+#include "Utils/ActorUtils.h"
 #include "Utils/ComponentUtils.h"
 
 
@@ -35,6 +38,12 @@ void USelectionBox::BeginPlay()
 	if (TargetableComponent != nullptr)
 	{
 		TargetableComponent->RegisterSideUpdates(this, &USelectionBox::OnSideChanged);
+	}
+
+	if (const auto EntityInfo = GetRelatedSingletonTypedComponents<UEntityInfo>(GetOwner());
+		EntityInfo != nullptr)
+	{
+		AssociatedRow = EntityInfo->TableRow;
 	}
 }
 
@@ -112,11 +121,31 @@ void USelectionBox::SetUnitRelation(const EUnitRelationType Relation)
 void USelectionBox::OnSelect()
 {
 	SetVisibility(true);
+
+	if (const auto State = GetPlayerState(GetOwner()).Pin();
+		State != nullptr)
+	{
+		if (const auto UnitUI = GetRelatedSingletonComponent<IUnitUI, UUnitUI>(State.Get());
+			UnitUI.GetObject() != nullptr)
+		{
+			IUnitUI::Execute_AddUnit(UnitUI.GetObject(), AssociatedRow);
+		}
+	}
 }
 
 void USelectionBox::OnDeselect()
 {
 	SetVisibility(false);
+	
+	if (const auto State = GetPlayerState(GetOwner()).Pin();
+		State != nullptr)
+	{
+		if (const auto UnitUI = GetRelatedSingletonComponent<IUnitUI, UUnitUI>(State.Get());
+			UnitUI.GetObject() != nullptr)
+		{
+			IUnitUI::Execute_RemoveUnit(UnitUI.GetObject(), AssociatedRow);
+		}
+	}
 }
 
 bool USelectionBox::HasTag(const FName TagName)

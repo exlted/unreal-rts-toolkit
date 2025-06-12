@@ -8,6 +8,5 @@ struct FUnitStats
 {
 	GENERATED_BODY()
 
-
 	
 };

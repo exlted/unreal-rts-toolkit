@@ -19,11 +19,11 @@ public:
 
 	UEntityInfo();
 	
-	UPROPERTY(Replicated, EditAnywhere, BlueprintReadOnly, Category=UnitInfo, meta=(AllowPrivateAccess = "true"), ReplicatedUsing = OnRep_SideChanged)
+	UPROPERTY(Replicated, BlueprintReadOnly, Category=UnitInfo, ReplicatedUsing = OnRep_SideChanged)
 	FSide SideInfo;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=UnitInfo, meta=(AllowPrivateAccess = "true"))
-	EEntityType EntityType;
+
+	UPROPERTY(Replicated, BlueprintReadOnly, Category=UnitInfo)
+	FDataTableRowHandle TableRow;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=UnitInfo, meta=(AllowPrivateAccess = "true"))
 	FSideChanged OnSideChanged;
@@ -45,6 +45,7 @@ public:
 	std::vector<FName> GetTags() const;
 	virtual FSide GetSide() override;
 	virtual void SetSide(FSide NewSide) override;
+	virtual void SetTableRow(const FDataTableRowHandle) override;
 
 	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
 	

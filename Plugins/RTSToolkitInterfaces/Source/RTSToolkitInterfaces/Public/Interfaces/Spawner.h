@@ -22,8 +22,8 @@ class RTSTOOLKITINTERFACES_API ISpawner
 
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
-	virtual void SpawnEntity(UObject* WorldContext, UClass* SpawnClass, FTransform SpawnTransform) = 0;
-	virtual void SpawnPlayerDefinedEntity(UObject* WorldContext, UClass* SpawnClass) = 0;
+	virtual void SpawnEntity(UObject* WorldContext, FDataTableRowHandle EntityInfo, FTransform SpawnTransform) = 0;
+	virtual void SpawnPlayerDefinedEntity(UObject* WorldContext, FDataTableRowHandle EntityInfo) = 0;
 	virtual void FinishPlayerDefinedEntity(UObject* WorldContext, bool AddMultiple) = 0;
 	virtual void CancelPlayerDefinedEntity() = 0;
 	virtual TWeakObjectPtr<AActor> GetPlayerDefinedEntity() = 0;
