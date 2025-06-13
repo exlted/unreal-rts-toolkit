@@ -4,6 +4,7 @@
 #include "ActorComponents/UEntityInfo.h"
 
 #include "Net/UnrealNetwork.h"
+#include "Structs/UnitInfo.h"
 
 UEntityInfo::UEntityInfo()
 {
@@ -76,6 +77,18 @@ void UEntityInfo::SetSide(const FSide NewSide)
 void UEntityInfo::SetTableRow(const FDataTableRowHandle NewRowHandle)
 {
 	TableRow = NewRowHandle;
+	const auto Row = TableRow.GetRow<FUnitInfo>("Getting Associated Row");
+	if (const auto NewMaxHealth = Row->Stats.Find(HealthStat);
+		NewMaxHealth != nullptr)
+	{
+		const float HealthDelta = MaxHealth - Health;
+		MaxHealth = *NewMaxHealth;
+		Health = MaxHealth - HealthDelta;
+		if (Health <= 0)
+		{
+			// I dunno... Should they die here? This really should only happen during initialization of a Unit
+		}
+	}
 }
 
 void UEntityInfo::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
@@ -84,6 +97,8 @@ void UEntityInfo::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& Ou
 
 	DOREPLIFETIME(UEntityInfo, SideInfo);
 	DOREPLIFETIME(UEntityInfo, TableRow);
+	DOREPLIFETIME(UEntityInfo, Health);
+	DOREPLIFETIME(UEntityInfo, MaxHealth);
 }
 
 void UEntityInfo::OnRep_SideChanged()

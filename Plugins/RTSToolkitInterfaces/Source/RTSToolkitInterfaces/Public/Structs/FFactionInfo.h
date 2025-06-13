@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "FSpawnInfo.h"
+#include "UnitInfo.h"
 #include "Blueprint/AIBlueprintHelperLibrary.h"
 #include "FFactionInfo.generated.h"
 
@@ -15,7 +16,7 @@ struct FFactionInfo
 	
 	void SpawnInitialEntities(UObject* WorldContext, const FTransform& SpawnLocation, AActor* SpawnOwner)
 	{
-		for (const auto [Entity, SpawnOffset, Stats] : InitialEntities)
+		for (const auto [Entity, SpawnOffset] : InitialEntities)
 		{
 			const auto UnitInfo = Entity.GetRow<FUnitInfo>("RequestedToBuild");
 			const FTransform SpawnTransform = SpawnLocation + SpawnOffset;

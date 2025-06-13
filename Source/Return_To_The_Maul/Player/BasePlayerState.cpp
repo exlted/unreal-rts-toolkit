@@ -47,7 +47,7 @@ void ABasePlayerState::SetColor(const FColor Color)
 
 void ABasePlayerState::SpawnEntities(const FTransform& SpawnLocation)
 {
-	for (const auto [Entity, SpawnOffset, Stats] : Side.Faction.InitialEntities)
+	for (const auto [Entity, SpawnOffset] : Side.Faction.InitialEntities)
 	{
 		UnitSpawningSystem->SpawnEntity(this, Entity, SpawnLocation + SpawnOffset);
 	}

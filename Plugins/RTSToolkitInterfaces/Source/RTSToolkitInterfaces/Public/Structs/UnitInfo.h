@@ -2,7 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "Enums/EEntityType.h"
-#include "Objects/ResourceCost.h"
+#include "Structs/ResourceCost.h"
 #include "UnitInfo.generated.h"
 
 USTRUCT(BlueprintType)
@@ -24,4 +24,7 @@ struct FUnitInfo : public FTableRowBase
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TArray<FResourceCost> Cost;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(GetKeyOptions="StatSettings.GetStatTypes"))
+	TMap<FName, float> Stats;
 };

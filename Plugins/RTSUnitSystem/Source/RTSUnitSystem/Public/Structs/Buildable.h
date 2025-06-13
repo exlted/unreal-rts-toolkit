@@ -1,6 +1,4 @@
 ﻿#pragma once
-#include "Objects/ResourceCost.h"
-#include "Structs/UnitInfo.h"
 #include "Buildable.generated.h"
 
 USTRUCT(BlueprintType)
