@@ -4,11 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "Components/WidgetComponent.h"
+#include "Interfaces/HealthBarUI.h"
 #include "HealthBar.generated.h"
 
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
-class RTSUNITSYSTEM_API UHealthBar : public UActorComponent
+class RTSUNITSYSTEM_API UHealthBar : public UWidgetComponent
 {
 	GENERATED_BODY()
 
@@ -16,6 +18,8 @@ public:
 	// Sets default values for this component's properties
 	UHealthBar();
 
+	TScriptInterface<IHealthBarUI> HealthBar;
+	
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;

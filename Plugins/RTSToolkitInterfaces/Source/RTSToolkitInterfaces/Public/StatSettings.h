@@ -8,7 +8,7 @@
 /**
  * 
  */
-UCLASS(Config=Game, DefaultConfig, meta = (DisplayName="Stat Settings"))
+UCLASS(Config=Game, DefaultConfig, meta = (DisplayName="Stat Settings"), BlueprintType)
 class RTSTOOLKITINTERFACES_API UStatSettings final : public UDeveloperSettings
 {
 	GENERATED_BODY()
@@ -16,14 +16,33 @@ class RTSTOOLKITINTERFACES_API UStatSettings final : public UDeveloperSettings
 public:
 	UStatSettings() {}
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stat Types")
-	TArray<FString> StatTypes = {"Health", "Move Speed", "Defense"};
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Stat Types")
+	TArray<FString> StatTypes = {"Health", "CurrentHealth", "Move Speed", "Defense"};
 
-	UFUNCTION()
+	UPROPERTY(Config, EditAnywhere, BlueprintReadOnly, Category = "Stat Names", meta=(GetOptions="GetStatTypes"))
+	FString HealthStat;
+	
+	UPROPERTY(Config, EditAnywhere, BlueprintReadOnly, Category = "Stat Names", meta=(GetOptions="GetStatTypes"))
+	FString CurrentHealthStat;
+	
+	UFUNCTION(BlueprintCallable)
 	static TArray<FString> GetStatTypes()
 	{
 		const auto StatSettings = GetDefault<UStatSettings>();
-		
 		return StatSettings->StatTypes;
+	}
+
+	UFUNCTION(BlueprintCallable)
+	static FName GetHealthStat()
+	{
+		const auto StatSettings = GetDefault<UStatSettings>();
+		return FName(StatSettings->HealthStat);
+	}
+
+	UFUNCTION(BlueprintCallable)
+	static FName GetCurrentHealthStat()
+	{
+		const auto StatSettings = GetDefault<UStatSettings>();
+		return FName(StatSettings->CurrentHealthStat);
 	}
 };

@@ -122,13 +122,17 @@ void USelectionBox::OnSelect()
 {
 	SetVisibility(true);
 
-	if (const auto State = GetPlayerState(GetOwner()).Pin();
-		State != nullptr)
+	if (auto StatUpdater = GetRelatedSingletonComponent<IStatUpdater, UStatUpdater>(GetOwner());
+		StatUpdater != nullptr)
 	{
-		if (const auto UnitUI = GetRelatedSingletonComponent<IUnitUI, UUnitUI>(State.Get());
-			UnitUI.GetObject() != nullptr)
+		if (const auto State = GetPlayerState(GetOwner()).Pin();
+			State != nullptr)
 		{
-			IUnitUI::Execute_AddUnit(UnitUI.GetObject(), AssociatedRow);
+			if (const auto UnitUI = GetRelatedSingletonComponent<IUnitUI, UUnitUI>(State.Get());
+				UnitUI.GetObject() != nullptr)
+			{
+				IUnitUI::Execute_AddUnit(UnitUI.GetObject(), AssociatedRow, StatUpdater);
+			}
 		}
 	}
 }
@@ -137,13 +141,18 @@ void USelectionBox::OnDeselect()
 {
 	SetVisibility(false);
 	
-	if (const auto State = GetPlayerState(GetOwner()).Pin();
-		State != nullptr)
+
+	if (auto StatUpdater = GetRelatedSingletonComponent<IStatUpdater, UStatUpdater>(GetOwner());
+		StatUpdater != nullptr)
 	{
-		if (const auto UnitUI = GetRelatedSingletonComponent<IUnitUI, UUnitUI>(State.Get());
-			UnitUI.GetObject() != nullptr)
+		if (const auto State = GetPlayerState(GetOwner()).Pin();
+			State != nullptr)
 		{
-			IUnitUI::Execute_RemoveUnit(UnitUI.GetObject(), AssociatedRow);
+			if (const auto UnitUI = GetRelatedSingletonComponent<IUnitUI, UUnitUI>(State.Get());
+				UnitUI.GetObject() != nullptr)
+			{
+				IUnitUI::Execute_RemoveUnit(UnitUI.GetObject(), AssociatedRow, StatUpdater);
+			}
 		}
 	}
 }

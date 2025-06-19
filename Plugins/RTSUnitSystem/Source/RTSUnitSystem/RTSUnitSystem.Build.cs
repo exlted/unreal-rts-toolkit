@@ -25,7 +25,7 @@ public class RTSUnitSystem : ModuleRules
 		PublicDependencyModuleNames.AddRange(
 			new string[]
 			{
-				"Core", "AIModule", "SupportFunctions", "RTSToolkitInterfaces", "WaypointSystem", "RTSEconomySystem",
+				"Core", "AIModule", "SupportFunctions", "RTSToolkitInterfaces", "WaypointSystem", "RTSEconomySystem", "UMG"
 				// ... add other public dependencies that you statically link with here ...
 			}
 			);

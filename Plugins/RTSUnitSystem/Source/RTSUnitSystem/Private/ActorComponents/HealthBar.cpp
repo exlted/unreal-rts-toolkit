@@ -3,6 +3,11 @@
 
 #include "ActorComponents/HealthBar.h"
 
+#include "StatSettings.h"
+#include "Interfaces/HealthBarUI.h"
+#include "Interfaces/StatUpdater.h"
+#include "Utils/ComponentUtils.h"
+
 
 // Sets default values for this component's properties
 UHealthBar::UHealthBar()
@@ -20,8 +25,21 @@ void UHealthBar::BeginPlay()
 {
 	Super::BeginPlay();
 
+	SetCastShadow(false);
 	// ...
-	
+	if (!GetWidget()->Implements<UHealthBarUI>())
+	{
+		UE_LOG(LogTemp, Error, TEXT("Health Bar Widget is not a UHealthBarUI"));
+	}
+	else
+	{
+		HealthBar = GetWidget();
+		if (const auto StatUpdater = GetRelatedSingletonComponent<IStatUpdater, UStatUpdater>(GetOwner());
+			StatUpdater != nullptr)
+		{
+			HealthBar->Execute_RegisterStatUpdater(GetWidget(), StatUpdater);
+		}
+	}
 }
 
 
@@ -31,5 +49,6 @@ void UHealthBar::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
 	// ...
+	
 }
 

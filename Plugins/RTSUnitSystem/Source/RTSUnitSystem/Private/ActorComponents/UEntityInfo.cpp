@@ -3,6 +3,7 @@
 
 #include "ActorComponents/UEntityInfo.h"
 
+#include "StatSettings.h"
 #include "Net/UnrealNetwork.h"
 #include "Structs/UnitInfo.h"
 
@@ -78,12 +79,14 @@ void UEntityInfo::SetTableRow(const FDataTableRowHandle NewRowHandle)
 {
 	TableRow = NewRowHandle;
 	const auto Row = TableRow.GetRow<FUnitInfo>("Getting Associated Row");
-	if (const auto NewMaxHealth = Row->Stats.Find(HealthStat);
+	if (const auto NewMaxHealth = Row->Stats.Find(UStatSettings::GetHealthStat());
 		NewMaxHealth != nullptr)
 	{
 		const float HealthDelta = MaxHealth - Health;
 		MaxHealth = *NewMaxHealth;
+		OnStatUpdated.Broadcast(UStatSettings::GetHealthStat(), MaxHealth);
 		Health = MaxHealth - HealthDelta;
+		OnStatUpdated.Broadcast(UStatSettings::GetCurrentHealthStat(), Health);
 		if (Health <= 0)
 		{
 			// I dunno... Should they die here? This really should only happen during initialization of a Unit
@@ -106,6 +109,16 @@ void UEntityInfo::OnRep_SideChanged()
 	OnSideChanged.Broadcast(SideInfo);
 }
 
+void UEntityInfo::OnRep_HealthChanged()
+{
+	OnStatUpdated.Broadcast(UStatSettings::GetCurrentHealthStat(), Health);
+}
+
+void UEntityInfo::OnRep_MaxHealthChanged()
+{
+	OnStatUpdated.Broadcast(UStatSettings::GetHealthStat(), MaxHealth);
+}
+
 bool UEntityInfo::IsDamagableBy(const EDamageSource Source)
 {
 	if (Source == EDamageSource::Count)
@@ -126,12 +139,30 @@ bool UEntityInfo::DoDamage(const float Amount)
 {
 	Health -= Amount;
 
+	OnStatUpdated.Broadcast(UStatSettings::GetCurrentHealthStat(), Health);
+	
 	if (Health <= 0)
 	{
 		GetOwner()->Destroy();
 		return true;
 	}
 	return false;
+}
+
+void UEntityInfo::RegisterStatUpdatedCallback_Implementation(const FStatUpdatedParameter& CallbackFunc)
+{
+	OnStatUpdated.Add(CallbackFunc);
+}
+
+void UEntityInfo::DeregisterStatUpdatedCallback_Implementation(const FStatUpdatedParameter& CallbackFunc)
+{
+	OnStatUpdated.Remove(CallbackFunc);
+}
+
+void UEntityInfo::InitializeCurrentState_Implementation(const FStatUpdatedParameter& CallbackFunc)
+{
+	CallbackFunc.Execute(UStatSettings::GetCurrentHealthStat(), Health);
+	CallbackFunc.Execute(UStatSettings::GetHealthStat(), MaxHealth);
 }
 
 FSideChanged& UEntityInfo::GetEventDelegate()
