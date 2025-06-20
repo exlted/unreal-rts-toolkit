@@ -47,7 +47,7 @@ void ULifeLoser::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 void ULifeLoser::OverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	OtherActor->Destroy();
+	OtherActor->Destroy(true);
 	if (const auto GameState = GetWorld()->GetGameState();
 		GameState != nullptr && GameState->Implements<ULivesHandler>())
 	{
