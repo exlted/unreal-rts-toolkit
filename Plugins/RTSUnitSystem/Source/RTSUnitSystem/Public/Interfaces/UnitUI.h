@@ -25,7 +25,13 @@ class RTSUNITSYSTEM_API  IUnitUI
 public:
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
 	void AddUnit(FDataTableRowHandle UnitInfo, const TScriptInterface<IStatUpdater>& StatCallback);
+	
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	void AddUnitNoStats(FDataTableRowHandle UnitInfo);
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
 	void RemoveUnit(FDataTableRowHandle UnitInfo, const TScriptInterface<IStatUpdater>& StatCallback);
+	
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	void ClearUnits();
 };

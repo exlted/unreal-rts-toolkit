@@ -25,7 +25,7 @@ public class RTSGamemode : ModuleRules
 		PublicDependencyModuleNames.AddRange(
 			new string[]
 			{
-				"Core",
+				"Core", "RTSToolkitInterfaces", "RTSToolkitInterfaces",
 				// ... add other public dependencies that you statically link with here ...
 			}
 			);

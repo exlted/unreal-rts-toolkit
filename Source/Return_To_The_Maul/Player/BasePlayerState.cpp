@@ -65,5 +65,9 @@ TWeakObjectPtr<UUIManager> ABasePlayerState::GetUIManager()
 
 void ABasePlayerState::StartNextWave_Implementation()
 {
-	GetWorld()->GetAuthGameMode<ARTSGameModeBase>()->StartNextWave();
+	if (const auto GameController = GetRelatedSingletonComponent<IGameController, UGameController>(GetWorld()->GetAuthGameMode());
+		GameController != nullptr)
+	{
+		GameController->StartNextWave();
+	}
 }

@@ -60,23 +60,3 @@ FString ARTSGameModeBase::InitNewPlayer(APlayerController* NewPlayerController, 
 	
 	return ErrorMessage;
 }
-
-void ARTSGameModeBase::StartNextWave()
-{
-	for (const auto& Spawner : Spawners)
-	{
-		if (Spawner->HasAnotherWave())
-		{
-			Spawner->SpawnNextWave();
-		}
-		else
-		{
-			// End Game
-		}
-	}
-}
-
-void ARTSGameModeBase::RegisterSpawner(const TScriptInterface<IAutoSpawner> NewSpawner)
-{
-	Spawners.Add(NewSpawner);
-}

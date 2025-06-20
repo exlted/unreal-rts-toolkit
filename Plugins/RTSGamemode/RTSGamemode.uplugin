@@ -24,6 +24,10 @@
 		{
 			"Name": "SupportFunctions",
 			"Enabled": true
+		},
+		{
+			"Name": "RTSToolkitInterfaces",
+			"Enabled": true
 		}
 	]
 }

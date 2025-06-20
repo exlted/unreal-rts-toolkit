@@ -6,14 +6,12 @@
 #include "ActorComponents/SpawnLocation.h"
 #include "Blueprint/AIBlueprintHelperLibrary.h"
 #include "GameFramework/GameModeBase.h"
-#include "GameFramework/PlayerState.h"
+#include "GameFramework/GameStateBase.h"
 #include "Interfaces/GameController.h"
 #include "Interfaces/Movable.h"
 #include "Interfaces/Spawnable.h"
-#include "Interfaces/Spawner.h"
 #include "Interfaces/Targetable.h"
 #include "Interfaces/WaypointHolder.h"
-#include "Utils/ActorUtils.h"
 #include "Utils/ComponentUtils.h"
 
 
@@ -38,9 +36,9 @@ void UCreepSpawner::BeginPlay()
 	if (const auto GameMode = GetWorld()->GetAuthGameMode();
 		GameMode != nullptr)
 	{
-		if (GameMode->Implements<UGameController>())
+		if (GameMode->GameState->Implements<UGameController>())
 		{
-			const auto GameController = TScriptInterface<IGameController>(GameMode);
+			const auto GameController = TScriptInterface<IGameController>(GameMode->GameState);
 			GameController->RegisterSpawner(this);
 		}
 	}

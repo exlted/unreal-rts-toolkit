@@ -12,15 +12,12 @@
  * 
  */
 UCLASS()
-class RETURN_TO_THE_MAUL_API ARTSGameModeBase : public AGameModeBase, public IGameController
+class RETURN_TO_THE_MAUL_API ARTSGameModeBase : public AGameModeBase
 {
 	GENERATED_BODY()
 
 public:
 	virtual FString InitNewPlayer(APlayerController* NewPlayerController, const FUniqueNetIdRepl& UniqueId, const FString& Options, const FString& Portal = L"") override;
-
-	virtual void StartNextWave() override;
-	virtual void RegisterSpawner(TScriptInterface<IAutoSpawner> NewSpawner) override;
 
 	
 	UPROPERTY(EditAnywhere)
@@ -37,7 +34,4 @@ public:
 			FColor(255, 255, 255, 255),
 			FColor(0, 0, 0, 255),
 		};
-
-	UPROPERTY(EditAnywhere)
-	TArray<TScriptInterface<IAutoSpawner>> Spawners;
 };
