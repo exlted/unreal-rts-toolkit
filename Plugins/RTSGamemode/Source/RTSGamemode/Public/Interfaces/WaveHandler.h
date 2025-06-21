@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "WaveVoteHandler.h"
 #include "UObject/Interface.h"
 #include "WaveHandler.generated.h"
 
@@ -25,15 +26,6 @@ class RTSGAMEMODE_API IWaveHandler
 
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
-
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
-	void VoteStartNextWave();
-	virtual void VoteStartNextWave_Implementation() = 0;
-
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
-	void RevokeVoteStartNextWave();
-	virtual void RevokeVoteStartNextWave_Implementation() = 0;
-
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
 	void RegisterWaveDataCallback(const FNextWaveParameter& Callback);
 	virtual void RegisterWaveDataCallback_Implementation(const FNextWaveParameter& Callback) = 0;

@@ -2,6 +2,8 @@
 
 
 #include "BasePlayerState.h"
+
+#include "GameFramework/GameStateBase.h"
 #include "Net/UnrealNetwork.h"
 #include "Return_To_The_Maul/GameMode/RTSGameModeBase.h"
 
@@ -61,6 +63,32 @@ FSide ABasePlayerState::GetSide()
 TWeakObjectPtr<UUIManager> ABasePlayerState::GetUIManager()
 {
 	return UIManager;
+}
+
+void ABasePlayerState::VoteStartNextWave_Implementation()
+{
+	VoteNextWave(false);
+}
+
+void ABasePlayerState::RevokeVoteStartNextWave_Implementation()
+{
+	VoteNextWave(true);
+}
+
+void ABasePlayerState::VoteNextWave_Implementation(bool Revoke)
+{
+	if (const auto GameState = GetWorld()->GetGameState();
+		GameState != nullptr && GameState->Implements<UWaveVoteHandler>())
+	{
+		if (!Revoke)
+		{
+			IWaveVoteHandler::Execute_VoteStartNextWave(GameState);
+		}
+		else
+		{
+			IWaveVoteHandler::Execute_RevokeVoteStartNextWave(GameState);
+		}
+	}
 }
 
 void ABasePlayerState::StartNextWave_Implementation()

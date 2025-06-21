@@ -15,7 +15,8 @@
  * 
  */
 UCLASS()
-class RTSGAMEMODE_API ABaseRTSGameState : public AGameStateBase, public ILivesStateUpdater, public ILivesHandler, public IWaveHandler, public IGameController
+class RTSGAMEMODE_API ABaseRTSGameState : public AGameStateBase, public ILivesStateUpdater, public ILivesHandler
+	, public IWaveHandler, public IGameController, public IWaveVoteHandler
 {
 	GENERATED_BODY()
 public:

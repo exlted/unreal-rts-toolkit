@@ -8,6 +8,7 @@
 #include "GameFramework/PlayerState.h"
 #include "Interfaces/HasSide.h"
 #include "Interfaces/HasUIManager.h"
+#include "Interfaces/WaveVoteHandler.h"
 #include "Structs/FSide.h"
 #include "BasePlayerState.generated.h"
 
@@ -16,7 +17,7 @@
  */
 UCLASS()
 class RETURN_TO_THE_MAUL_API ABasePlayerState : public APlayerState, public IHasSide
-	, public IHasUIManager
+	, public IHasUIManager, public IWaveVoteHandler
 {
 	GENERATED_BODY()
 
@@ -50,4 +51,10 @@ public:
 
 	UFUNCTION(Server, Reliable)
 	void StartNextWave();
+	
+	virtual void VoteStartNextWave_Implementation() override;
+	virtual void RevokeVoteStartNextWave_Implementation() override;
+
+	UFUNCTION(Server, Reliable)
+	void VoteNextWave(bool Revoke);
 };
