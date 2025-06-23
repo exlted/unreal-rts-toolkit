@@ -51,8 +51,4 @@ void UDebugPlayerController::BeginPlay()
 
 void UDebugPlayerController::OnDebugTriggered(const FInputActionInstance& Instance)
 {
-	if (const auto State = PlayerController->GetPlayerState<ABasePlayerState>(); State != nullptr)
-	{
-		State->StartNextWave();
-	}
 }
