@@ -27,7 +27,9 @@ public class SimpleMenuSystem : ModuleRules
 			{
 				"Core",
 				"DeveloperSettings",
-				"InputCore"
+				"InputCore", 
+				"UMG",
+				"EnhancedInput"
 				// ... add other public dependencies that you statically link with here ...
 			}
 			);
